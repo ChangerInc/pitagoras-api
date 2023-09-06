@@ -1,5 +1,7 @@
 package com.changer.projeto.api;
 
+import com.changer.projeto.api.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +13,8 @@ import java.util.List;
 public class UsuarioController {
 
     List<Usuario> usuarios = new ArrayList<>();
+    @Autowired
+    UsuarioRepository usuarioRepository;
 
     public UsuarioController() {
     }
@@ -18,6 +22,7 @@ public class UsuarioController {
     @GetMapping({"/"})
     public ResponseEntity <List<Usuario>> getUsuarios() {
         if (usuarios.isEmpty()) {
+//            usuarioRepository.
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(usuarios);
