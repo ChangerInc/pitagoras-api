@@ -1,5 +1,6 @@
-package com.changer.projeto.api;
+package com.changer.projeto.api.controller;
 
+import com.changer.projeto.api.Usuario;
 import com.changer.projeto.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

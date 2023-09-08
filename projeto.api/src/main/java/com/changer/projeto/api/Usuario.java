@@ -4,11 +4,20 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+//import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Entity(name = "Usuario")
+@AllArgsConstructor
+@NoArgsConstructor
+//@Data
+@Getter
+@Setter
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -17,27 +26,7 @@ public class Usuario {
     private String email;
     private String senha;
 
-    public Usuario() {}
-
-    public Usuario(String nome, String email, String senha) {
-        this.nome = nome;
-        this.email = email;
-        this.senha = senha;
-    }
-
     public void atualizarSenha(String novaSenha) {
         this.senha = novaSenha;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getSenha() {
-        return senha;
     }
 }
