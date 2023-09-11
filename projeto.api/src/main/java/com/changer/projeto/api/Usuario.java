@@ -15,7 +15,6 @@ import java.util.UUID;
 @Entity(name = "Usuario")
 @AllArgsConstructor
 @NoArgsConstructor
-//@Data
 @Getter
 @Setter
 public class Usuario {
