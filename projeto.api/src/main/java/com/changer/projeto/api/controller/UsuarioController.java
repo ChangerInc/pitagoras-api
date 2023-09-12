@@ -1,8 +1,8 @@
 package com.changer.projeto.api.controller;
 
 import com.changer.projeto.api.Usuario;
-import com.changer.projeto.api.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+//import com.changer.projeto.api.repository.UsuarioRepository;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +14,8 @@ import java.util.List;
 public class UsuarioController {
 
     List<Usuario> usuarios = new ArrayList<>();
-    @Autowired
-    UsuarioRepository usuarioRepository;
+//    @Autowired
+//    UsuarioRepository usuarioRepository;
 
     public UsuarioController() {
     }
