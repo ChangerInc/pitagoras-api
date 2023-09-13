@@ -8,6 +8,8 @@ package com.changer.projeto.api;
 //import lombok.Getter;
 //import lombok.NoArgsConstructor;
 
+import com.changer.projeto.api.util.Criptograma;
+
 import java.util.UUID;
 
 //@Entity(name = "Usuario")
@@ -30,7 +32,7 @@ public class Usuario {
         this.id = UUID.randomUUID();
         this.nome = nome;
         this.email = email;
-        this.senha = senha;
+        this.senha = new Criptograma().encrypt(senha);
     }
 
     public UUID getId() {

@@ -6,7 +6,7 @@ import java.security.NoSuchAlgorithmException;
 public class Criptograma {
 
     // Método para calcular o hash SHA-256 de uma string
-    public static String encrypt(String input) {
+    public String encrypt(String input) {
         try {
             // Obtém uma instância do MessageDigest com o algoritmo SHA-256
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -33,22 +33,22 @@ public class Criptograma {
     }
 
     // Para teste:
-    public static void main(String[] args) {
-        String input = "ueummmmmmm";
-        String outraInput = "2548964896896";
-        String encrypted = encrypt(input);
-        String encrypted2 = encrypt(outraInput);
-        System.out.println("Texto Original: " + input);
-        System.out.println("Texto Original: " + outraInput);
-        System.out.println("\nCaracteres: " + encrypted.length());
-        System.out.println("Caracteres: " + encrypted2.length());
-        System.out.println("\nSHA-256 Hash: " + encrypt(input));
-        System.out.println("SHA-256 Hash: " + encrypt(outraInput));
-
-        if (encrypted.equals(encrypted2)) {
-            System.out.println("são exatamente iguais!");
-        } else {
-            System.out.println("são diferentes");
-        }
-    }
+//    public static void main(String[] args) {
+//        String input = "ueummmmmmm";
+//        String outraInput = "2548964896896";
+//        String encrypted = encrypt(input);
+//        String encrypted2 = encrypt(outraInput);
+//        System.out.println("Texto Original: " + input);
+//        System.out.println("Texto Original: " + outraInput);
+//        System.out.println("\nCaracteres: " + encrypted.length());
+//        System.out.println("Caracteres: " + encrypted2.length());
+//        System.out.println("\nSHA-256 Hash: " + encrypt(input));
+//        System.out.println("SHA-256 Hash: " + encrypt(outraInput));
+//
+//        if (encrypted.equals(encrypted2)) {
+//            System.out.println("são exatamente iguais!");
+//        } else {
+//            System.out.println("são diferentes");
+//        }
+//    }
 }
