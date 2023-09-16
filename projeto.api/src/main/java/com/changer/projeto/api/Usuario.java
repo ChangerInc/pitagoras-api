@@ -25,7 +25,7 @@ public class Usuario {
     private String senha;
 
     public void atualizarSenha(String novaSenha) {
-        this.senha = novaSenha;
+        this.senha = new Criptograma().encrypt(novaSenha);
     }
 
     public Usuario(String nome, String email, String senha) {
