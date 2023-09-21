@@ -1,4 +1,4 @@
-package com.changer.projeto.api.util;
+package changer.pitagoras.util;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

@@ -1,10 +1,10 @@
-package com.changer.projeto.api;
+package changer.pitagoras;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ApplicationTests {
+class PitagorasTests {
 
 	@Test
 	void contextLoads() {

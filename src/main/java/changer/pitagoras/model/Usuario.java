@@ -1,4 +1,4 @@
-package com.changer.projeto.api;
+package changer.pitagoras.model;
 
 //import jakarta.persistence.GeneratedValue;
 //import jakarta.persistence.GenerationType;
@@ -8,7 +8,7 @@ package com.changer.projeto.api;
 //import lombok.Getter;
 //import lombok.NoArgsConstructor;
 
-import com.changer.projeto.api.util.Criptograma;
+import changer.pitagoras.util.Criptograma;
 
 import java.util.UUID;
 
