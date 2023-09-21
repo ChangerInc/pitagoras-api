@@ -2,7 +2,7 @@ package changer.pitagoras.controller;
 
 import changer.pitagoras.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
-import changer.pitagoras.repository.UsuarioRepository;
+import changer.pitagoras.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,18 +16,14 @@ public class UsuarioController {
 
     List<Usuario> usuarios = new ArrayList<>();
     @Autowired
-    UsuarioRepository usuarioRepository;
+    private UsuarioService usuarioService;
 
     public UsuarioController() {
     }
 
-    @GetMapping({"/"})
-    public ResponseEntity<List<Usuario>> getUsuarios() {
-        if (usuarios.isEmpty()) {
-//            usuarioRepository.
-            return ResponseEntity.status(204).build();
-        }
-        return ResponseEntity.status(200).body(usuarios);
+    @GetMapping("/")
+    public List<Usuario> listarUsuarios() {
+        return usuarioService.listarUsuarios();
     }
 
     @PostMapping("/")

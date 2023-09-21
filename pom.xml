@@ -8,10 +8,10 @@
 		<version>3.1.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.changer</groupId>
-	<artifactId>projeto.api</artifactId>
+	<groupId>changer</groupId>
+	<artifactId>pitagoras.api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>projeto.api</name>
+	<name>pitagoras.api</name>
 	<description>Projeto semestral com Spring Boot</description>
 	<properties>
 		<java.version>17</java.version>
@@ -44,11 +44,11 @@
 			<scope>test</scope>
 		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>org.projectlombok</groupId>-->
-<!--			<artifactId>lombok</artifactId>-->
-<!--			<optional>true</optional>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 
 	<build>
