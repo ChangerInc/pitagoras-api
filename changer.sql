@@ -2,7 +2,7 @@ create database if not exists changer;
 use changer;
 
 create table if not exists Usuario (
-id char(36) primary key,
+id binary(16) primary key,
 nome varchar(20),
 email varchar(100),
 senha char(64)

@@ -1,4 +1,6 @@
 package changer.pitagoras.util;
+import changer.pitagoras.model.Usuario;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -32,23 +34,9 @@ public class Criptograma {
         }
     }
 
-    // Para teste:
-//    public static void main(String[] args) {
-//        String input = "ueummmmmmm";
-//        String outraInput = "2548964896896";
-//        String encrypted = encrypt(input);
-//        String encrypted2 = encrypt(outraInput);
-//        System.out.println("Texto Original: " + input);
-//        System.out.println("Texto Original: " + outraInput);
-//        System.out.println("\nCaracteres: " + encrypted.length());
-//        System.out.println("Caracteres: " + encrypted2.length());
-//        System.out.println("\nSHA-256 Hash: " + encrypt(input));
-//        System.out.println("SHA-256 Hash: " + encrypt(outraInput));
-//
-//        if (encrypted.equals(encrypted2)) {
-//            System.out.println("são exatamente iguais!");
-//        } else {
-//            System.out.println("são diferentes");
-//        }
-//    }
+    public static void main(String[] args) {
+        Usuario teste = new Usuario("Nacchan", "nata@teste.com", "1615");
+
+        System.out.println(teste);
+    }
 }

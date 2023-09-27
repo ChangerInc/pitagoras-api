@@ -13,8 +13,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping({"/usuario"})
 public class UsuarioController {
-
-    List<Usuario> usuarios = new ArrayList<>();
     @Autowired
     private UsuarioService usuarioService;
 
@@ -27,35 +25,33 @@ public class UsuarioController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Usuario> realizarCadastro(
-            @RequestBody Usuario novoUsuario) {
-        for (Usuario user : usuarios) {
+    public ResponseEntity<Usuario> postCadastro(@RequestBody Usuario novoUsuario) {
+        for (Usuario user : usuarioService.listarUsuarios()) {
             if (novoUsuario.getEmail().equals(user.getEmail())) {
                 return ResponseEntity.status(409).build();
             }
         }
 
-        usuarios.add(novoUsuario);
+        usuarioService.novoUsuario(novoUsuario);
 
         return ResponseEntity.status(201).body(novoUsuario);
     }
 
     @GetMapping({"/login"})
     public ResponseEntity<Usuario> realizarLogin(@RequestBody Usuario usuarioLogado) {
-        for (Usuario user : usuarios) {
-            if (usuarioLogado.getEmail().equals(user.getEmail()) &&
-                    usuarioLogado.getSenha().equals(user.getSenha())) {
-                return ResponseEntity.status(200).body(user);
-            }
+        Usuario user = usuarioService.login(usuarioLogado.getEmail(), usuarioLogado.getSenha());
+
+        if (user == null) {
+            return ResponseEntity.status(404).build();
         }
 
-        return ResponseEntity.status(404).build();
+        return ResponseEntity.status(200).body(user);
     }
 
-    @PutMapping("/{novaSenha}")
+    @PutMapping("/{uuid}/{novaSenha}")
     public ResponseEntity<Usuario> atualizarSenha(
-            @RequestBody Usuario usuario, @PathVariable String novaSenha) {
-        Usuario user = realizarLogin(usuario).getBody();
+            @PathVariable UUID uuid, @PathVariable String novaSenha) {
+        Usuario user = usuarioService.encontrarUsuario(uuid);
 
         if (user == null) {
             return ResponseEntity.status(404).build();
@@ -68,10 +64,14 @@ public class UsuarioController {
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity<Usuario> excluirUsuario(@PathVariable UUID uuid) {
-        boolean excluiu = usuarios.removeIf(user -> user.getId().equals(uuid));
+        Usuario encontrado = usuarioService.encontrarUsuario(uuid);
 
-        int status = excluiu ? 200 : 404;
+        if (encontrado == null) {
+            ResponseEntity.status(404).build();
+        }
 
-        return ResponseEntity.status(status).build();
+        usuarioService.deletarUsuario(encontrado);
+
+        return ResponseEntity.status(200).build();
     }
 }
