@@ -9,6 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
-    @Query("SELECT u FROM Usuario u WHERE u.email = :email AND u.senha = :senha")
+    @Query("SELECT u FROM Usuario AS u WHERE u.email = :email AND u.senha = :senha")
     List<Usuario> login(@Param("email") String email, @Param("senha") String senha);
 }
