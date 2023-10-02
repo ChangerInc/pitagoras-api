@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import changer.pitagoras.util.Criptograma;
+
 import java.util.UUID;
 
 @Entity(name = "Usuario")
@@ -25,16 +26,14 @@ public class Usuario {
         this.id = UUID.randomUUID();
         this.nome = nome;
         this.email = email;
-        this.senha = encryptSenha(senha);
+        setSenha(senha);
     }
 
-    public String encryptSenha(String senha) {
-        Criptograma criptograma = new Criptograma();
-
-        return criptograma.encrypt(senha);
+    public void setSenha(String senha) {
+        this.senha = new Criptograma().encrypt(senha);
     }
 
     public void atualizarSenha(String novaSenha) {
-        this.senha = encryptSenha(novaSenha);
+        setSenha(senha);
     }
 }

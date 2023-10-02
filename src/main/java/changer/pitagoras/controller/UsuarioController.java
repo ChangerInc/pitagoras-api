@@ -20,8 +20,14 @@ public class UsuarioController {
     }
 
     @GetMapping("/")
-    public List<Usuario> listarUsuarios() {
-        return usuarioService.listarUsuarios();
+    public ResponseEntity<List<Usuario>> listarUsuarios() {
+        List<Usuario> lista = usuarioService.listarUsuarios();
+
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+
+        return ResponseEntity.status(200).body(lista);
     }
 
     @PostMapping("/")
@@ -51,7 +57,7 @@ public class UsuarioController {
     @PutMapping("/{uuid}/{novaSenha}")
     public ResponseEntity<Usuario> atualizarSenha(
             @PathVariable UUID uuid, @PathVariable String novaSenha) {
-        Usuario user = usuarioService.encontrarUsuario(uuid);
+        Usuario user = usuarioService.encontrarUsuario(uuid).;
 
         if (user == null) {
             return ResponseEntity.status(404).build();
