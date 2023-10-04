@@ -57,7 +57,7 @@ public class UsuarioController {
     @PutMapping("/{uuid}/{novaSenha}")
     public ResponseEntity<Usuario> atualizarSenha(
             @PathVariable UUID uuid, @PathVariable String novaSenha) {
-        Usuario user = usuarioService.encontrarUsuario(uuid).;
+        Usuario user = usuarioService.encontrarUsuario(uuid);
 
         if (user == null) {
             return ResponseEntity.status(404).build();
