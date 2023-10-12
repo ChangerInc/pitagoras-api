@@ -1,15 +1,19 @@
 package changer.pitagoras.dto;
 
 import changer.pitagoras.util.Criptograma;
+import jakarta.persistence.Entity;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-public class UsuarioSimplesDto {
+@Setter
+public class UsuarioEmailSenhaDto {
     private String email;
     private String senha;
 
-    public UsuarioSimplesDto(String email, String senha) {
+    public UsuarioEmailSenhaDto(String email, String senha) {
         this.email = email;
         this.senha = Criptograma.encrypt(senha);
     }
+
 }
