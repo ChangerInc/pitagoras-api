@@ -1,13 +1,11 @@
 package changer.pitagoras.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import changer.pitagoras.util.Criptograma;
+import org.hibernate.annotations.Type;
 
 import java.util.UUID;
 
@@ -36,4 +34,6 @@ public class Usuario {
     public void setSenha(String senha) {
         this.senha = Criptograma.encrypt(senha);
     }
+
+
 }
