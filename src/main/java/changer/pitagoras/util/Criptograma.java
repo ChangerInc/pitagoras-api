@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
 public class Criptograma {
 
     // Método para calcular o hash SHA-256 de uma string
-    public String encrypt(String input) {
+    public static String encrypt(String input) {
         try {
             // Obtém uma instância do MessageDigest com o algoritmo SHA-256
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

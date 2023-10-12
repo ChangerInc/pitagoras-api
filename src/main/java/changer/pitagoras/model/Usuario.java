@@ -29,11 +29,11 @@ public class Usuario {
         setSenha(senha);
     }
 
-    public void setSenha(String senha) {
-        this.senha = new Criptograma().encrypt(senha);
+    public void setId(UUID id) {
+        this.id = id;
     }
 
-    public void atualizarSenha(String novaSenha) {
-        setSenha(senha);
+    public void setSenha(String senha) {
+        this.senha = Criptograma.encrypt(senha);
     }
 }

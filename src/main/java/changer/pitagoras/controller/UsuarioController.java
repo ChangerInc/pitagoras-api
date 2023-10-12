@@ -1,5 +1,6 @@
 package changer.pitagoras.controller;
 
+import changer.pitagoras.dto.UsuarioSimplesDto;
 import changer.pitagoras.model.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import changer.pitagoras.service.UsuarioService;
@@ -32,11 +33,9 @@ public class UsuarioController {
 
     @PostMapping("/")
     public ResponseEntity<Usuario> postCadastro(@RequestBody Usuario novoUsuario) {
-        for (Usuario user : usuarioService.listarUsuarios()) {
-            if (novoUsuario.getEmail().equals(user.getEmail())) {
+            if (usuarioService.novoUsuario(novoUsuario) == null) {
                 return ResponseEntity.status(409).build();
             }
-        }
 
         usuarioService.novoUsuario(novoUsuario);
 
@@ -44,8 +43,10 @@ public class UsuarioController {
     }
 
     @GetMapping({"/login"})
-    public ResponseEntity<Usuario> realizarLogin(@RequestBody Usuario usuarioLogado) {
-        Usuario user = usuarioService.login(usuarioLogado.getEmail(), usuarioLogado.getSenha());
+    public ResponseEntity<UsuarioSimplesDto> realizarLogin(@RequestBody UsuarioSimplesDto usuarioLogado) {
+        UsuarioSimplesDto user = usuarioService.login(
+                usuarioLogado.getEmail(),
+                usuarioLogado.getSenha());
 
         if (user == null) {
             return ResponseEntity.status(404).build();
@@ -54,18 +55,11 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(user);
     }
 
-    @PutMapping("/{uuid}/{novaSenha}")
-    public ResponseEntity<Usuario> atualizarSenha(
-            @PathVariable UUID uuid, @PathVariable String novaSenha) {
-        Usuario user = usuarioService.encontrarUsuario(uuid);
-
-        if (user == null) {
-            return ResponseEntity.status(404).build();
-        }
-
-        user.atualizarSenha(novaSenha);
-
-        return ResponseEntity.status(200).body(user);
+    @PutMapping("/{uuid}")
+    public ResponseEntity<Usuario> atualizarSenha(@PathVariable UUID uuid, @RequestBody String senha) {
+        return usuarioService.update(senha, uuid)
+                ? ResponseEntity.status(200).body(usuarioService.encontrarUsuario(uuid))
+                : ResponseEntity.status(404).build();
     }
 
     @DeleteMapping("/{uuid}")

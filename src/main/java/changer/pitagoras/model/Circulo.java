@@ -1,7 +1,6 @@
 package changer.pitagoras.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,15 +12,17 @@ import java.util.UUID;
 @Getter
 public class Circulo {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String nomeCirculo;
-    private UUID idDono;
+    @OneToOne
+    private Usuario dono;
     private LocalDateTime dataCriacao;
 
-    public Circulo(UUID id, String nomeCirculo, UUID idDono, LocalDateTime dataCriacao) {
-        this.id = id;
+    public Circulo(String nomeCirculo, Usuario dono) {
+        this.id = UUID.randomUUID();
         this.nomeCirculo = nomeCirculo;
-        this.idDono = idDono;
-        this.dataCriacao = dataCriacao;
+        this.dono = dono;
+        this.dataCriacao = LocalDateTime.now();
     }
 }
