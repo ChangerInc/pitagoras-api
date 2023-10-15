@@ -3,7 +3,6 @@ package changer.pitagoras.config;
 public enum VertopalConnector {
 
     CONVERT("/convert/file"),
-    DOWNLOAD("/download/file"),
     UPLOAD("/upload/file"),
     URL("/download/url");
 
