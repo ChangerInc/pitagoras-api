@@ -1,5 +1,6 @@
 package changer.pitagoras.controller;
 
+import changer.pitagoras.config.VertopalConnector;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.UsuarioEmailSenhaDto;
 import changer.pitagoras.model.Usuario;
