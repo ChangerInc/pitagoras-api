@@ -1,6 +1,9 @@
 package changer.pitagoras.util;
 
-public class ListaObj<T>{
+import java.util.ArrayList;
+import java.util.List;
+
+public class ListaObj <T>{
 
     // Atributos
     private T[] vetor;       // Vetor onde serÃ¡ armazenada a lista
@@ -21,7 +24,7 @@ public class ListaObj<T>{
      */
     public void adiciona(T elemento) {
         if (nroElem >= vetor.length) {
-            System.out.println("Lista está¡ cheia");
+            System.out.println("Lista estÃ¡ cheia");
         }
         else {
             vetor[nroElem++] = elemento;
@@ -97,13 +100,25 @@ public class ListaObj<T>{
         }
     }
 
-    public void setElemento(int ind, T elemento){
-        vetor[ind] = elemento;
-    }
-
     /* limpa() - limpa a lista */
     public void limpa() {
         nroElem = 0;
+    }
+
+    public void ordenaPorNome() {
+        // Crie uma nova lista para armazenar os elementos ordenados.
+        List<T> elementosOrdenados = new ArrayList<>();
+
+        // Adicione todos os elementos da lista atual à lista ordenada, em ordem alfabética.
+        for (int i = 0; i < nroElem; i++) {
+            elementosOrdenados.add(vetor[i]);
+        }
+
+        // Ordene a lista de elementos.
+        elementosOrdenados.sort((o1, o2) -> o1.toString().compareTo(o2.toString()));
+
+        // Substitua a lista atual pela lista ordenada.
+        vetor = elementosOrdenados.toArray(vetor);
     }
 
 }

@@ -6,8 +6,6 @@ import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.UsuarioRepository;
 import changer.pitagoras.util.Criptograma;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +27,7 @@ public class UsuarioService {
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             return null;
         }
+
         return usuarioRepository.save(usuario);
     }
 
@@ -76,4 +75,5 @@ public class UsuarioService {
     public UsuarioNomeEmailDto converterParaUsuarioSemSenhaDTO(Usuario usuario) {
         return new UsuarioNomeEmailDto(usuario.getNome(), usuario.getEmail());
     }
+
 }
