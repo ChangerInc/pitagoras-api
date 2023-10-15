@@ -24,8 +24,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     Integer updateSenha(@Param("senha") String senha, @Param("id") UUID id);
 
     @Query("""
-    select new changer.pitagoras.dto.UsuarioEmailSenhaDto(u.email, u.senha) 
-    from Usuario u WHERE u.email = ?1 AND u.senha = ?2       
+    select new changer.pitagoras.dto.UsuarioEmailSenhaDto(u.email, u.senha)
+    from Usuario u WHERE u.email = ?1 AND u.senha = ?2
     """)
     Optional<UsuarioEmailSenhaDto> buscarUsuarioEmailSenhaDto(@Param("email") String email,
                                         @Param("senha") String senha);
@@ -34,4 +34,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     UsuarioEmailSenhaDto findByEmail(@Param("email") String email);
 
+    Boolean existsBySenhaAndId(@Param("senha") String senha, @Param("id") UUID id);
 }

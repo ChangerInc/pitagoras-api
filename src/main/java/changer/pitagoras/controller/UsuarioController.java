@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -48,12 +49,21 @@ public class UsuarioController {
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<UsuarioNomeEmailDto> atualizarSenha(@PathVariable UUID uuid, @RequestBody String senha) {
-        UsuarioNomeEmailDto usuario =
-                usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(uuid));
-        return usuarioService.update(senha, uuid)
-                ? ResponseEntity.status(200).body(usuario)
-                : ResponseEntity.status(404).build();
+    public ResponseEntity<UsuarioNomeEmailDto> atualizarSenha(
+            @PathVariable UUID uuid,
+            @RequestBody Map<String, String> senhas) {
+
+        int result = usuarioService.update(senhas, uuid);
+
+        if (result == 404) {
+            return ResponseEntity.status(result).build();
+        }
+
+        UsuarioNomeEmailDto usuario = usuarioService.converterParaUsuarioSemSenhaDTO(
+                usuarioService.encontrarUsuario(uuid)
+        );
+
+        return result == 200 ? ResponseEntity.status(result).body(usuario) : ResponseEntity.status(result).build();
     }
 
     @DeleteMapping("/{uuid}")

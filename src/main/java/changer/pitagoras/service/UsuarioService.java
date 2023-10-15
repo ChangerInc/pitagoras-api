@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,7 +39,7 @@ public class UsuarioService {
 
     public UsuarioEmailSenhaDto encontrarUsuarioPorEmail(UsuarioEmailSenhaDto dto) {
         Optional<UsuarioEmailSenhaDto> usuario =
-                usuarioRepository.buscarUsuarioEmailSenhaDto(dto.getEmail(),dto.getSenha());
+                usuarioRepository.buscarUsuarioEmailSenhaDto(dto.getEmail(), dto.getSenha());
         System.out.println(usuario);
         return usuario.orElse(null);
     }
@@ -47,9 +49,24 @@ public class UsuarioService {
     }
 
 
+    public int update(Map<String, String> senhas, UUID id) {
+        String senhaAtual = senhas.get("senhaAtual");
+        String senhaNova = senhas.get("senhaNova");
 
-    public boolean update(String senha, UUID id) {
-        return usuarioRepository.updateSenha(Criptograma.encrypt(senha), id) != 0;
+        if (encontrarUsuario(id) == null) {
+            return 404;
+        }
+
+        if (usuarioRepository.existsBySenhaAndId(Criptograma.encrypt(senhaNova), id)) {
+            return 409;
+        }
+
+        if (usuarioRepository.existsBySenhaAndId(Criptograma.encrypt(senhaAtual), id)) {
+            usuarioRepository.updateSenha(Criptograma.encrypt(senhaNova), id);
+            return 200;
+        }
+
+        return 400;
     }
 
     public UsuarioEmailSenhaDto converterParaUsuarioLoginDTO(String email, String senha) {
