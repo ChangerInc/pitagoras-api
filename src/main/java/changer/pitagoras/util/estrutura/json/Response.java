@@ -1,4 +1,4 @@
-package changer.pitagoras.util.json;
+package changer.pitagoras.util.estrutura.json;
 
 public class Response {
     private Result result;

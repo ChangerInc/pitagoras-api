@@ -1,7 +1,7 @@
 package changer.pitagoras.service;
 
 import changer.pitagoras.config.VertopalConnector;
-import changer.pitagoras.util.json.Response;
+import changer.pitagoras.util.estrutura.json.Response;
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
