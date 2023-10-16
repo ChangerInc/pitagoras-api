@@ -15,7 +15,8 @@ public class Circulo {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String nomeCirculo;
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "Usuario_id")
     private Usuario dono;
     private LocalDateTime dataCriacao;
 

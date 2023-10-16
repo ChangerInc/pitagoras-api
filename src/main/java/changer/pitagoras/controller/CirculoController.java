@@ -1,5 +1,6 @@
 package changer.pitagoras.controller;
 
+import changer.pitagoras.dto.CirculoSimplesDto;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.service.CirculoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,26 +39,26 @@ public class CirculoController {
         return criado == null ? ResponseEntity.status(404).build() : ResponseEntity.status(201).body(criado);
     }
 
-    @PutMapping("/{novo}")
-    public ResponseEntity<Circulo> putNome(@PathVariable String novo, @RequestBody Map<UUID, UUID> ids) {
-        int stts = circuloService.validacao(ids);
+    @PutMapping("/")
+    public ResponseEntity<Circulo> putNome(@RequestBody CirculoSimplesDto c) {
+        int stts = circuloService.validacao(c.getIdCirc(), c.getIdDono());
 
         if (stts > 400) {
             return ResponseEntity.status(stts).build();
         }
 
-        return ResponseEntity.status(stts).body(circuloService.alterarNome(novo, ids.get("idCirculo")));
+        return ResponseEntity.status(stts).body(circuloService.alterarNome(c.getNome(), c.getIdCirc()));
     }
     
     @DeleteMapping("/")
-    public ResponseEntity<Circulo> delCirculo(@RequestBody Map<UUID, UUID> ids) {
-        int stts = circuloService.validacao(ids);
+    public ResponseEntity<Circulo> delCirculo(@RequestBody CirculoSimplesDto c) {
+        int stts = circuloService.validacao(c.getIdCirc(), c.getIdDono());
 
         if (stts > 400) {
             return ResponseEntity.status(stts).build();
         }
 
-        circuloService.deletar(ids.get("idCirculo"));
+        circuloService.deletar(c.getIdCirc());
         return ResponseEntity.status(stts).build();
     }
 }

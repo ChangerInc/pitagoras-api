@@ -1,7 +1,6 @@
 package changer.pitagoras.dto;
 
 import changer.pitagoras.util.Criptograma;
-import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;
 
