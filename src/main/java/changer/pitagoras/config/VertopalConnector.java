@@ -3,8 +3,8 @@ package changer.pitagoras.config;
 public enum VertopalConnector {
 
     CONVERT("/convert/file"),
-    DOWNLOAD("/download/file"),
-    UPLOAD("/upload/file");
+    UPLOAD("/upload/file"),
+    URL("/download/url");
 
     private final String uri;
     private static final String BASE_URL = "https://api.vertopal.com/v1";
