@@ -8,10 +8,14 @@ import changer.pitagoras.util.Criptograma;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 @Service
 public class UsuarioService {
@@ -74,6 +78,23 @@ public class UsuarioService {
 
     public UsuarioNomeEmailDto converterParaUsuarioSemSenhaDTO(Usuario usuario) {
         return new UsuarioNomeEmailDto(usuario.getNome(), usuario.getEmail());
+    }
+
+    public void exportToCSV(ListaObj<Usuario> lista, String filename) {
+    try (FileWriter writer = new FileWriter(filename)) {
+        // Escrevendo o cabeçalho
+        writer.append("ID,Nome,Email,Senha\n");
+        
+        for (int i = 0; i < lista.getTamanho(); i++) {
+            Usuario usuario = lista.getElemento(i);
+            writer.append(usuario.getId().toString()).append(",");
+            writer.append(usuario.getNome()).append(",");
+            writer.append(usuario.getEmail()).append(",");
+            writer.append(usuario.getSenha()).append("\n");
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
     }
 
 }

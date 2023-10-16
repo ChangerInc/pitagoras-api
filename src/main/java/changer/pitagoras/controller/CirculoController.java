@@ -5,10 +5,15 @@ import changer.pitagoras.service.CirculoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/circulos")
@@ -60,4 +65,22 @@ public class CirculoController {
         circuloService.deletar(ids.get("idCirculo"));
         return ResponseEntity.status(stts).build();
     }
+    
+
+
+    @GetMapping("/downloadUsuariosCSV")
+    public ResponseEntity<InputStreamResource> downloadCSV() {
+        String filename = "usuarios.csv";
+        ListaObj<Usuario> lista = // obtenha sua lista aqui
+        exportToCSV(lista, filename);
+        
+        File file = new File(filename);
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+        
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + file.getName())
+                .contentType(MediaType.parseMediaType("application/csv"))
+                .body(resource);
+    }
+
 }

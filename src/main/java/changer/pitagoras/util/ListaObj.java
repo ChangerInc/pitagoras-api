@@ -121,4 +121,39 @@ public class ListaObj <T>{
         vetor = elementosOrdenados.toArray(vetor);
     }
 
+    public void ordenaPorNome(ListaObj<Usuario> lista) {
+    // Usando o método de ordenação por inserção como exemplo
+    int listaTamanho = lista.getTamanho();
+    for (int i = 1; i < listaTamanho; i++) {
+        Usuario key = lista.getElemento(i);
+        int j = i - 1;
+        while (j >= 0 && lista.getElemento(j).getNome().compareTo(key.getNome()) > 0) {
+            lista.setElemento(j + 1, lista.getElemento(j));
+            j--;
+        }
+        lista.setElemento(j + 1, key);
+    }}
+
+    public int pesquisaBinariaPorNome(ListaObj<Usuario> lista, String nome) {
+    int left = 0;
+    int right = lista.getTamanho() - 1;
+    
+    while (left <= right) {
+        int mid = (left + right) / 2;
+        Usuario midUsuario = lista.getElemento(mid);
+        
+        if (midUsuario.getNome().equals(nome)) {
+            return mid;
+        } else if (midUsuario.getNome().compareTo(nome) < 0) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    return -1;  // Não encontrado
+    }
+
+
+
 }
