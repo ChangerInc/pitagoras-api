@@ -9,39 +9,43 @@ import java.io.IOException;
 import java.util.*;
 
 public class GerenciadorDeArquivo {
-    public static void gravaArquivoCsv(ListaObj<Usuario> lista, String nomeArq){
+    public static void gravaArquivoCsv(ListaObj<Usuario> lista, String nomeArq) {
         FileWriter arq = null;
         Formatter saida = null;
-        Boolean incorreto = false;
+        Boolean deuRuim = false;
 
-        nomeArq += ".csv";
+        nomeArq += "Usuarios.csv";
 
-        try{
+        try {
             arq = new FileWriter(nomeArq);
             saida = new Formatter(arq);
-        } catch (IOException erro){
+        } catch (IOException erro) {
             System.out.println("Erro ao abrir o arquivo");
             System.exit(1);
         }
 
-        try{
+        try {
             for (int i = 0; i < lista.getTamanho(); i++) {
-                Object objeto = lista.getElemento(i);
 
-                saida.format("%s\n", objeto.toString());
+                Usuario usuario = lista.getElemento(i);
+                saida.format("%d;%s;%s;%.2f\n",
+                        usuario.getId(),
+                        usuario.getNome(),
+                        usuario.getEmail(),
+                        usuario.getSenha());
             }
-        }catch (FormatterClosedException erro){
+        } catch (FormatterClosedException erro) {
             System.out.println("Erro ao gravar o arquivo");
-            incorreto = true;
-        } finally{
+            deuRuim = true;
+        } finally {
             saida.close();
-            try{
+            try {
                 arq.close();
-            }catch (IOException erro){
+            } catch (IOException erro) {
                 System.out.println("Erro ao fechar o arquivo");
-                incorreto = true;
+                deuRuim = true;
             }
-            if (incorreto){
+            if (deuRuim) {
                 System.exit(1);
             }
         }
@@ -52,9 +56,8 @@ public class GerenciadorDeArquivo {
         Scanner entrada = null;
         Boolean deuRuim = false;
 
-        nomeArq += ".csv";
+        nomeArq += "Usuarios.csv";
 
-        // Bloco try-catch para abrir o arquivo
         try {
             arq = new FileReader(nomeArq);
             entrada = new Scanner(arq).useDelimiter(";|\\n");
@@ -63,14 +66,20 @@ public class GerenciadorDeArquivo {
             System.exit(1);
         }
 
-        // Bloco try-catch para ler o arquivo
         try {
-            // Imprime o cabeçalho
-            System.out.println(entrada.next());
 
-            // Imprime o corpo do arquivo
+            System.out.printf("%4S %-15S %-9S %6S\n",
+                    "id", "nome","email", "senha" );
             while (entrada.hasNext()) {
-                System.out.println(entrada.next());
+
+                UUID id = UUID.fromString(entrada.next());
+                String nome = entrada.next();
+                String email = entrada.next();
+                String senha = entrada.next();
+
+                System.out.printf("%4d %-15s %-9s %6.2f\n",
+                        id, nome, email, senha);
+
             }
         } catch (NoSuchElementException erro) {
             System.out.println("Arquivo com problemas");
@@ -91,7 +100,4 @@ public class GerenciadorDeArquivo {
             }
         }
     }
-
-
-
 }

@@ -4,11 +4,18 @@ import changer.pitagoras.config.VertopalConnector;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.UsuarioEmailSenhaDto;
 import changer.pitagoras.model.Usuario;
+import changer.pitagoras.util.ListaObj;
 import org.springframework.beans.factory.annotation.Autowired;
 import changer.pitagoras.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -85,5 +92,19 @@ public class UsuarioController {
             return ResponseEntity.status(404).build();
         }
         return ResponseEntity.status(200).body(usuario);
+    }
+
+    @GetMapping("/downloadUsuariosCSV")
+    public ResponseEntity<InputStreamResource> downloadCSV() {
+        String filename = "Usuarios.csv";
+        ListaObj<Usuario> lista = (lista, filename);
+
+        File file = new File(filename);
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + file.getName())
+                .contentType(MediaType.parseMediaType("application/csv"))
+                .body(resource);
     }
 }
