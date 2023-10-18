@@ -97,7 +97,7 @@ public class UsuarioController {
     @GetMapping("/downloadUsuariosCSV")
     public ResponseEntity<InputStreamResource> downloadCSV() {
         String filename = "Usuarios.csv";
-        ListaObj<Usuario> lista = (lista, filename);
+        ListaObj<Usuario> lista = exportaUsuarioParaCSV(lista, filename);
 
         File file = new File(filename);
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
