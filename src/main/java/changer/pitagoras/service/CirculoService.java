@@ -33,12 +33,10 @@ public class CirculoService {
         return dono == null ? null : circuloRepository.save(new Circulo(nome, dono));
     }
 
-    public int validacao(Map<UUID, UUID> ids) {
-        UUID idCirc = ids.get("idCirculo");
-        UUID idDono = ids.get("idDono");
+    public int validacao(UUID idCirc, UUID idDono) {
 
         if (circuloRepository.existsById(idCirc)) {
-            if (circuloRepository.existe(idCirc, idDono)) {
+            if (circuloRepository.existe(idCirc, idDono) != null) {
                 return 200;
             }
 

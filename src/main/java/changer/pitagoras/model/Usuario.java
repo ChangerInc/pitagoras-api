@@ -1,3 +1,4 @@
+
 package changer.pitagoras.model;
 
 import jakarta.persistence.*;
