@@ -6,14 +6,17 @@ import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.UsuarioRepository;
 import changer.pitagoras.util.Criptograma;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
 
 @Service
 public class UsuarioService {
@@ -29,6 +32,7 @@ public class UsuarioService {
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             return null;
         }
+
         return usuarioRepository.save(usuario);
     }
 
@@ -76,4 +80,22 @@ public class UsuarioService {
     public UsuarioNomeEmailDto converterParaUsuarioSemSenhaDTO(Usuario usuario) {
         return new UsuarioNomeEmailDto(usuario.getNome(), usuario.getEmail());
     }
+
+    public void exportaUsuarioParaCSV(String filename) {
+        List<Usuario> usuarios = usuarioRepository.findAll();
+
+        try (FileWriter writer = new FileWriter(filename)) {
+            writer.append("ID,Nome,Email,Senha\n");
+
+            for (Usuario usuario : usuarios) {
+                writer.append(usuario.getId().toString()).append(",");
+                writer.append(usuario.getNome()).append(",");
+                writer.append(usuario.getEmail()).append(",");
+                writer.append(usuario.getSenha()).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -1,6 +1,9 @@
 package changer.pitagoras.util;
 
-public class ListaObj<T>{
+import java.util.ArrayList;
+import java.util.List;
+
+public class ListaObj <T>{
 
     // Atributos
     private T[] vetor;       // Vetor onde serÃ¡ armazenada a lista
@@ -21,7 +24,7 @@ public class ListaObj<T>{
      */
     public void adiciona(T elemento) {
         if (nroElem >= vetor.length) {
-            System.out.println("Lista está¡ cheia");
+            System.out.println("Lista estÃ¡ cheia");
         }
         else {
             vetor[nroElem++] = elemento;
@@ -97,13 +100,57 @@ public class ListaObj<T>{
         }
     }
 
-    public void setElemento(int ind, T elemento){
-        vetor[ind] = elemento;
-    }
-
     /* limpa() - limpa a lista */
     public void limpa() {
         nroElem = 0;
     }
 
+    public void ordenaPorNome() {
+        // Crie uma nova lista para armazenar os elementos ordenados.
+        List<T> elementosOrdenados = new ArrayList<>();
+
+        // Adicione todos os elementos da lista atual à lista ordenada, em ordem alfabética.
+        for (int i = 0; i < nroElem; i++) {
+            elementosOrdenados.add(vetor[i]);
+        }
+
+        // Ordene a lista de elementos.
+        elementosOrdenados.sort((o1, o2) -> o1.toString().compareTo(o2.toString()));
+
+        // Substitua a lista atual pela lista ordenada.
+        vetor = elementosOrdenados.toArray(vetor);
+    }
+
+    public void ordenaPorNome(ListaObj<Usuario> lista) {
+        // Usando o método de ordenação por inserção como exemplo
+        int listaTamanho = lista.getTamanho();
+        for (int i = 1; i < listaTamanho; i++) {
+            Usuario key = lista.getElemento(i);
+            int j = i - 1;
+            while (j >= 0 && lista.getElemento(j).getNome().compareTo(key.getNome()) > 0) {
+                lista.setElemento(j + 1, lista.getElemento(j));
+                j--;
+            }
+            lista.setElemento(j + 1, key);
+        }}
+
+    public int pesquisaBinariaPorNome(ListaObj<Usuario> lista, String nome) {
+        int left = 0;
+        int right = lista.getTamanho() - 1;
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            Usuario midUsuario = lista.getElemento(mid);
+
+            if (midUsuario.getNome().equals(nome)) {
+                return mid;
+            } else if (midUsuario.getNome().compareTo(nome) < 0) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+
+        return -1;  // Não encontrado
+    }
 }

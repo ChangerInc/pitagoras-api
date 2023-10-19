@@ -2,6 +2,9 @@ package changer.pitagoras.util;
 
 import changer.pitagoras.model.Usuario;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Ordenacao {
 //    public static void insertionSort(ListaObj<Usuario> lista) {
 //        int listaTamanho = lista.getTamanho();
@@ -45,4 +48,6 @@ public class Ordenacao {
 //            lista.setElemento(minIndex, usuarioDaVez);
 //        }
 //    }
+
+
 }

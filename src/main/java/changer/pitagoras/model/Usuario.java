@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import changer.pitagoras.util.Criptograma;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "Usuario")
@@ -34,6 +36,5 @@ public class Usuario {
     public void setSenha(String senha) {
         this.senha = Criptograma.encrypt(senha);
     }
-
 
 }
