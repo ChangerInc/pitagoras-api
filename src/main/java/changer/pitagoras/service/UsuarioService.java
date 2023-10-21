@@ -81,21 +81,4 @@ public class UsuarioService {
         return new UsuarioNomeEmailDto(usuario.getNome(), usuario.getEmail());
     }
 
-    public void exportaUsuarioParaCSV(String filename) {
-        List<Usuario> usuarios = usuarioRepository.findAll();
-
-        try (FileWriter writer = new FileWriter(filename)) {
-            writer.append("ID,Nome,Email,Senha\n");
-
-            for (Usuario usuario : usuarios) {
-                writer.append(usuario.getId().toString()).append(",");
-                writer.append(usuario.getNome()).append(",");
-                writer.append(usuario.getEmail()).append(",");
-                writer.append(usuario.getSenha()).append("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

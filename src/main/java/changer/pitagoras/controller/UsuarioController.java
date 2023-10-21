@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -92,19 +93,5 @@ public class UsuarioController {
             return ResponseEntity.status(404).build();
         }
         return ResponseEntity.status(200).body(usuario);
-    }
-
-    @GetMapping("/downloadUsuariosCSV")
-    public ResponseEntity<InputStreamResource> downloadCSV() {
-        String filename = "Usuarios.csv";
-        usuarioService.exportaUsuarioParaCSV(filename); // Correção aqui
-
-        File file = new File(filename);
-        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-
-        return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=" + file.getName())
-                .contentType(MediaType.parseMediaType("application/csv"))
-                .body(resource);
     }
 }
