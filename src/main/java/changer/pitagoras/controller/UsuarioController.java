@@ -23,6 +23,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/usuario")
+//@Api(value = "Usuários", description = "Operações relacionadas a usuários")
 public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
@@ -30,6 +31,7 @@ public class UsuarioController {
     public UsuarioController() {
     }
 
+//    @ApiOperation(value = "Obter a lista de todos os usuários")
     @GetMapping("/completo")
     public ResponseEntity<List<Usuario>> listarUsuarios() {
         List<Usuario> lista = usuarioService.listarUsuarios();
