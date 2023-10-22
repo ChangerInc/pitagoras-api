@@ -38,9 +38,21 @@ public class UsuarioController {
         if (lista.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        return ResponseEntity.status(200).body(lista);
+        
+        ListaObj<Usuario> listaObj = new ListaObj<>(lista.size());
+        for (Usuario usuario : lista) {
+            listaObj.adiciona(usuario);
+        }
+        
+        listaObj.ordenaPorNome();  // Chama o método de ordenação
+        
+        List<Usuario> listaOrdenada = new ArrayList<>();
+        for (int i = 0; i < listaObj.getTamanho(); i++) {
+            listaOrdenada.add(listaObj.getElemento(i));
+        }
+        
+        return ResponseEntity.status(200).body(listaOrdenada);
     }
-
     @PostMapping("/")
     public ResponseEntity<Usuario> postCadastro(@RequestBody Usuario novoUsuario) {
         Usuario usuarioCriado = usuarioService.novoUsuario(novoUsuario);

@@ -106,19 +106,15 @@ public class ListaObj <T>{
     }
 
     public void ordenaPorNome() {
-        // Crie uma nova lista para armazenar os elementos ordenados.
-        List<T> elementosOrdenados = new ArrayList<>();
-
-        // Adicione todos os elementos da lista atual à lista ordenada, em ordem alfabética.
-        for (int i = 0; i < nroElem; i++) {
-            elementosOrdenados.add(vetor[i]);
+        for (int i = 0; i < nroElem - 1; i++) {
+            for (int j = 0; j < nroElem - 1 - i; j++) {
+                if (vetor[j].toString().compareTo(vetor[j + 1].toString()) > 0) {
+                    T temp = vetor[j];
+                    vetor[j] = vetor[j + 1];
+                    vetor[j + 1] = temp;
+                }
+            }
         }
-
-        // Ordene a lista de elementos.
-        elementosOrdenados.sort((o1, o2) -> o1.toString().compareTo(o2.toString()));
-
-        // Substitua a lista atual pela lista ordenada.
-        vetor = elementosOrdenados.toArray(vetor);
     }
 
 }
