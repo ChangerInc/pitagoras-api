@@ -53,6 +53,7 @@ public class UsuarioController {
         
         return ResponseEntity.status(200).body(listaOrdenada);
     }
+    
     @PostMapping("/")
     public ResponseEntity<Usuario> postCadastro(@RequestBody Usuario novoUsuario) {
         Usuario usuarioCriado = usuarioService.novoUsuario(novoUsuario);

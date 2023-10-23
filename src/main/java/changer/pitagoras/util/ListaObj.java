@@ -107,13 +107,16 @@ public class ListaObj <T>{
 
     public void ordenaPorNome() {
         for (int i = 0; i < nroElem - 1; i++) {
-            for (int j = 0; j < nroElem - 1 - i; j++) {
-                if (vetor[j].toString().compareTo(vetor[j + 1].toString()) > 0) {
-                    T temp = vetor[j];
-                    vetor[j] = vetor[j + 1];
-                    vetor[j + 1] = temp;
+            int indMenor = i;
+
+            for (int j = i + 1; j < nroElem; j++) {
+                if (vetor[j].toString().compareTo(vetor[indMenor].toString()) < 0) {
+                    indMenor = j;
                 }
             }
+            T aux = vetor[i];
+            vetor[i] = vetor[indMenor];
+            vetor[indMenor] = aux;
         }
     }
 
