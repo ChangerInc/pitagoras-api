@@ -1,8 +1,11 @@
 package changer.pitagoras.util;
 
+import changer.pitagoras.model.Usuario;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
-
+@Getter
 public class ListaObj <T>{
 
     // Atributos
@@ -29,6 +32,10 @@ public class ListaObj <T>{
         else {
             vetor[nroElem++] = elemento;
         }
+    }
+
+    public void adiciona(int i, T elemento) {
+        vetor[i] = elemento;
     }
 
     /* Metodo exibe - exibe os elementos da lista */
@@ -119,5 +126,4 @@ public class ListaObj <T>{
             vetor[indMenor] = aux;
         }
     }
-
 }

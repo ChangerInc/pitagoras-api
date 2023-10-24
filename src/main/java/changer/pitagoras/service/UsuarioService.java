@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import changer.pitagoras.model.Usuario;
+import changer.pitagoras.util.ListaObj;
+import java.util.List;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -79,6 +83,40 @@ public class UsuarioService {
 
     public UsuarioNomeEmailDto converterParaUsuarioSemSenhaDTO(Usuario usuario) {
         return new UsuarioNomeEmailDto(usuario.getNome(), usuario.getEmail());
+    }
+
+    public void ordenaPorNome(ListaObj<Usuario> listaObj) {
+        for (int i = 0; i < listaObj.getTamanho() - 1; i++) {
+            int indMenor = i;
+            for (int j = i + 1; j < listaObj.getTamanho(); j++) {
+                if (listaObj.getElemento(j).getNome().compareToIgnoreCase(listaObj.getElemento(indMenor).getNome()) < 0) {
+                    indMenor = j;
+                }
+            }
+            Usuario aux = listaObj.getElemento(i);
+            listaObj.adiciona(i, listaObj.getElemento(indMenor));
+            listaObj.adiciona(indMenor, aux);
+        }
+    }
+
+    public int pesquisaBinaria(ListaObj<Usuario> listaObj, String nome) {
+        int inicio = 0;
+        int fim = listaObj.getTamanho() - 1;
+
+        while (inicio <= fim) {
+            int meio = (inicio + fim) / 2;
+            int comp = listaObj.getElemento(meio).getNome().compareToIgnoreCase(nome);
+
+            if (comp == 0) {
+                return meio;
+            } else if (comp < 0) {
+                inicio = meio + 1;
+            } else {
+                fim = meio - 1;
+            }
+        }
+
+        return -1;
     }
 
 }

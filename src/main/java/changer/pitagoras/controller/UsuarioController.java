@@ -11,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,27 +36,30 @@ public class UsuarioController {
 
 //    @ApiOperation(value = "Obter a lista de todos os usuários")
     @GetMapping("/completo")
-    public ResponseEntity<List<Usuario>> listarUsuarios() {
+    public ResponseEntity<Usuario[]> listarUsuarios() {
         List<Usuario> lista = usuarioService.listarUsuarios();
         if (lista.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        
+
         ListaObj<Usuario> listaObj = new ListaObj<>(lista.size());
         for (Usuario usuario : lista) {
             listaObj.adiciona(usuario);
         }
-        
-        listaObj.ordenaPorNome();  // Chama o método de ordenação
-        
-        List<Usuario> listaOrdenada = new ArrayList<>();
-        for (int i = 0; i < listaObj.getTamanho(); i++) {
-            listaOrdenada.add(listaObj.getElemento(i));
+
+        usuarioService.ordenaPorNome(listaObj);  // Chama o método de ordenação
+
+        int indice = usuarioService.pesquisaBinaria(listaObj, "nomeDoUsuario");  // Chama o método de pesquisa binária
+
+        if (indice != -1) {
+            System.out.println("Usuário encontrado: " + listaObj.getElemento(indice));
+        } else {
+            System.out.println("Usuário não encontrado");
         }
-        
-        return ResponseEntity.status(200).body(listaOrdenada);
+
+        return ResponseEntity.status(200).body(listaObj.getVetor());
     }
-    
+
     @PostMapping("/")
     public ResponseEntity<Usuario> postCadastro(@RequestBody Usuario novoUsuario) {
         Usuario usuarioCriado = usuarioService.novoUsuario(novoUsuario);
