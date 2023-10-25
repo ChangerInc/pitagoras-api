@@ -2,18 +2,16 @@
 package changer.pitagoras.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import changer.pitagoras.util.Criptograma;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "Usuario")
 @NoArgsConstructor
-@Getter
+@Data
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,15 +24,6 @@ public class Usuario {
         this.id = UUID.randomUUID();
         this.nome = nome;
         this.email = email;
-        setSenha(senha);
+        this.senha = senha;
     }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = Criptograma.encrypt(senha);
-    }
-
 }

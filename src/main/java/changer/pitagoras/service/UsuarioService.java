@@ -1,17 +1,25 @@
 package changer.pitagoras.service;
 
+import changer.pitagoras.config.security.GerenciadorTokenJwt;
+import changer.pitagoras.dto.UsuarioCriacaoDto;
+import changer.pitagoras.dto.UsuarioMapper;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.UsuarioEmailSenhaDto;
+import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
+import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.UsuarioRepository;
-import changer.pitagoras.util.Criptograma;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import changer.pitagoras.model.Usuario;
 import changer.pitagoras.util.ListaObj;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 import java.util.List;
@@ -27,6 +35,12 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private GerenciadorTokenJwt gerenciadorTokenJwt;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
@@ -61,16 +75,14 @@ public class UsuarioService {
         String senhaAtual = senhas.get("senhaAtual");
         String senhaNova = senhas.get("senhaNova");
 
-        if (encontrarUsuario(id) == null) {
+        if (encontrarUsuario(id) == null)
             return 404;
-        }
 
-        if (usuarioRepository.existsBySenhaAndId(Criptograma.encrypt(senhaNova), id)) {
+        if (usuarioRepository.existsBySenhaAndId(passwordEncoder.encode(senhaNova), id))
             return 409;
-        }
 
-        if (usuarioRepository.existsBySenhaAndId(Criptograma.encrypt(senhaAtual), id)) {
-            usuarioRepository.updateSenha(Criptograma.encrypt(senhaNova), id);
+        if (usuarioRepository.existsBySenhaAndId(passwordEncoder.encode(senhaAtual), id)) {
+            usuarioRepository.updateSenha(passwordEncoder.encode(senhaNova), id);
             return 200;
         }
 
@@ -117,6 +129,35 @@ public class UsuarioService {
         }
 
         return -1;
+    }
+
+    public void criar(UsuarioCriacaoDto usuarioCriacaoDto) {
+        final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
+
+        String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
+        novoUsuario.setSenha(senhaCriptografada);
+
+        this.usuarioRepository.save(novoUsuario);
+    }
+
+    public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto) {
+
+        final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
+                usuarioLoginDto.getEmail(), usuarioLoginDto.getSenha());
+
+        final Authentication authentication = this.authenticationManager.authenticate(credentials);
+
+        Usuario usuarioAutenticado =
+                usuarioRepository.findByEmail(usuarioLoginDto.getEmail())
+                        .orElseThrow(
+                                () -> new ResponseStatusException(404, "Email do usuário não cadastrado", null)
+                        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        final String token = gerenciadorTokenJwt.generateToken(authentication);
+
+        return UsuarioMapper.of(usuarioAutenticado, token);
     }
 
 }

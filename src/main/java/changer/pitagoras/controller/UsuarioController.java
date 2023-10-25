@@ -1,25 +1,24 @@
 package changer.pitagoras.controller;
 
-import changer.pitagoras.config.VertopalConnector;
+import changer.pitagoras.dto.UsuarioCriacaoDto;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
-import changer.pitagoras.dto.UsuarioEmailSenhaDto;
+import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
+import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.util.ListaObj;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import changer.pitagoras.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,48 +33,18 @@ public class UsuarioController {
     public UsuarioController() {
     }
 
-//    @ApiOperation(value = "Obter a lista de todos os usuários")
-    @GetMapping("/completo")
-    public ResponseEntity<Usuario[]> listarUsuarios() {
-        List<Usuario> lista = usuarioService.listarUsuarios();
-        if (lista.isEmpty()) {
-            return ResponseEntity.status(204).build();
-        }
-
-        ListaObj<Usuario> listaObj = new ListaObj<>(lista.size());
-        for (Usuario usuario : lista) {
-            listaObj.adiciona(usuario);
-        }
-
-        usuarioService.ordenaPorNome(listaObj);  // Chama o método de ordenação
-
-        int indice = usuarioService.pesquisaBinaria(listaObj, "nomeDoUsuario");  // Chama o método de pesquisa binária
-
-        if (indice != -1) {
-            System.out.println("Usuário encontrado: " + listaObj.getElemento(indice));
-        } else {
-            System.out.println("Usuário não encontrado");
-        }
-
-        return ResponseEntity.status(200).body(listaObj.getVetor());
-    }
-
     @PostMapping("/")
-    public ResponseEntity<Usuario> postCadastro(@RequestBody Usuario novoUsuario) {
-        Usuario usuarioCriado = usuarioService.novoUsuario(novoUsuario);
-        if (usuarioCriado == null) {
-            return ResponseEntity.status(409).build();
-        }
-        usuarioService.novoUsuario(novoUsuario);
-        return ResponseEntity.status(201).body(novoUsuario);
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
+        this.usuarioService.criar(usuarioCriacaoDto);
+        return ResponseEntity.status(201).build();
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UsuarioEmailSenhaDto> login(@RequestBody UsuarioEmailSenhaDto usuario){
-        if(usuarioService.encontrarUsuarioPorEmail(usuario) != null){
-            return ResponseEntity.status(200).body(usuario);
-        }
-        return ResponseEntity.status(401).build();
+    public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
+        UsuarioTokenDto usuarioTokenDto = this.usuarioService.autenticar(usuarioLoginDto);
+
+        return ResponseEntity.status(200).body(usuarioTokenDto);
     }
 
     @PutMapping("/{uuid}")

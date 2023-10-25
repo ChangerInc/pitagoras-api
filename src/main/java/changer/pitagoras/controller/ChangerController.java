@@ -1,6 +1,8 @@
 package changer.pitagoras.controller;
 
+import changer.pitagoras.model.Usuario;
 import changer.pitagoras.service.ChangerService;
+import changer.pitagoras.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/changer/adm")
@@ -19,6 +22,9 @@ public class ChangerController {
 
     @Autowired
     ChangerService changerService;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
 
     @GetMapping("/download-csv")
@@ -33,5 +39,15 @@ public class ChangerController {
                 .header("Content-Disposition", "attachment; filename=" + file.getName())
                 .contentType(MediaType.parseMediaType("application/csv"))
                 .body(resource);
+    }
+
+    @GetMapping("/usuarios")
+    public ResponseEntity<List<Usuario>> listarUsuarios() {
+        List<Usuario> lista = usuarioService.listarUsuarios();
+
+        if (lista.isEmpty())
+            return ResponseEntity.status(204).build();
+
+        return ResponseEntity.status(200).body(lista);
     }
 }
