@@ -34,30 +34,29 @@ public class UsuarioController {
     public UsuarioController() {
     }
 
-//    @ApiOperation(value = "Obter a lista de todos os usuários")
     @GetMapping("/completo")
-    public ResponseEntity<Usuario[]> listarUsuarios() {
+    public ResponseEntity<ListaObj<Usuario>> listarUsuarios() {
         List<Usuario> lista = usuarioService.listarUsuarios();
         if (lista.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
 
-        ListaObj<Usuario> listaObj = new ListaObj<>(lista.size());
-        for (Usuario usuario : lista) {
-            listaObj.adiciona(usuario);
+        return ResponseEntity.status(200).body(usuarioService.ordenaPorNome(lista));
+    }
+
+    @GetMapping("/{email}")
+    public ResponseEntity<Usuario> getByNome(@PathVariable String email) {
+        if (listarUsuarios().getStatusCode().value() == 200) {
+            Usuario userPesquisado = usuarioService.pesquisaBinaria(
+                    usuarioService.ordenaPorNome(usuarioService.listarUsuarios()), email
+            );
+
+            if (userPesquisado != null) {
+                return ResponseEntity.status(200).body(userPesquisado);
+            }
         }
 
-        usuarioService.ordenaPorNome(listaObj);  // Chama o método de ordenação
-
-        int indice = usuarioService.pesquisaBinaria(listaObj, "nomeDoUsuario");  // Chama o método de pesquisa binária
-
-        if (indice != -1) {
-            System.out.println("Usuário encontrado: " + listaObj.getElemento(indice));
-        } else {
-            System.out.println("Usuário não encontrado");
-        }
-
-        return ResponseEntity.status(200).body(listaObj.getVetor());
+        return ResponseEntity.status(404).build();
     }
 
     @PostMapping("/")
@@ -71,9 +70,11 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UsuarioEmailSenhaDto> login(@RequestBody UsuarioEmailSenhaDto usuario){
-        if(usuarioService.encontrarUsuarioPorEmail(usuario) != null){
-            return ResponseEntity.status(200).body(usuario);
+    public ResponseEntity<UsuarioNomeEmailDto> login(@RequestBody UsuarioEmailSenhaDto usuario) {
+        UsuarioNomeEmailDto response = usuarioService.encontrarUsuarioPorEmail(usuario);
+
+        if (response != null) {
+            return ResponseEntity.status(200).body(response);
         }
         return ResponseEntity.status(401).build();
     }
@@ -83,6 +84,9 @@ public class UsuarioController {
             @PathVariable UUID uuid,
             @RequestBody Map<String, String> senhas) {
 
+        if (senhas.get("senhaAtual") == null || senhas.get("senhaNova") == null) {
+            return ResponseEntity.status(400).build();
+        }
         int result = usuarioService.update(senhas, uuid);
 
         if (result == 404) {
@@ -104,15 +108,5 @@ public class UsuarioController {
         }
         usuarioService.deletarUsuario(encontrado);
         return ResponseEntity.status(200).build();
-    }
-
-    @GetMapping("/home/{id}")
-    public ResponseEntity<UsuarioNomeEmailDto> chamarUsuarioPorIdSemSenha(@PathVariable UUID id) {
-        UsuarioNomeEmailDto usuario =
-                usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(id));
-        if (usuario == null) {
-            return ResponseEntity.status(404).build();
-        }
-        return ResponseEntity.status(200).body(usuario);
     }
 }

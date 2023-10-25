@@ -4,6 +4,8 @@ import changer.pitagoras.util.Criptograma;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 public class UsuarioEmailSenhaDto {
