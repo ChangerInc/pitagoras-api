@@ -14,7 +14,7 @@ public class ReactConnector {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:3000"); // Permita o acesso a partir do seu domínio React
+        config.addAllowedOrigin("http://localhost:5173/"); // Permita o acesso a partir do seu domínio React
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);

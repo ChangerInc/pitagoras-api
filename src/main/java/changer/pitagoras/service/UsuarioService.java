@@ -59,8 +59,8 @@ public class UsuarioService {
         return usuarioOptional.orElse(null);
     }
 
-    public UsuarioEmailSenhaDto encontrarUsuarioPorEmail(UsuarioEmailSenhaDto dto) {
-        Optional<UsuarioEmailSenhaDto> usuario =
+    public UsuarioNomeEmailDto encontrarUsuarioPorEmail(UsuarioEmailSenhaDto dto) {
+        Optional<UsuarioNomeEmailDto> usuario =
                 usuarioRepository.buscarUsuarioEmailSenhaDto(dto.getEmail(), dto.getSenha());
         System.out.println(usuario);
         return usuario.orElse(null);
@@ -94,14 +94,20 @@ public class UsuarioService {
     }
 
     public UsuarioNomeEmailDto converterParaUsuarioSemSenhaDTO(Usuario usuario) {
-        return new UsuarioNomeEmailDto(usuario.getNome(), usuario.getEmail());
+        return new UsuarioNomeEmailDto(usuario.getId(), usuario.getNome(), usuario.getEmail());
     }
 
-    public void ordenaPorNome(ListaObj<Usuario> listaObj) {
+    public ListaObj<Usuario> ordenaPorNome(List<Usuario> lista) {
+        ListaObj<Usuario> listaObj = new ListaObj<>(lista.size());
+
+        for (Usuario usuario : lista) {
+            listaObj.adiciona(usuario);
+        }
+
         for (int i = 0; i < listaObj.getTamanho() - 1; i++) {
             int indMenor = i;
             for (int j = i + 1; j < listaObj.getTamanho(); j++) {
-                if (listaObj.getElemento(j).getNome().compareToIgnoreCase(listaObj.getElemento(indMenor).getNome()) < 0) {
+                if (listaObj.getElemento(j).getEmail().compareToIgnoreCase(listaObj.getElemento(indMenor).getEmail()) < 0) {
                     indMenor = j;
                 }
             }
@@ -109,18 +115,20 @@ public class UsuarioService {
             listaObj.adiciona(i, listaObj.getElemento(indMenor));
             listaObj.adiciona(indMenor, aux);
         }
+
+        return listaObj;
     }
 
-    public int pesquisaBinaria(ListaObj<Usuario> listaObj, String nome) {
+    public Usuario pesquisaBinaria(ListaObj<Usuario> listaObj, String email) {
         int inicio = 0;
         int fim = listaObj.getTamanho() - 1;
 
         while (inicio <= fim) {
             int meio = (inicio + fim) / 2;
-            int comp = listaObj.getElemento(meio).getNome().compareToIgnoreCase(nome);
+            int comp = listaObj.getElemento(meio).getEmail().compareToIgnoreCase(email);
 
             if (comp == 0) {
-                return meio;
+                return listaObj.getElemento(meio);
             } else if (comp < 0) {
                 inicio = meio + 1;
             } else {
@@ -128,7 +136,7 @@ public class UsuarioService {
             }
         }
 
-        return -1;
+        return null;
     }
 
     public void criar(UsuarioCriacaoDto usuarioCriacaoDto) {

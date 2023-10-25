@@ -1,10 +1,7 @@
 package changer.pitagoras.util;
 
-import changer.pitagoras.model.Usuario;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
 @Getter
 public class ListaObj <T>{
 

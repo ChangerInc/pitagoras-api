@@ -1,6 +1,7 @@
 package changer.pitagoras.repository;
 
 import changer.pitagoras.dto.UsuarioEmailSenhaDto;
+import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.model.Usuario;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,15 +25,15 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     Integer updateSenha(@Param("senha") String senha, @Param("id") UUID id);
 
     @Query("""
-    select new changer.pitagoras.dto.UsuarioEmailSenhaDto(u.email, u.senha)
+    select new changer.pitagoras.dto.UsuarioNomeEmailDto(u.id, u.nome, u.email)
     from Usuario u WHERE u.email = ?1 AND u.senha = ?2
     """)
-    Optional<UsuarioEmailSenhaDto> buscarUsuarioEmailSenhaDto(@Param("email") String email,
-                                        @Param("senha") String senha);
+    Optional<UsuarioNomeEmailDto> buscarUsuarioEmailSenhaDto(@Param("email") String email,
+                                                             @Param("senha") String senha);
 
     Boolean existsByEmail(@Param("email") String email);
 
     Optional<Usuario> findByEmail(String email);
 
-    Boolean existsBySenhaAndId(@Param("senha") String senha, @Param("id") UUID id);
+    Boolean existsBySenhaAndId(String senha, UUID id);
 }

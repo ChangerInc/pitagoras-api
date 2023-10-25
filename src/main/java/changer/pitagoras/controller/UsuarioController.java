@@ -33,6 +33,31 @@ public class UsuarioController {
     public UsuarioController() {
     }
 
+    @GetMapping("/completo")
+    public ResponseEntity<ListaObj<Usuario>> listarUsuarios() {
+        List<Usuario> lista = usuarioService.listarUsuarios();
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+
+        return ResponseEntity.status(200).body(usuarioService.ordenaPorNome(lista));
+    }
+
+    @GetMapping("/{email}")
+    public ResponseEntity<Usuario> getByNome(@PathVariable String email) {
+        if (listarUsuarios().getStatusCode().value() == 200) {
+            Usuario userPesquisado = usuarioService.pesquisaBinaria(
+                    usuarioService.ordenaPorNome(usuarioService.listarUsuarios()), email
+            );
+
+            if (userPesquisado != null) {
+                return ResponseEntity.status(200).body(userPesquisado);
+            }
+        }
+
+        return ResponseEntity.status(404).build();
+    }
+
     @PostMapping("/")
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
@@ -52,6 +77,9 @@ public class UsuarioController {
             @PathVariable UUID uuid,
             @RequestBody Map<String, String> senhas) {
 
+        if (senhas.get("senhaAtual") == null || senhas.get("senhaNova") == null) {
+            return ResponseEntity.status(400).build();
+        }
         int result = usuarioService.update(senhas, uuid);
 
         if (result == 404) {
