@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import changer.pitagoras.service.UsuarioService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,25 +66,28 @@ public class UsuarioController {
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<UsuarioNomeEmailDto> atualizarSenha(
+    public ResponseEntity<?> atualizarSenha(
             @PathVariable UUID uuid,
             @RequestBody Map<String, String> senhas) {
 
-        if (senhas.get("senhaAtual") == null || senhas.get("senhaNova") == null) {
-            return ResponseEntity.status(400).build();
+        if (senhas == null || !senhas.containsKey("senhaAtual") || !senhas.containsKey("senhaNova")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+
         int result = usuarioService.update(senhas, uuid);
 
-        if (result == 404) {
-            return ResponseEntity.status(result).build();
+        HttpStatus httpStatus;
+
+        if (result == 200) {
+            UsuarioNomeEmailDto usuario = usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(uuid));
+            httpStatus = HttpStatus.OK;
+            return ResponseEntity.status(httpStatus).body(usuario);
+        } else {
+            httpStatus = HttpStatus.valueOf(result);
+            return ResponseEntity.status(httpStatus).build();
         }
-
-        UsuarioNomeEmailDto usuario = usuarioService.converterParaUsuarioSemSenhaDTO(
-                usuarioService.encontrarUsuario(uuid)
-        );
-
-        return result == 200 ? ResponseEntity.status(result).body(usuario) : ResponseEntity.status(result).build();
     }
+
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity<Usuario> excluirUsuario(@PathVariable UUID uuid) {

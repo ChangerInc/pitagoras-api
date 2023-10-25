@@ -75,19 +75,28 @@ public class UsuarioService {
         String senhaAtual = senhas.get("senhaAtual");
         String senhaNova = senhas.get("senhaNova");
 
-        if (encontrarUsuario(id) == null)
-            return 404;
-
-        if (usuarioRepository.existsBySenhaAndId(passwordEncoder.encode(senhaNova), id))
-            return 409;
-
-        if (usuarioRepository.existsBySenhaAndId(passwordEncoder.encode(senhaAtual), id)) {
-            usuarioRepository.updateSenha(passwordEncoder.encode(senhaNova), id);
-            return 200;
+        // Verifique se o usuário existe
+        Usuario usuario = encontrarUsuario(id);
+        if (usuario == null) {
+            return 404; // Não encontrado
         }
 
-        return 400;
+        // Verifique se a senha atual está correta
+        if (!passwordEncoder.matches(senhaAtual, usuario.getSenha())) {
+            return 400; // Senha atual incorreta
+        }
+
+        // Verifique se a nova senha é igual à senha atual
+        if (passwordEncoder.matches(senhaNova, usuario.getSenha())) {
+            return 409; // Nova senha igual à senha atual
+        }
+
+        // Atualize a senha do usuário
+        usuarioRepository.updateSenha(passwordEncoder.encode(senhaNova), id);
+
+        return 200; // Atualização bem-sucedida
     }
+
 
     public UsuarioEmailSenhaDto converterParaUsuarioLoginDTO(String email, String senha) {
         return new UsuarioEmailSenhaDto(email, senha);
