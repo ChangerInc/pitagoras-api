@@ -5,6 +5,7 @@ import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Usuario;
+import changer.pitagoras.service.ChangerService;
 import changer.pitagoras.util.ListaObj;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -29,33 +30,24 @@ import java.util.UUID;
 public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private ChangerService changerService;
 
     public UsuarioController() {
     }
 
-    @GetMapping("/completo")
-    public ResponseEntity<ListaObj<Usuario>> listarUsuarios() {
-        List<Usuario> lista = usuarioService.listarUsuarios();
-        if (lista.isEmpty()) {
-            return ResponseEntity.status(204).build();
-        }
-
-        return ResponseEntity.status(200).body(usuarioService.ordenaPorNome(lista));
-    }
 
     @GetMapping("/{email}")
     public ResponseEntity<Usuario> getByNome(@PathVariable String email) {
-        if (listarUsuarios().getStatusCode().value() == 200) {
-            Usuario userPesquisado = usuarioService.pesquisaBinaria(
-                    usuarioService.ordenaPorNome(usuarioService.listarUsuarios()), email
-            );
+        List<Usuario> lista = usuarioService.listarUsuarios();
+        if (lista.isEmpty())
+            return ResponseEntity.status(204).build();
 
-            if (userPesquisado != null) {
-                return ResponseEntity.status(200).body(userPesquisado);
-            }
-        }
+        Usuario userPesquisado = usuarioService.pesquisaBinaria(
+                usuarioService.ordenaPorNome(usuarioService.listarUsuarios()), email
+        );
 
-        return ResponseEntity.status(404).build();
+        return ResponseEntity.status(200).body(userPesquisado);
     }
 
     @PostMapping("/")
