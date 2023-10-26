@@ -177,4 +177,16 @@ public class UsuarioService {
         return UsuarioMapper.of(usuarioAutenticado, token);
     }
 
+    public int atualizarFoto(byte[] novaFoto, UUID codigo) {
+        return usuarioRepository.atualizarFoto(novaFoto, codigo);
+    }
+
+    public byte[] getFoto(UUID codigo) {
+        return usuarioRepository.getFoto(codigo);
+    }
+
+    public boolean fotoExiste(UUID codigo) {
+        return usuarioRepository.existsById(codigo);
+    }
+
 }
