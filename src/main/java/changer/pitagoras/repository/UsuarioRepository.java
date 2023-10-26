@@ -36,4 +36,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     Optional<Usuario> findByEmail(String email);
 
     Boolean existsBySenhaAndId(String senha, UUID id);
+
+    @Transactional
+    @Modifying
+    @Query("update Usuario u set u.fotoPerfil = ?1 where u.id = ?2")
+    int atualizarFoto(byte[] foto, UUID codigo);
+
+    @Query("select u.fotoPerfil from Usuario u where u.id = ?1")
+    byte[] getFoto(UUID codigo);
 }

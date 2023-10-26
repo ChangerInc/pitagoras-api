@@ -19,11 +19,15 @@ public class Usuario {
     private String nome;
     private String email;
     private String senha;
+    @Lob
+    @Column(length = 16 * 1024 * 1024) // 16 MB
+    private byte[] fotoPerfil;
 
     public Usuario(String nome, String email, String senha) {
         this.id = UUID.randomUUID();
         this.nome = nome;
         this.email = email;
         this.senha = senha;
+        this.fotoPerfil = null;
     }
 }

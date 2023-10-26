@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import changer.pitagoras.service.UsuarioService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -107,5 +108,24 @@ public class UsuarioController {
             return ResponseEntity.status(404).build();
         }
         return ResponseEntity.status(200).body(usuario);
+    }
+
+    @PatchMapping(value = "/foto/{codigo}",
+            consumes = "image/*")
+    public ResponseEntity<Void> patchFoto(@PathVariable UUID codigo, @RequestBody byte[] novaFoto){
+
+        int atualizado = usuarioService.atualizarFoto(novaFoto, codigo);
+        int status = atualizado == 1 ? 200 : 404;
+
+        return ResponseEntity.status(status).build();
+    }
+
+    @GetMapping(value = "/foto/{codigo}", produces = "image/**")
+    public ResponseEntity<byte[]> getFoto(@PathVariable UUID codigo){
+
+        if (usuarioService.fotoExiste(codigo))
+            return ResponseEntity.status(200).body(usuarioService.getFoto(codigo));
+
+        return ResponseEntity.status(404).build();
     }
 }
