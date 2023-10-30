@@ -1,9 +1,8 @@
 package changer.pitagoras.service;
 
 import changer.pitagoras.config.VertopalConnector;
-import changer.pitagoras.util.estrutura.json.Response;
-import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -25,8 +24,7 @@ public class VertopalService {
     private String accessToken;
     @Value("${api.data.app}")
     private String app;
-    private Response resposta;
-    private Gson gson = new Gson();
+    private JSONObject jsonObject;
 
     public VertopalService() {
     }
@@ -45,7 +43,7 @@ public class VertopalService {
             ResponseEntity<String> requisicao =
                     restTemplate.exchange(VertopalConnector.UPLOAD.getURL(), HttpMethod.POST, requestEntity, String.class);
 
-            resposta = gson.fromJson(requisicao.getBody(), Response.class);
+            jsonObject = new JSONObject(requisicao.getBody());
             return requisicao.getBody();
         } else {
             return "Arquivo não selecionado";
@@ -54,6 +52,9 @@ public class VertopalService {
 
     public String converterArquivo(String extensao){
         if (extensao != null && !extensao.isEmpty()) {
+            JSONObject result = jsonObject.getJSONObject("result");
+            JSONObject output = result.getJSONObject("output");
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Authorization", "Bearer " + accessToken);
@@ -65,13 +66,13 @@ public class VertopalService {
                     "\"parameters\": {\n" +
                     "        \"output\": \"%s\"\n" +
                     "    }\n" +
-                    "}").formatted(app, resposta.getResult().getOutput().getConnector(), extensao));
+                    "}").formatted(app, output.getString("connector"), extensao));
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(data, headers);
             ResponseEntity<String> requisicao =
                     restTemplate.exchange(VertopalConnector.CONVERT.getURL(), HttpMethod.POST, requestEntity, String.class);
 
-            resposta = gson.fromJson(requisicao.getBody(), Response.class);
+            jsonObject = new JSONObject(requisicao.getBody());
             return requisicao.getBody();
         } else {
             return "Você não informou o formato para qual deseja fazer a conversão";
@@ -79,6 +80,9 @@ public class VertopalService {
     }
 
     public String obterUrl(){
+        JSONObject result = jsonObject.getJSONObject("result");
+        JSONObject output = result.getJSONObject("output");
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.set("Authorization", "Bearer " + accessToken);
@@ -87,19 +91,23 @@ public class VertopalService {
         data.add("data", ("{\n" +
                 "    \"app\": \"%s\",\n" +
                 "    \"connector\": \"%s\"\n" +
-                "}").formatted(app, resposta.getResult().getOutput().getConnector()));
+                "}").formatted(app, output.getString("connector")));
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(data, headers);
         ResponseEntity<String> requisicao =
                 restTemplate.exchange(VertopalConnector.URL.getURL(), HttpMethod.POST, requestEntity, String.class);
 
-        resposta = gson.fromJson(requisicao.getBody(), Response.class);
+        jsonObject = new JSONObject(requisicao.getBody());
         return requisicao.getBody();
     }
 
     public void recuperarArquivo(String local) {
         obterUrl();
-        File file = new File(local+"/"+ resposta.getResult().getOutput().getName());
+
+        JSONObject result = jsonObject.getJSONObject("result");
+        JSONObject output = result.getJSONObject("output");
+
+        File file = new File(local+"/"+ output.getString("name"));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -109,11 +117,11 @@ public class VertopalService {
         data.add("data", ("{\n" +
                 "    \"app\": \"%s\",\n" +
                 "    \"connector\": \"%s\"\n" +
-                "}").formatted(app, resposta.getResult().getOutput().getConnector()));
+                "}").formatted(app, output.getString("connector")));
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(data, headers);
         ResponseEntity<byte[]> requisicao = restTemplate
-                .exchange(resposta.getResult().getOutput().getUrl(), HttpMethod.POST, requestEntity, byte[].class);
+                .exchange(output.getString("url"), HttpMethod.POST, requestEntity, byte[].class);
         salvarArquivo(file, requisicao);
     }
     public void salvarArquivo(File file, ResponseEntity<byte[]> requisicao){
