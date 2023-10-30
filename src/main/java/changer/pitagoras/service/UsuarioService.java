@@ -1,10 +1,7 @@
 package changer.pitagoras.service;
 
 import changer.pitagoras.config.security.GerenciadorTokenJwt;
-import changer.pitagoras.dto.UsuarioCriacaoDto;
-import changer.pitagoras.dto.UsuarioMapper;
-import changer.pitagoras.dto.UsuarioNomeEmailDto;
-import changer.pitagoras.dto.UsuarioEmailSenhaDto;
+import changer.pitagoras.dto.*;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Usuario;
@@ -44,6 +41,10 @@ public class UsuarioService {
 
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
+    }
+
+    public List<UsuarioAdmDto> listarUsuariosAdm() {
+        return usuarioRepository.findUsersAdm();
     }
 
     public Usuario novoUsuario(Usuario usuario) {

@@ -1,5 +1,6 @@
 package changer.pitagoras.controller;
 
+import changer.pitagoras.dto.UsuarioAdmDto;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.service.ChangerService;
 import changer.pitagoras.service.UsuarioService;
@@ -43,12 +44,12 @@ public class ChangerController {
     }
 
     @GetMapping("/adm/usuarios")
-    public ResponseEntity<ListaObj<Usuario>> listarUsuarios() {
-        List<Usuario> lista = usuarioService.listarUsuarios();
+    public ResponseEntity<List<UsuarioAdmDto>> listarUsuarios() {
+        List<UsuarioAdmDto> lista = usuarioService.listarUsuariosAdm();
 
         if (lista.isEmpty())
             return ResponseEntity.status(204).build();
 
-        return ResponseEntity.status(200).body(usuarioService.ordenaPorNome(lista));
+        return ResponseEntity.status(200).body(lista);
     }
 }
