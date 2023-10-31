@@ -2,10 +2,9 @@ package changer.pitagoras.controller;
 
 import changer.pitagoras.service.VertopalService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -24,8 +23,13 @@ public class VertopalController {
         return vertopalService.converterArquivo(extensao);
     }
 
-    @PostMapping("/baixar")
-    public void baixarArquivo(@RequestParam("local-download") String localDownload){
-        vertopalService.recuperarArquivo(localDownload);
+    @GetMapping("/url")
+    public ResponseEntity<String> obterUrl(){
+        return ResponseEntity.status(200).body(vertopalService.obterUrl());
+    }
+
+    @GetMapping("/baixar")
+    public ResponseEntity<byte[]> baixarArquivo(){
+        return ResponseEntity.status(200).body(vertopalService.recuperarArquivo());
     }
 }
