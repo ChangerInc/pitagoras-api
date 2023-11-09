@@ -1,7 +1,9 @@
 package changer.pitagoras.controller;
 
+import changer.pitagoras.dto.CirculoMembrosDto;
 import changer.pitagoras.dto.CirculoSimplesDto;
 import changer.pitagoras.model.Circulo;
+import changer.pitagoras.model.Membro;
 import changer.pitagoras.service.CirculoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/circulos")
+@RequestMapping("/circulo")
 public class CirculoController {
     @Autowired
     CirculoService circuloService;
@@ -41,24 +43,19 @@ public class CirculoController {
 
     @PutMapping("/")
     public ResponseEntity<Circulo> putNome(@RequestBody CirculoSimplesDto c) {
-        int stts = circuloService.validacao(c.getIdCirc(), c.getIdDono());
-
-        if (stts > 400) {
-            return ResponseEntity.status(stts).build();
-        }
-
-        return ResponseEntity.status(stts).body(circuloService.alterarNome(c.getNome(), c.getIdCirc()));
+        return ResponseEntity.status(204).body(circuloService.alterarNome(c));
     }
     
     @DeleteMapping("/")
     public ResponseEntity<Circulo> delCirculo(@RequestBody CirculoSimplesDto c) {
-        int stts = circuloService.validacao(c.getIdCirc(), c.getIdDono());
+        circuloService.deletar(c);
 
-        if (stts > 400) {
-            return ResponseEntity.status(stts).build();
-        }
+        return ResponseEntity.status(204).build();
+    }
 
-        circuloService.deletar(c.getIdCirc());
-        return ResponseEntity.status(stts).build();
+    @PostMapping("/adicionar-membro")
+//    public ResponseEntity<CirculoMembrosDto> adicionar(Map<String, UUID> novoMembro) {
+    public ResponseEntity<Membro> adicionar(Map<String, UUID> novoMembro) {
+        return ResponseEntity.status(201).body(circuloService.addMembro(novoMembro));
     }
 }
