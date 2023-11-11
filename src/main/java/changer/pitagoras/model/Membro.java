@@ -1,5 +1,6 @@
 package changer.pitagoras.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,9 @@ import java.util.UUID;
 public class Membro {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @JsonIgnore
     private UUID id;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "Circulo_id")
     private Circulo circulo;

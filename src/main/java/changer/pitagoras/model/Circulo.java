@@ -26,4 +26,14 @@ public class Circulo {
         this.dono = dono;
         this.dataCriacao = LocalDateTime.now();
     }
+
+    @Override
+    public String toString() {
+        return "Circulo{" +
+                "id=" + id +
+                ", nomeCirculo='" + nomeCirculo + '\'' +
+                ", dono=" + dono +
+                ", dataCriacao=" + dataCriacao +
+                '}';
+    }
 }

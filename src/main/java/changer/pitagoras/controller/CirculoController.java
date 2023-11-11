@@ -25,13 +25,9 @@ public class CirculoController {
                 : ResponseEntity.status(200).body(circuloService.getAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Circulo> getOne(@PathVariable UUID id) {
-        if (circuloService.getOne(id).isPresent()) {
-            return ResponseEntity.status(200).body(circuloService.getOne(id).get());
-        }
-
-        return ResponseEntity.status(404).build();
+    @GetMapping("/acesso")
+    public ResponseEntity<CirculoMembrosDto> getOne(@RequestBody Map<String, UUID> ids) {
+        return ResponseEntity.status(200).body(circuloService.getOne(ids));
     }
 
     @PostMapping("/")
@@ -45,7 +41,7 @@ public class CirculoController {
     public ResponseEntity<Circulo> putNome(@RequestBody CirculoSimplesDto c) {
         return ResponseEntity.status(204).body(circuloService.alterarNome(c));
     }
-    
+
     @DeleteMapping("/")
     public ResponseEntity<Circulo> delCirculo(@RequestBody CirculoSimplesDto c) {
         circuloService.deletar(c);
@@ -54,8 +50,7 @@ public class CirculoController {
     }
 
     @PostMapping("/adicionar-membro")
-//    public ResponseEntity<CirculoMembrosDto> adicionar(Map<String, UUID> novoMembro) {
-    public ResponseEntity<Membro> adicionar(Map<String, UUID> novoMembro) {
+    public ResponseEntity<CirculoMembrosDto> adicionarRequestBody(@RequestBody Map<String, UUID> novoMembro) {
         return ResponseEntity.status(201).body(circuloService.addMembro(novoMembro));
     }
 }

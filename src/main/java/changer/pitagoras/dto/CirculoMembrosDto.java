@@ -1,5 +1,6 @@
 package changer.pitagoras.dto;
 
+import changer.pitagoras.dto.autenticacao.MembroDto;
 import changer.pitagoras.model.Membro;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,5 +16,5 @@ public class CirculoMembrosDto {
     private String nomeCirculo;
     private UsuarioNomeEmailDto dono;
     private LocalDateTime dataCriacao;
-//    private List<Membro> membros;
+    private List<MembroDto> membros;
 }
