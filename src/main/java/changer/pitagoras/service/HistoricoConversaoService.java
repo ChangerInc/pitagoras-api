@@ -13,6 +13,18 @@ public class HistoricoConversaoService {
     @Autowired
     private HistoricoConversaoRepository historicoConversaoRepository;
 
+    public HistoricoConversao registrarConversaoEHistorico(HistoricoConversao resultado) {
+    HistoricoConversao historico = new HistoricoConversao();
+        historico.setNome(resultado.getNome());
+        historico.setTamanho(resultado.getTamanho());
+        historico.setExtensaoAnterior(resultado.getExtensaoAnterior());
+        historico.setExtensaoAtual(resultado.getExtensaoAtual());
+        historico.setLinkDownload(resultado.getLinkDownload());
+        historico.setUsuario(resultado.getUsuario());
+
+    // Salvar o histórico no banco de dados
+        return salvarHistoricoConversao(historico);
+}
     public HistoricoConversao salvarHistoricoConversao(HistoricoConversao historico) {
         return historicoConversaoRepository.save(historico);
     }
