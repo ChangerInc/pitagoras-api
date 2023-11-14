@@ -14,7 +14,7 @@ import java.util.UUID;
 public class HistoricoConversaoController {
 
     @Autowired
-    private HistoricoConversaoService historicoConversaoService;
+        private HistoricoConversaoService historicoConversaoService;
 
     @PostMapping
     public ResponseEntity<HistoricoConversao> criarHistorico(@RequestBody HistoricoConversao historico) {
