@@ -145,9 +145,9 @@ public class VertopalService {
     public void processarArquivo(ResponseEntity<byte[]> response) {
 
         // Processar resposta
-        JSONObject jsonObject = new JSONObject(response.getBody());
-        JSONObject result = jsonObject.getJSONObject("result");
-        JSONObject output = result.getJSONObject("output");
+//       jsonObject = new JSONObject(response.getBody());
+       result = jsonObject.getJSONObject("result");
+       output = result.getJSONObject("output");
 
         String name = output.getString("name");
         BigDecimal size = new BigDecimal(output.getLong("size"));
