@@ -38,10 +38,7 @@ public class CirculoService {
         }
     }
 
-    protected CirculoMembrosDto gerarCirculoMembros(Map<String, UUID> ids) {
-        UUID dono = ids.get("idUser");
-        UUID idCirc = ids.get("idCirc");
-
+    protected CirculoMembrosDto gerarCirculoMembros(UUID dono, UUID idCirc) {
         validacao(idCirc, dono);
 
         Circulo auxCirc = circuloRepository.findById(idCirc).get();
@@ -51,7 +48,7 @@ public class CirculoService {
         List<MembroDto> membros = new ArrayList<>();
 
         if (!auxMembro.isEmpty()) {
-            membros = converterLista(auxMembro);
+            membros = converterListaMembros(auxMembro);
         }
 
         return new CirculoMembrosDto(
@@ -67,7 +64,7 @@ public class CirculoService {
         return new UsuarioNomeEmailDto(membro.getId(), membro.getNome(), membro.getEmail());
     }
 
-    protected List<MembroDto> converterLista(List<Membro> lista) {
+    protected List<MembroDto> converterListaMembros(List<Membro> lista) {
         List<MembroDto> membros = new ArrayList<>();
 
         for (Membro m : lista) {
@@ -77,34 +74,63 @@ public class CirculoService {
         return membros;
     }
 
-    public List<Circulo> getAll() {
-        return circuloRepository.findAll();
+    protected List<CirculoMembrosDto> converterListaCirculos(List<Circulo> lista) {
+        List<CirculoMembrosDto> circulos = new ArrayList<>();
+
+        for (Circulo c : lista) {
+            circulos.add(gerarCirculoMembros(c.getDono().getId(), c.getId()));
+        }
+
+        return circulos;
+    }
+
+    public List<CirculoMembrosDto> getAll() {
+        return converterListaCirculos(circuloRepository.findAll());
     }
 
     public CirculoMembrosDto getOne(Map<String, UUID> ids) {
-        return gerarCirculoMembros(ids);
+        validacao(ids.get("idCirc"), ids.get("idDono"));
+
+        return gerarCirculoMembros(ids.get("idDono"), ids.get("idCirc"));
     }
 
-    public Circulo insert(String nome, UUID idDono) {
+    public CirculoMembrosDto insert(String nome, UUID idDono) {
         Usuario dono = usuarioService.encontrarUsuario(idDono);
 
-        return dono == null ? null : circuloRepository.save(new Circulo(nome, dono));
+        if (dono == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        Circulo auxCirculo = circuloRepository.save(new Circulo(nome, dono));
+
+        return gerarCirculoMembros(idDono, auxCirculo.getId());
     }
 
-    public Circulo alterarNome(CirculoSimplesDto c) {
-        validacao(c.getIdCirc(), c.getIdDono());
+    public CirculoMembrosDto alterarNome(CirculoSimplesDto c) {
+        UUID idCirc = c.getIdCirc();
+        UUID idDono = c.getIdDono();
 
-        return circuloRepository.updateNome(c.getNome(), c.getIdCirc()) != 0
-                ? circuloRepository.findById(c.getIdCirc()).get() : null;
+        if (idDono == null || idCirc == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        validacao(idCirc, idDono);
+
+        Optional<Circulo> auxCirc = circuloRepository.findById(idCirc);
+
+        if (circuloRepository.updateNome(c.getNome(), c.getIdCirc()) != 0 && auxCirc.isPresent()) {
+            return gerarCirculoMembros(idDono, idCirc);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
-    public void deletar(CirculoSimplesDto c) {
-        validacao(c.getIdCirc(), c.getIdDono());
+    public void deletar(Map<String, UUID> ids) {
+        validacao(ids.get("idCirc"), ids.get("idDono"));
 
-        circuloRepository.deleteById(c.getIdCirc());
+        circuloRepository.deleteById(ids.get("idCirc"));
     }
 
-    //    public CirculoMembrosDto addMembro(Map<String, UUID> novoMembro) {
     public CirculoMembrosDto addMembro(Map<String, UUID> novoMembro) {
         UUID idUser = novoMembro.get("idUser");
         UUID idCirc = novoMembro.get("idCirc");
@@ -114,17 +140,18 @@ public class CirculoService {
         Circulo auxCirc = circuloRepository.findById(idCirc).get();
         Usuario auxUser = usuarioService.encontrarUsuario(idUser);
 
-        UsuarioNomeEmailDto userSimples = new UsuarioNomeEmailDto(idUser, auxUser.getNome(), auxUser.getEmail());
+        UsuarioNomeEmailDto userSimples = converteUserSimples(auxUser);
 
         Membro novo = new Membro(auxUser, auxCirc);
 
         membroRepository.save(novo);
+
         return new CirculoMembrosDto(
                 idCirc,
                 auxCirc.getNomeCirculo(),
                 userSimples,
                 auxCirc.getDataCriacao(),
-                converterLista(membroRepository.findAllByCirculoEquals(auxCirc))
+                converterListaMembros(membroRepository.findAllByCirculoEquals(auxCirc))
         );
     }
 }

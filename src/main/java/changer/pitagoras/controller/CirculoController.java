@@ -20,9 +20,8 @@ public class CirculoController {
     CirculoService circuloService;
 
     @GetMapping("/")
-    public ResponseEntity<List<Circulo>> getAll() {
-        return circuloService.getAll().isEmpty() ? ResponseEntity.status(204).body(circuloService.getAll())
-                : ResponseEntity.status(200).body(circuloService.getAll());
+    public ResponseEntity<List<CirculoMembrosDto>> get() {
+        return ResponseEntity.status(200).body(circuloService.getAll());
     }
 
     @GetMapping("/acesso")
@@ -31,20 +30,18 @@ public class CirculoController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Circulo> postCirculo(@RequestBody Circulo c) {
-        Circulo criado = circuloService.insert(c.getNomeCirculo(), c.getDono().getId());
-
-        return criado == null ? ResponseEntity.status(404).build() : ResponseEntity.status(201).body(criado);
+    public ResponseEntity<CirculoMembrosDto> postCirculo(@RequestBody Circulo c) {
+        return ResponseEntity.status(201).body(circuloService.insert(c.getNomeCirculo(), c.getDono().getId()));
     }
 
-    @PutMapping("/")
-    public ResponseEntity<Circulo> putNome(@RequestBody CirculoSimplesDto c) {
+    @PatchMapping("/")
+    public ResponseEntity<CirculoMembrosDto> patchNome(@RequestBody CirculoSimplesDto c) {
         return ResponseEntity.status(204).body(circuloService.alterarNome(c));
     }
 
     @DeleteMapping("/")
-    public ResponseEntity<Circulo> delCirculo(@RequestBody CirculoSimplesDto c) {
-        circuloService.deletar(c);
+    public ResponseEntity<Circulo> delCirculo(@RequestBody Map<String, UUID> ids) {
+        circuloService.deletar(ids);
 
         return ResponseEntity.status(204).build();
     }
