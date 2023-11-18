@@ -111,7 +111,7 @@ public class CirculoService {
         UUID idDono = c.getIdDono();
 
         if (idDono == null || idCirc == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Body faltando informações");
         }
 
         validacao(idCirc, idDono);
@@ -121,7 +121,7 @@ public class CirculoService {
         if (circuloRepository.updateNome(c.getNome(), c.getIdCirc()) != 0 && auxCirc.isPresent()) {
             return gerarCirculoMembros(idDono, idCirc);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Circulo não encontrado");
         }
     }
 
@@ -153,5 +153,15 @@ public class CirculoService {
                 auxCirc.getDataCriacao(),
                 converterListaMembros(membroRepository.findAllByCirculoEquals(auxCirc))
         );
+    }
+
+    public List<CirculoSimplesDto> getAllById(UUID idUser) {
+        Usuario user = usuarioService.encontrarUsuario(idUser);
+
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        }
+
+        return circuloRepository.findAllByDono(user);
     }
 }

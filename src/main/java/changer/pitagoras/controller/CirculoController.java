@@ -24,6 +24,11 @@ public class CirculoController {
         return ResponseEntity.status(200).body(circuloService.getAll());
     }
 
+    @GetMapping("/todos")
+    public ResponseEntity<List<CirculoSimplesDto>> todosCircUser(@RequestBody UUID idUser) {
+        return ResponseEntity.status(200).body(circuloService.getAllById(idUser));
+    }
+
     @GetMapping("/acesso")
     public ResponseEntity<CirculoMembrosDto> getOne(@RequestBody Map<String, UUID> ids) {
         return ResponseEntity.status(200).body(circuloService.getOne(ids));
