@@ -30,5 +30,5 @@ public interface CirculoRepository extends JpaRepository<Circulo, UUID> {
     )
     int updateNome(@Param("novoNome") String novoNome, @Param("id") UUID id);
 
-    List<CirculoSimplesDto> findAllByDono(Usuario dono);
+    List<Circulo> findAllByDono(Usuario dono);
 }

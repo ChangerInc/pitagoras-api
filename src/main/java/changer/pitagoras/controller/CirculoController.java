@@ -24,8 +24,8 @@ public class CirculoController {
         return ResponseEntity.status(200).body(circuloService.getAll());
     }
 
-    @GetMapping("/todos")
-    public ResponseEntity<List<CirculoSimplesDto>> todosCircUser(@RequestBody UUID idUser) {
+    @GetMapping("/todos/{idUser}")
+    public ResponseEntity<List<CirculoMembrosDto>> todosCircUser(@PathVariable UUID idUser) {
         return ResponseEntity.status(200).body(circuloService.getAllById(idUser));
     }
 

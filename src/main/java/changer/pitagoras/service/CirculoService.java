@@ -2,6 +2,7 @@ package changer.pitagoras.service;
 
 import changer.pitagoras.dto.CirculoMembrosDto;
 import changer.pitagoras.dto.CirculoSimplesDto;
+import changer.pitagoras.dto.UsuarioFotoDto;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.autenticacao.MembroDto;
 import changer.pitagoras.model.Circulo;
@@ -13,7 +14,6 @@ import changer.pitagoras.repository.MembroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -45,7 +45,7 @@ public class CirculoService {
         Usuario auxUser = usuarioService.encontrarUsuario(dono);
 
         List<Membro> auxMembro = membroRepository.findAllByCirculoEquals(auxCirc);
-        List<MembroDto> membros = new ArrayList<>();
+        List<UsuarioFotoDto> membros = new ArrayList<>();
 
         if (!auxMembro.isEmpty()) {
             membros = converterListaMembros(auxMembro);
@@ -60,15 +60,15 @@ public class CirculoService {
         );
     }
 
-    protected UsuarioNomeEmailDto converteUserSimples(Usuario membro) {
-        return new UsuarioNomeEmailDto(membro.getId(), membro.getNome(), membro.getEmail());
+    protected UsuarioFotoDto converteUserSimples(Usuario membro) {
+        return new UsuarioFotoDto(membro.getId(), membro.getNome(), membro.getFotoPerfil());
     }
 
-    protected List<MembroDto> converterListaMembros(List<Membro> lista) {
-        List<MembroDto> membros = new ArrayList<>();
+    protected List<UsuarioFotoDto> converterListaMembros(List<Membro> lista) {
+        List<UsuarioFotoDto> membros = new ArrayList<>();
 
         for (Membro m : lista) {
-            membros.add(new MembroDto(converteUserSimples(m.getMembro()), m.getDataInclusao()));
+            membros.add(converteUserSimples(m.getMembro()));
         }
 
         return membros;
@@ -134,34 +134,27 @@ public class CirculoService {
     public CirculoMembrosDto addMembro(Map<String, UUID> novoMembro) {
         UUID idUser = novoMembro.get("idUser");
         UUID idCirc = novoMembro.get("idCirc");
+        UUID idDono = novoMembro.get("idDono");
 
-        validacao(idCirc, novoMembro.get("idDono"));
+        validacao(idCirc, idDono);
 
         Circulo auxCirc = circuloRepository.findById(idCirc).get();
         Usuario auxUser = usuarioService.encontrarUsuario(idUser);
-
-        UsuarioNomeEmailDto userSimples = converteUserSimples(auxUser);
 
         Membro novo = new Membro(auxUser, auxCirc);
 
         membroRepository.save(novo);
 
-        return new CirculoMembrosDto(
-                idCirc,
-                auxCirc.getNomeCirculo(),
-                userSimples,
-                auxCirc.getDataCriacao(),
-                converterListaMembros(membroRepository.findAllByCirculoEquals(auxCirc))
-        );
+        return gerarCirculoMembros(idDono, idCirc);
     }
 
-    public List<CirculoSimplesDto> getAllById(UUID idUser) {
+    public List<CirculoMembrosDto> getAllById(UUID idUser) {
         Usuario user = usuarioService.encontrarUsuario(idUser);
 
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
         }
 
-        return circuloRepository.findAllByDono(user);
+        return converterListaCirculos(circuloRepository.findAllByDono(user));
     }
 }
