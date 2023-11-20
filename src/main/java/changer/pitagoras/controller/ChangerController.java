@@ -43,6 +43,20 @@ public class ChangerController {
                 .body(resource);
     }
 
+    @GetMapping("/adm/download-txt")
+    public ResponseEntity<InputStreamResource> downloadTXT() throws FileNotFoundException {
+        String filename = "Usuarios.txt";
+        changerService.exportaUsuarioParaTXT(filename); // Correção aqui
+
+        File file = new File(filename);
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + file.getName())
+                .contentType(MediaType.parseMediaType("application/txt"))
+                .body(resource);
+    }
+
     @GetMapping("/adm/usuarios")
     public ResponseEntity<List<UsuarioAdmDto>> listarUsuarios() {
         List<UsuarioAdmDto> lista = usuarioService.listarUsuariosAdm();

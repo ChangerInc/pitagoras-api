@@ -1,7 +1,9 @@
 package changer.pitagoras.service;
 
+import changer.pitagoras.dto.UsuarioTxtDto;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.UsuarioRepository;
+import changer.pitagoras.util.GerenciadorDeArquivoTxt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,5 +31,17 @@ public class ChangerService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void exportaUsuarioParaTXT(String filename) {
+        List<UsuarioTxtDto> usuarios = usuarioRepository.findUsuarioTxtDto();
+
+        try (FileWriter writer = new FileWriter(filename)) {
+            GerenciadorDeArquivoTxt.gravaArquivoTxt(usuarios, "Usuarios.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }

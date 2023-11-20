@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-public class GerenciadorDeArquivo {
+public class GerenciadorDeArquivoCsv {
     public static void gravaArquivoCsv(ListaObj<Usuario> lista, String nomeArq) {
         FileWriter arq = null;
         Formatter saida = null;

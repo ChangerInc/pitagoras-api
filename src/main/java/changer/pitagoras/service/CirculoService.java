@@ -3,8 +3,6 @@ package changer.pitagoras.service;
 import changer.pitagoras.dto.CirculoMembrosDto;
 import changer.pitagoras.dto.CirculoSimplesDto;
 import changer.pitagoras.dto.UsuarioFotoDto;
-import changer.pitagoras.dto.UsuarioNomeEmailDto;
-import changer.pitagoras.dto.autenticacao.MembroDto;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.Membro;
 import changer.pitagoras.model.Usuario;

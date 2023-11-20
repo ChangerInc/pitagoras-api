@@ -3,7 +3,6 @@ package changer.pitagoras.controller;
 import changer.pitagoras.dto.CirculoMembrosDto;
 import changer.pitagoras.dto.CirculoSimplesDto;
 import changer.pitagoras.model.Circulo;
-import changer.pitagoras.model.Membro;
 import changer.pitagoras.service.CirculoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -1,19 +1,20 @@
 create database if not exists changer;
 use changer;
-
 create table if not exists Usuario (
 id binary(16) primary key,
 nome varchar(20),
 email varchar(100),
 senha char(64),
-fotoPerfil mediumblob
+fotoPerfil mediumblob,
+plano tinyint(1),
+dataCriacaoConta datetime
 );
 
 create table if not exists Circulo (
 id binary(16) primary key,
 nomeCirculo varchar(50),
 idDono binary(16),  -- Usuario (id)
-dataCriacao datetime
+dataCriacaoCirculo datetime
 );
 
 create table if not exists MembroCirculo (

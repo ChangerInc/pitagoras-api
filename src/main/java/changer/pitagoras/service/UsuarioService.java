@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import changer.pitagoras.util.ListaObj;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import java.util.List;
@@ -151,7 +152,8 @@ public class UsuarioService {
 
     public void criar(UsuarioCriacaoDto usuarioCriacaoDto) {
         final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
-
+        novoUsuario.setPlano(false);
+        novoUsuario.setDataCriacaoConta(LocalDateTime.now());
         String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
         novoUsuario.setSenha(senhaCriptografada);
 

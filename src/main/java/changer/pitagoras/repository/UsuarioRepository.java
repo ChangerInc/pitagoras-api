@@ -1,10 +1,9 @@
 package changer.pitagoras.repository;
 
 import changer.pitagoras.dto.UsuarioAdmDto;
-import changer.pitagoras.dto.UsuarioEmailSenhaDto;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
+import changer.pitagoras.dto.UsuarioTxtDto;
 import changer.pitagoras.model.Usuario;
-import changer.pitagoras.util.ListaObj;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -50,4 +49,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     @Query("select new changer.pitagoras.dto.UsuarioAdmDto(u.id, u.nome, u.email, u.senha) from Usuario u")
     List<UsuarioAdmDto> findUsersAdm();
+
+    @Query("select new changer.pitagoras.dto.UsuarioTxtDto(u.id as idUsuario, u.nome, u.email, u.senha, u.plano, u.dataCriacaoConta) from Usuario u")
+    List<UsuarioTxtDto> findUsuarioTxtDto();
 }

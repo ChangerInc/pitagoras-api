@@ -1,7 +1,6 @@
 package changer.pitagoras.util;
 
-import changer.pitagoras.dto.UsuarioCirculoDto;
-import changer.pitagoras.model.Usuario;
+import changer.pitagoras.dto.UsuarioTxtDto;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -30,34 +29,32 @@ public class GerenciadorDeArquivoTxt {
         }
     }
 
-    public static void gravaArquivoTxt(List<UsuarioCirculoDto> lista, String nomeArq) {
+    public static void gravaArquivoTxt(List<UsuarioTxtDto> lista, String nomeArq) {
         int contaRegDados = 0;
 
         // Monta o registro de header
         String header = "00USERS"; //Verificar documento de layout
+        LocalDateTime agora = LocalDateTime.now();
+        int ano = agora.getYear();
+        int mes = agora.getMonthValue();
+        int semestre = mes > 6 ? 2 : 1;
+        header += String.format("%04d%d", ano, semestre);;
         header += LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
-        header += "01";
+        header += "02";
 
         // Grava o registro de header
         gravaRegistro(header, nomeArq);
 
         // Grava os registros de dados (ou registros de corpo)
-        for (UsuarioCirculoDto usuario : lista) {
+        for (UsuarioTxtDto usuario : lista) {
             //Usuario
             String corpo = "02";
-            corpo += String.format("%-36s", usuario.getIdUsuario()); //Completar de acordo com documento
-            corpo += String.format("%-20s", usuario.getNome());
-            corpo += String.format("%-100s", usuario.getEmail());
+            corpo += String.format("%-37s", usuario.getIdUsuario()); //Completar de acordo com documento
+            corpo += String.format("%-25s", usuario.getNome());
+            corpo += String.format("%-40s", usuario.getEmail());
             corpo += String.format("%-64s", usuario.getSenha());
             corpo += String.format("%-6s", usuario.getPlano());
-            corpo += String.format("%-19s", usuario.getDataCriacaoConta());
-
-            //Circulo
-            corpo += String.format("%-16s", usuario.getIdCirculo()); //Completar de acordo com documento
-            corpo += String.format("%-50s", usuario.getNomeCirculo());
-            corpo += String.format("%-36s", usuario.getDono());
-            corpo += String.format("%-19s", usuario.getDataCriacaoCirculo());
-
+            corpo += String.format("%-18s ", usuario.getDataCriacaoConta());
 
             //Gravando corpo no arquivo:
             gravaRegistro(corpo, nomeArq);
@@ -82,7 +79,7 @@ public class GerenciadorDeArquivoTxt {
 
         // Cria uma lista para armazenar os objetos criados com
         // os dados lidos do arquivo txt
-        List<UsuarioCirculoDto> listaLida = new ArrayList<>();
+        List<UsuarioTxtDto> listaLida = new ArrayList<>();
         // Abre o arquivo
         try {
             entrada = new BufferedReader(new FileReader(nomeArq));
@@ -103,30 +100,24 @@ public class GerenciadorDeArquivoTxt {
                 if (tipoRegistro.equals("00")) {
                     System.out.println("É um registro de header");
                     //Exibir informações do header
-                    System.out.printf("Tipo do arquivo: %s\n",registro.substring(2,11));
-                    System.out.printf("Ano/semestre: %s\n",registro.substring(11,16));
-                    System.out.printf("Data e Hora: %s\n",registro.substring(16,35));
-                    System.out.printf("Versão do layout: %s\n",registro.substring(35,37));
+                    System.out.printf("Tipo do arquivo: %s\n",registro.substring(2,7));
+                    System.out.printf("Ano/semestre: %s\n",registro.substring(7,12));
+                    System.out.printf("Data e Hora: %s\n",registro.substring(12,31));
+                    System.out.printf("Versão do layout: %s\n",registro.substring(31,33));
 
                 } else if (tipoRegistro.equals("01")) {
                     System.out.println("É um registro de trailer");
                     //Exibir quantidade de registros
-                    System.out.println("Quantidade de registros de dados baixados pós conversão:" + contaRegDadosLidos);
+                    System.out.println("Quantidade de registros de dados baixados pós conversão: " + contaRegDadosLidos);
 
                 } else if (tipoRegistro.equals("02")) {
                     System.out.println("É um registro de corpo");
-                    String id = registro.substring(0,6).trim();
-                    String nome = registro.substring(6,27).trim();
-                    String email = registro.substring(27,43).trim();
-                    String senha = registro.substring(43,56).trim();
-                    String plano = registro.substring(56,62).trim();
-                    String dataConta = registro.substring(56,62).trim();
-                    String circulo = registro.substring(56,62).trim();
-                    String nomeCirculo = registro.substring(56,62).trim();
-                    String dono = registro.substring(56,62).trim();
-                    String dataCirculo = registro.substring(56,62).trim();
-
-
+                    String id = registro.substring(0,39).trim();
+                    String nome = registro.substring(39,56).trim();
+                    String email = registro.substring(56,97).trim();
+                    String senha = registro.substring(97,162).trim();
+                    String plano = registro.substring(165,174).trim();
+                    String dataConta = registro.substring(174,204).trim();
 
                     System.out.println("ID: " + id);
                     System.out.println("Nome: " + nome);
@@ -134,12 +125,6 @@ public class GerenciadorDeArquivoTxt {
                     System.out.println("Senha.: " + senha);
                     System.out.println("Plano: " + plano);
                     System.out.println("Data de criação de conta.: " + dataConta);
-                    System.out.println("Circulo: " + circulo);
-                    System.out.println("Nome do circulo: " + nomeCirculo);
-                    System.out.println("Dono: " + dono);
-                    System.out.println("Data de criação do circulo: " + dataCirculo);
-
-
 
                     //Guardar dados do corpo em variáveis
                     // Incrementa o contador de reg de dados lidos
@@ -165,7 +150,7 @@ public class GerenciadorDeArquivoTxt {
         // Exibe a lista lida
         System.out.println("\nLista lida do arquivo:");
 
-        for (UsuarioCirculoDto e : listaLida) {
+        for (UsuarioTxtDto e : listaLida) {
             System.out.println(e);
         }
         // Aqui tb seria possível salvar a lista no BD
