@@ -36,4 +36,6 @@ public class Usuario {
         this.dataCriacaoConta = LocalDateTime.now();
 
     }
+
+
 }

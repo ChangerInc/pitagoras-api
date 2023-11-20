@@ -150,14 +150,13 @@ public class UsuarioService {
         return null;
     }
 
-    public void criar(UsuarioCriacaoDto usuarioCriacaoDto) {
+    public Usuario criar(UsuarioCriacaoDto usuarioCriacaoDto) {
         final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
         novoUsuario.setPlano(false);
         novoUsuario.setDataCriacaoConta(LocalDateTime.now());
         String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
         novoUsuario.setSenha(senhaCriptografada);
-
-        this.usuarioRepository.save(novoUsuario);
+        return usuarioRepository.save(novoUsuario);
     }
 
     public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto) {

@@ -54,9 +54,8 @@ public class UsuarioController {
 
     @PostMapping("/")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<Void> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
-        this.usuarioService.criar(usuarioCriacaoDto);
-        return ResponseEntity.status(201).build();
+    public ResponseEntity<Usuario> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
+        return ResponseEntity.status(201).body(usuarioService.criar(usuarioCriacaoDto));
     }
 
     @PostMapping("/login")
