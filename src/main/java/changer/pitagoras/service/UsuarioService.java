@@ -151,6 +151,9 @@ public class UsuarioService {
     }
 
     public Usuario criar(UsuarioCriacaoDto usuarioCriacaoDto) {
+        if(usuarioRepository.existsByEmail(usuarioCriacaoDto.getEmail())){
+            return null;
+        }
         final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
         novoUsuario.setPlano(false);
         novoUsuario.setDataCriacaoConta(LocalDateTime.now());

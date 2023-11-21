@@ -34,7 +34,7 @@ public class UsuarioControllerTest {
     private PasswordEncoder encoder;
 
     @Test
-    @DisplayName("Deve retornar os dados do usuário recem criado conforme ele foi cadastrado")
+    @DisplayName("Deve retornar os dados do usuário recem criado se ele foi cadastrado com sucesso")
     public void testCriarUsuario() {
         // Dados de teste
         UsuarioCriacaoDto usuarioCriacaoDto = new UsuarioCriacaoDto();
@@ -62,6 +62,22 @@ public class UsuarioControllerTest {
         assertEquals(usuario.getPlano(), false);
         assertNull(usuario.getFotoPerfil());
         assertNotNull(usuario.getDataCriacaoConta());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 409 caso o email já esteja cadastrado")
+    public void testEmailExistente(){
+
+        UsuarioCriacaoDto segundoUsuarioCriacaoDto = new UsuarioCriacaoDto();
+        segundoUsuarioCriacaoDto.setNome("segundo");
+        segundoUsuarioCriacaoDto.setEmail("laeale@gmail.com");
+        segundoUsuarioCriacaoDto.setSenha("121212");
+
+        when(usuarioRepository.existsByEmail(segundoUsuarioCriacaoDto.getEmail())).thenReturn(true);
+
+        Usuario segundoUsuario = usuarioService.criar(segundoUsuarioCriacaoDto);
+
+        assertNull(segundoUsuario);
     }
 }
 
