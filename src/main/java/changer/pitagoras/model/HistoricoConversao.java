@@ -16,7 +16,7 @@ import java.util.UUID;
 @Getter
 public class HistoricoConversao {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID idConversao;
     private String nome;
     private BigDecimal tamanho;
@@ -28,8 +28,8 @@ public class HistoricoConversao {
     @JoinColumn(name = "Usuario_id")
     private Usuario usuario;
 
-    public HistoricoConversao(UUID idConversao, String nome, BigDecimal tamanho, String extensaoAnterior, String extensaoAtual, String linkDownload, Usuario usuario) {
-        this.idConversao = idConversao;
+    public HistoricoConversao(String nome, BigDecimal tamanho, String extensaoAnterior, String extensaoAtual, String linkDownload, Usuario usuario) {
+        this.idConversao = UUID.randomUUID();
         this.nome = nome;
         this.tamanho = tamanho;
         this.extensaoAnterior = extensaoAnterior;

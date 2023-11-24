@@ -18,14 +18,12 @@ public class HistoricoConversaoController {
 
     @PostMapping
     public ResponseEntity<HistoricoConversao> criarHistorico(@RequestBody HistoricoConversao historico) {
-        HistoricoConversao novoHistorico = historicoConversaoService.salvarHistoricoConversao(historico);
-        return ResponseEntity.ok(novoHistorico);
+        return ResponseEntity.ok(historicoConversaoService.salvarHistoricoConversao(historico));
     }
 
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<HistoricoConversao>> listarHistoricoPorUsuario(@PathVariable UUID usuarioId) {
-        List<HistoricoConversao> historicos = historicoConversaoService.buscarHistoricoPorUsuario(usuarioId);
-        return new ResponseEntity<>(historicos, HttpStatus.OK);
+        return new ResponseEntity<>(historicoConversaoService.buscarHistoricoPorUsuario(usuarioId), HttpStatus.OK);
     }
 
 }

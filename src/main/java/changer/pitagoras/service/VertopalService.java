@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -25,6 +27,7 @@ public class VertopalService {
     private RestTemplate restTemplate = new RestTemplate();
     @Autowired
     private HistoricoConversaoService historicoConversaoService;
+    private HistoricoConversao auxHistorico;
     @Value("${api.access.token}")
     private String accessToken;
     @Value("${api.data.app}")
@@ -37,11 +40,38 @@ public class VertopalService {
     public VertopalService() {
     }
 
-    public String enviarArquivo(MultipartFile file){
+    // Métodos úteis para esta classe:
+    protected String separarExtensao(String nomeDocumento) {
+        StringBuilder extensao = new StringBuilder();
+
+        boolean ponto = false;
+        for (int i = 0; i < nomeDocumento.length(); i++) {
+            char charAtual = nomeDocumento.charAt(i);
+
+            if (charAtual == '.') {
+                ponto = true;
+            }
+
+            if (charAtual != '.') {
+                extensao.append(charAtual);
+            }
+        }
+
+        return extensao.toString();
+    }
+    /*---------------------------------------------------*/
+
+    public String enviarArquivo(MultipartFile file) {
         if (file != null && !file.isEmpty()) {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Authorization", "Bearer " + accessToken);
+
+            /*this.auxHistorico = new HistoricoConversao(
+                    file.getOriginalFilename(),
+                    BigDecimal.valueOf(file.getSize()),
+                    separarExtensao(file.getOriginalFilename()),
+            );*/
 
             MultiValueMap<String, Object> data = new LinkedMultiValueMap<>();
             data.add("data", ("{\"app\":\"%s\"}").formatted(app));
@@ -58,7 +88,7 @@ public class VertopalService {
         }
     }
 
-    public String converterArquivo(String extensao){
+    public String converterArquivo(String extensao) {
         if (extensao != null && !extensao.isEmpty()) {
             result = jsonObject.getJSONObject("result");
             output = result.getJSONObject("output");
@@ -87,7 +117,7 @@ public class VertopalService {
         }
     }
 
-    public String obterUrl(){
+    public String obterUrl() {
         result = jsonObject.getJSONObject("result");
         output = result.getJSONObject("output");
 
@@ -133,11 +163,11 @@ public class VertopalService {
         processarArquivo(requisicao);
         return requisicao.getBody();
     }
-    public void salvarArquivo(File file, ResponseEntity<byte[]> requisicao){
+
+    public void salvarArquivo(File file, ResponseEntity<byte[]> requisicao) {
         try {
             FileUtils.writeByteArrayToFile(file, Objects.requireNonNull(requisicao.getBody()));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -146,8 +176,8 @@ public class VertopalService {
 
         // Processar resposta
 //       jsonObject = new JSONObject(response.getBody());
-       result = jsonObject.getJSONObject("result");
-       output = result.getJSONObject("output");
+        result = jsonObject.getJSONObject("result");
+        output = result.getJSONObject("output");
 
         String name = output.getString("name");
         BigDecimal size = new BigDecimal(output.getLong("size"));
