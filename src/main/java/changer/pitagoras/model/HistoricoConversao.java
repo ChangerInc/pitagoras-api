@@ -1,10 +1,10 @@
 package changer.pitagoras.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,19 +23,21 @@ public class HistoricoConversao {
     private String extensaoAnterior;
     private String extensaoAtual;
     private LocalDateTime dataConversao;
-    private String linkDownload;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] bytesArquivo;
     @ManyToOne
     @JoinColumn(name = "Usuario_id")
     private Usuario usuario;
 
-    public HistoricoConversao(String nome, BigDecimal tamanho, String extensaoAnterior, String extensaoAtual, String linkDownload, Usuario usuario) {
+    public HistoricoConversao(String nome, BigDecimal tamanho, String extensaoAnterior, String extensaoAtual, byte[] bytesArquivo, Usuario usuario) {
         this.idConversao = UUID.randomUUID();
         this.nome = nome;
         this.tamanho = tamanho;
         this.extensaoAnterior = extensaoAnterior;
         this.extensaoAtual = extensaoAtual;
         this.dataConversao = LocalDateTime.now();
-        this.linkDownload = linkDownload;
+        this.bytesArquivo = bytesArquivo;
         this.usuario = usuario;
     }
 }

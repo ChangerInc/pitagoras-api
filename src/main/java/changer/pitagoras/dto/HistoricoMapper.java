@@ -2,7 +2,7 @@ package changer.pitagoras.dto;
 
 import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.model.Usuario;
-import changer.pitagoras.dto.HistoricoDto;
+
 import java.util.UUID;
 
 public class HistoricoMapper {
@@ -13,7 +13,6 @@ public class HistoricoMapper {
         historicoConversao.setDataConversao(historicoDto.getDataConversao());
         historicoConversao.setExtensaoAnterior(historicoDto.getExtensaoAnterior());
         historicoConversao.setExtensaoAtual(historicoDto.getExtensaoAtual());
-        historicoConversao.setLinkDownload(historicoDto.getLinkDownload());
         historicoConversao.setTamanho(historicoDto.getTamanho());
         if (historicoDto.getFkUsuario() != null) {
             Usuario usuario = new Usuario();

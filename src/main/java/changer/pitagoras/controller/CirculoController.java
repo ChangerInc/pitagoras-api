@@ -3,6 +3,7 @@ package changer.pitagoras.controller;
 import changer.pitagoras.dto.CirculoMembrosDto;
 import changer.pitagoras.dto.CirculoSimplesDto;
 import changer.pitagoras.model.Circulo;
+import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.service.CirculoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -53,5 +54,21 @@ public class CirculoController {
     @PostMapping("/adicionar-membro")
     public ResponseEntity<CirculoMembrosDto> adicionarRequestBody(@RequestBody Map<String, UUID> novoMembro) {
         return ResponseEntity.status(201).body(circuloService.addMembro(novoMembro));
+    }
+
+    @PatchMapping("/publicar/{idCirculo}/{idArquivo}")
+    public ResponseEntity<Boolean> adicionarArquivoNaTurminha(@PathVariable UUID idCirculo, @PathVariable UUID idArquivo) {
+        return circuloService.adicionarArquivoNoGrupo(idCirculo, idArquivo) ? ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
+    }
+
+    @GetMapping("/arquivos/{idCirculo}")
+    public ResponseEntity<List<HistoricoConversao>> pegarTodosArquivosDoCirculo(@PathVariable UUID idCirculo) {
+        List<HistoricoConversao> arquivos = circuloService.resgatarArquivosDoCirculo(idCirculo);
+
+        if(arquivos.isEmpty()){
+            return ResponseEntity.status(204).build();
+        }
+
+        return ResponseEntity.status(200).body(arquivos);
     }
 }

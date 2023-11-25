@@ -1,17 +1,19 @@
 package changer.pitagoras.service;
 
-import changer.pitagoras.dto.CirculoMembrosDto;
-import changer.pitagoras.dto.CirculoSimplesDto;
-import changer.pitagoras.dto.UsuarioFotoDto;
+import changer.pitagoras.dto.*;
 import changer.pitagoras.model.Circulo;
+import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.model.Membro;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.CirculoRepository;
 //import changer.pitagoras.repository.MembroRepository;
+import changer.pitagoras.repository.HistoricoConversaoRepository;
 import changer.pitagoras.repository.MembroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -24,6 +26,9 @@ public class CirculoService {
     private UsuarioService usuarioService;
     @Autowired
     private MembroRepository membroRepository;
+
+    @Autowired
+    private HistoricoConversaoRepository historicoConversaoRepository;
 
     protected void validacao(UUID idCirc, UUID idDono) {
 
@@ -154,5 +159,23 @@ public class CirculoService {
         }
 
         return converterListaCirculos(circuloRepository.findAllByDono(user));
+    }
+
+    public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo){
+        Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idArquivo);
+        Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
+
+        if(arquivo.isEmpty() || circulo.isEmpty()){
+            return false;
+        }
+
+        circulo.get().getHistoricoDoCirculo().add(arquivo.get());
+        circuloRepository.save(circulo.get());
+        return true;
+    }
+
+    public List<HistoricoConversao> resgatarArquivosDoCirculo(UUID idCirculo){
+        Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
+        return circulo.map(Circulo::getHistoricoDoCirculo).orElse(null);
     }
 }

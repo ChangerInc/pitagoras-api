@@ -15,8 +15,5 @@ public class HistoricoDto {
     private String extensaoAnterior;
     private String extensaoAtual;
     private LocalDateTime dataConversao;
-    private String linkDownload;
     private String fkUsuario;
-
-
 }

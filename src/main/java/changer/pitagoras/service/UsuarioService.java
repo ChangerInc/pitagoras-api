@@ -4,7 +4,9 @@ import changer.pitagoras.config.security.GerenciadorTokenJwt;
 import changer.pitagoras.dto.*;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
+import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.model.Usuario;
+import changer.pitagoras.repository.HistoricoConversaoRepository;
 import changer.pitagoras.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import changer.pitagoras.util.ListaObj;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -39,6 +42,9 @@ public class UsuarioService {
     private GerenciadorTokenJwt gerenciadorTokenJwt;
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private HistoricoConversaoRepository historicoConversaoRepository;
 
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
@@ -194,4 +200,17 @@ public class UsuarioService {
         return usuarioRepository.existsById(codigo);
     }
 
+    public HistoricoConversao salvarArquivo(UUID codigo, byte[] novoArquivo) {
+        Optional<Usuario> usuario = usuarioRepository.findById(codigo);
+       if (usuario.isEmpty()){
+           return null;
+       }
+        HistoricoConversao historicoConversao = new HistoricoConversao();
+        historicoConversao.setIdConversao(UUID.randomUUID());
+        historicoConversao.setUsuario(usuario.get());
+        historicoConversao.setBytesArquivo(novoArquivo);
+
+        return historicoConversaoRepository.save(historicoConversao);
+
+    }
 }

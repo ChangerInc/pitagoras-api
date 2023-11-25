@@ -1,5 +1,7 @@
 package changer.pitagoras.service;
 
+import changer.pitagoras.dto.ArquivoApenasBytesDto;
+import changer.pitagoras.dto.HistoricoMapper;
 import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.repository.HistoricoConversaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,6 +31,14 @@ public class HistoricoConversaoService {
 
         // Implemente a lógica para buscar o histórico por usuário
         return lista;
+    }
+
+    public ArquivoApenasBytesDto pegarArquivoBytesPeloId(UUID id){
+        ArquivoApenasBytesDto arquivo = historicoConversaoRepository.findBytesArquivoAndIdConversaoByIdConversao(id);
+        if(arquivo == null){
+            return null;
+        }
+        return arquivo;
     }
 
 }

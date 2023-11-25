@@ -1,5 +1,6 @@
 package changer.pitagoras.controller;
 
+import changer.pitagoras.dto.ArquivoApenasBytesDto;
 import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.service.HistoricoConversaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,4 +27,9 @@ public class HistoricoConversaoController {
         return new ResponseEntity<>(historicoConversaoService.buscarHistoricoPorUsuario(usuarioId), HttpStatus.OK);
     }
 
+    @GetMapping("/arquivo/{idArquivo}")
+    public ResponseEntity<ArquivoApenasBytesDto> pegarBytesArquivoPeloId(@PathVariable UUID idArquivo) {
+        ArquivoApenasBytesDto arquivoDto = historicoConversaoService.pegarArquivoBytesPeloId(idArquivo);
+        return ResponseEntity.status(200).body(arquivoDto);
+    }
 }

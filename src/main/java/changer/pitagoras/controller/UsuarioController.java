@@ -4,15 +4,14 @@ import changer.pitagoras.dto.UsuarioCriacaoDto;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
+import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.service.ChangerService;
-import changer.pitagoras.util.ListaObj;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import changer.pitagoras.service.UsuarioService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -130,5 +129,16 @@ public class UsuarioController {
             return ResponseEntity.status(200).body(usuarioService.getFoto(codigo));
 
         return ResponseEntity.status(404).build();
+    }
+
+    @PostMapping(value = "/upload/{codigo}")
+    public ResponseEntity<byte[]> uploadArquivo(@PathVariable UUID codigo, @RequestBody byte[] novoArquivo){
+
+        HistoricoConversao atualizado = usuarioService.salvarArquivo(codigo, novoArquivo);
+        if (atualizado == null) {
+            return ResponseEntity.status(404).build();
+        }
+        return ResponseEntity.status(200).body(atualizado.getBytesArquivo());
+
     }
 }
