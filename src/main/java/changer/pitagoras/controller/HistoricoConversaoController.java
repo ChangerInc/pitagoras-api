@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/historicoconversao")
+@RequestMapping("/historico-conversao")
 public class HistoricoConversaoController {
 
     @Autowired
