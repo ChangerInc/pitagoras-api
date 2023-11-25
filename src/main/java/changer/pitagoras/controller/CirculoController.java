@@ -1,6 +1,7 @@
 package changer.pitagoras.controller;
 
 import changer.pitagoras.dto.CirculoMembrosDto;
+import changer.pitagoras.dto.CirculoPesquisaDto;
 import changer.pitagoras.dto.CirculoSimplesDto;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.HistoricoConversao;
@@ -70,5 +71,11 @@ public class CirculoController {
         }
 
         return ResponseEntity.status(200).body(arquivos);
+    }
+
+    @GetMapping("/pesquisar/{nomeCirculo}")
+    public ResponseEntity<List<CirculoPesquisaDto>> searchByName(@PathVariable String nomeCirculo) {
+        List<CirculoPesquisaDto> circulos = circuloService.findByNomeCirculoContaining(nomeCirculo);
+        return ResponseEntity.status(200).body(circulos);
     }
 }
