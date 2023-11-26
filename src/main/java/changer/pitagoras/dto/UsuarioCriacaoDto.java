@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public class UsuarioCriacaoDto {
 
-    @Size(min = 3, max = 10)
+    @Size(min = 3, max = 40)
     @Schema(description = "Nome do usuário", example = "Rafael Reis")
     private String nome;
 
