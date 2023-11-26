@@ -73,9 +73,11 @@ public class CirculoController {
         return ResponseEntity.status(200).body(arquivos);
     }
 
-    @GetMapping("/pesquisar/{nomeCirculo}")
-    public ResponseEntity<List<CirculoPesquisaDto>> searchByName(@PathVariable String nomeCirculo) {
-        List<CirculoPesquisaDto> circulos = circuloService.findByNomeCirculoContaining(nomeCirculo);
+    @GetMapping("/pesquisar/{nomeCirculo}/{idUser}")
+    public ResponseEntity<List<CirculoPesquisaDto>> searchByName(
+            @PathVariable String nomeCirculo, @PathVariable UUID idUser) {
+        List<CirculoPesquisaDto> circulos = circuloService.findByNomeCirculoContaining(nomeCirculo, idUser);
+
         return ResponseEntity.status(200).body(circulos);
     }
 }

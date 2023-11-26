@@ -11,9 +11,7 @@ import changer.pitagoras.repository.HistoricoConversaoRepository;
 import changer.pitagoras.repository.MembroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -161,11 +159,11 @@ public class CirculoService {
         return converterListaCirculos(circuloRepository.findAllByDono(user));
     }
 
-    public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo){
+    public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
         Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idArquivo);
         Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
 
-        if(arquivo.isEmpty() || circulo.isEmpty()){
+        if (arquivo.isEmpty() || circulo.isEmpty()) {
             return false;
         }
 
@@ -174,12 +172,25 @@ public class CirculoService {
         return true;
     }
 
-    public List<HistoricoConversao> resgatarArquivosDoCirculo(UUID idCirculo){
+    public List<HistoricoConversao> resgatarArquivosDoCirculo(UUID idCirculo) {
         Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
         return circulo.map(Circulo::getHistoricoDoCirculo).orElse(null);
     }
 
-    public List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo) {
-        return circuloRepository.findByNomeCirculoContaining(nomeCirculo);
+    public List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo, UUID idUser) {
+        Usuario user = usuarioService.encontrarUsuario(idUser);
+        List<CirculoPesquisaDto> lista = circuloRepository.findByNomeCirculoContaining(
+                nomeCirculo, user);
+        List<Membro> circMembro = membroRepository.findAllByMembroEquals(user);
+
+        for (Membro m :
+                circMembro) {
+            Circulo c = m.getCirculo();
+            if (c.getNomeCirculo().contains(nomeCirculo)) {
+                lista.add(new CirculoPesquisaDto(c.getId(), c.getNomeCirculo()));
+            }
+        }
+
+        return lista;
     }
 }

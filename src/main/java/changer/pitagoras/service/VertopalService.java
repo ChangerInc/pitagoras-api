@@ -45,8 +45,10 @@ public class VertopalService {
     }
 
     // Métodos úteis para esta classe:
-    protected String separarExtensao(String nomeDocumento) {
+    protected Map<String, String> separarExtensao(String nomeDocumento) {
         StringBuilder extensao = new StringBuilder();
+        StringBuilder nome = new StringBuilder();
+        Map<String, String> mapa = new HashMap<>();
 
         boolean ponto = false;
         for (int i = 0; i < nomeDocumento.length(); i++) {
@@ -56,12 +58,19 @@ public class VertopalService {
                 ponto = true;
             }
 
+            if (!ponto) {
+                nome.append(charAtual);
+            }
+
             if (ponto && charAtual != '.') {
                 extensao.append(charAtual);
             }
         }
 
-        return extensao.toString();
+        mapa.put("nome", nome.toString());
+        mapa.put("extensao", extensao.toString());
+
+        return mapa;
     }
     /*---------------------------------------------------*/
 
@@ -71,17 +80,21 @@ public class VertopalService {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Authorization", "Bearer " + accessToken);
 
+            Map<String, String> mapa = separarExtensao(file.getOriginalFilename());
+            String nome = mapa.get("nome");
+            String extensao = mapa.get("extensao");
+
             this.auxHistorico = new HistoricoConversao(
-                    file.getOriginalFilename(),
+                    nome,
                     BigDecimal.valueOf(file.getSize()),
-                    separarExtensao(Objects.requireNonNull(file.getOriginalFilename()))
+                    extensao
             );
 
             if (user != null) {
                 Usuario userObj = usuarioService.encontrarUsuario(user);
 
                 if (userObj == null) {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
                 }
 
                 auxHistorico.setUsuario(userObj);

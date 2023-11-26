@@ -36,6 +36,10 @@ public interface CirculoRepository extends JpaRepository<Circulo, UUID> {
     List<Circulo> findAllByDono(Usuario dono);
 
 
-    @Query("SELECT new changer.pitagoras.dto.CirculoPesquisaDto(c.id, c.nomeCirculo) FROM Circulo c WHERE c.nomeCirculo LIKE %?1%")
-    List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo);
+    @Query("""
+            SELECT new changer.pitagoras.dto.CirculoPesquisaDto(c.id, c.nomeCirculo)
+            FROM Circulo c
+            WHERE c.nomeCirculo LIKE %?1% AND c.dono = ?2
+            """)
+    List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo, Usuario user);
 }

@@ -1,5 +1,7 @@
 package changer.pitagoras.dto;
 
+import changer.pitagoras.model.Usuario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
