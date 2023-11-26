@@ -20,6 +20,9 @@ import changer.pitagoras.util.ListaObj;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -200,7 +203,7 @@ public class UsuarioService {
         return usuarioRepository.existsById(codigo);
     }
 
-    public HistoricoConversao salvarArquivo(UUID codigo, byte[] novoArquivo) {
+    public HistoricoConversao salvarArquivo(UUID codigo, MultipartFile file){
         Optional<Usuario> usuario = usuarioRepository.findById(codigo);
        if (usuario.isEmpty()){
            return null;
@@ -208,8 +211,24 @@ public class UsuarioService {
         HistoricoConversao historicoConversao = new HistoricoConversao();
         historicoConversao.setIdConversao(UUID.randomUUID());
         historicoConversao.setUsuario(usuario.get());
-        historicoConversao.setBytesArquivo(novoArquivo);
+        try {
+            historicoConversao.setBytesArquivo(file.getBytes());
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        historicoConversao.setDataConversao(LocalDateTime.now());
+        historicoConversao.setNome(file.getOriginalFilename());
+        historicoConversao.setExtensaoAtual(obterExtensaoArquivo(file.getOriginalFilename()));
+        historicoConversao.setTamanho(BigDecimal.valueOf(file.getSize()));
 
         return historicoConversaoRepository.save(historicoConversao);
+    }
+
+
+    private static String obterExtensaoArquivo(String nomeArquivo) {
+        Path path = Paths.get(nomeArquivo);
+        return path.getFileName().toString().contains(".")
+                ? path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1)
+                : "";
     }
 }
