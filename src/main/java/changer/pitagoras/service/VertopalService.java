@@ -191,7 +191,7 @@ public class VertopalService {
         ResponseEntity<byte[]> requisicao = restTemplate
                 .exchange(output.getString("url"), HttpMethod.POST, requestEntity, byte[].class);
         System.out.println(requisicao.getBody());
-        processarArquivo();
+        processarArquivo(requisicao.getBody());
         return requisicao.getBody();
     }
 
@@ -203,7 +203,7 @@ public class VertopalService {
         }
     }
 
-    public void processarArquivo() {
+    public void processarArquivo(byte[] documento) {
 
         // Processar resposta
         result = jsonObject.getJSONObject("result");
@@ -214,8 +214,8 @@ public class VertopalService {
 
         // Salvar informações no banco de dados
         auxHistorico.setIdConversao(UUID.randomUUID());
-        auxHistorico.setNome(name);
         auxHistorico.setTamanho(size);
+        auxHistorico.setBytesArquivo(documento);
         // Definir outros campos necessários, como extensões e link de download
 
         historicoConversaoService.salvarHistoricoConversao(auxHistorico);
