@@ -9,5 +9,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ArquivoApenasBytesDto {
     private UUID idConversao;
+    private String nomeArquivo;
     private byte[] bytesArquivo;
 }
