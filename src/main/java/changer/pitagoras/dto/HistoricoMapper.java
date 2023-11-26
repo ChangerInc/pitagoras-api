@@ -11,7 +11,7 @@ public class HistoricoMapper {
         HistoricoConversao historicoConversao = new HistoricoConversao();
 
         historicoConversao.setDataConversao(historicoDto.getDataConversao());
-        historicoConversao.setExtensaoAnterior(historicoDto.getExtensaoAnterior());
+        historicoConversao.setExtensaoInicial(historicoDto.getExtensaoAnterior());
         historicoConversao.setExtensaoAtual(historicoDto.getExtensaoAtual());
         historicoConversao.setTamanho(historicoDto.getTamanho());
         if (historicoDto.getFkUsuario() != null) {

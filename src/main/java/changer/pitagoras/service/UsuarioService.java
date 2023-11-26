@@ -211,6 +211,5 @@ public class UsuarioService {
         historicoConversao.setBytesArquivo(novoArquivo);
 
         return historicoConversaoRepository.save(historicoConversao);
-
     }
 }

@@ -2,6 +2,7 @@ package changer.pitagoras.service;
 
 import changer.pitagoras.config.VertopalConnector;
 import changer.pitagoras.model.HistoricoConversao;
+import changer.pitagoras.model.Usuario;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +29,8 @@ public class VertopalService {
     private RestTemplate restTemplate = new RestTemplate();
     @Autowired
     private HistoricoConversaoService historicoConversaoService;
+    @Autowired
+    private UsuarioService usuarioService;
     private HistoricoConversao auxHistorico;
     @Value("${api.access.token}")
     private String accessToken;
@@ -52,7 +56,7 @@ public class VertopalService {
                 ponto = true;
             }
 
-            if (charAtual != '.') {
+            if (ponto && charAtual != '.') {
                 extensao.append(charAtual);
             }
         }
@@ -61,17 +65,27 @@ public class VertopalService {
     }
     /*---------------------------------------------------*/
 
-    public String enviarArquivo(MultipartFile file) {
+    public String enviarArquivo(MultipartFile file, UUID user) {
         if (file != null && !file.isEmpty()) {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Authorization", "Bearer " + accessToken);
 
-            /*this.auxHistorico = new HistoricoConversao(
+            this.auxHistorico = new HistoricoConversao(
                     file.getOriginalFilename(),
                     BigDecimal.valueOf(file.getSize()),
-                    separarExtensao(file.getOriginalFilename()),
-            );*/
+                    separarExtensao(Objects.requireNonNull(file.getOriginalFilename()))
+            );
+
+            if (user != null) {
+                Usuario userObj = usuarioService.encontrarUsuario(user);
+
+                if (userObj == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                }
+
+                auxHistorico.setUsuario(userObj);
+            }
 
             MultiValueMap<String, Object> data = new LinkedMultiValueMap<>();
             data.add("data", ("{\"app\":\"%s\"}").formatted(app));
@@ -111,9 +125,13 @@ public class VertopalService {
                     restTemplate.exchange(VertopalConnector.CONVERT.getURL(), HttpMethod.POST, requestEntity, String.class);
 
             jsonObject = new JSONObject(requisicao.getBody());
+            auxHistorico.setExtensaoAtual(extensao);
             return requisicao.getBody();
         } else {
-            return "Você não informou o formato para qual deseja fazer a conversão";
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Você não informou o formato para qual deseja fazer a conversão"
+            );
         }
     }
 
@@ -160,7 +178,7 @@ public class VertopalService {
         ResponseEntity<byte[]> requisicao = restTemplate
                 .exchange(output.getString("url"), HttpMethod.POST, requestEntity, byte[].class);
         System.out.println(requisicao.getBody());
-        processarArquivo(requisicao);
+        processarArquivo();
         return requisicao.getBody();
     }
 
@@ -172,10 +190,9 @@ public class VertopalService {
         }
     }
 
-    public void processarArquivo(ResponseEntity<byte[]> response) {
+    public void processarArquivo() {
 
         // Processar resposta
-//       jsonObject = new JSONObject(response.getBody());
         result = jsonObject.getJSONObject("result");
         output = result.getJSONObject("output");
 
@@ -183,13 +200,11 @@ public class VertopalService {
         BigDecimal size = new BigDecimal(output.getLong("size"));
 
         // Salvar informações no banco de dados
-        HistoricoConversao historico = new HistoricoConversao();
-        historico.setIdConversao(UUID.randomUUID());
-        historico.setNome(name);
-        historico.setTamanho(size);
+        auxHistorico.setIdConversao(UUID.randomUUID());
+        auxHistorico.setNome(name);
+        auxHistorico.setTamanho(size);
         // Definir outros campos necessários, como extensões e link de download
 
-        historicoConversaoService.salvarHistoricoConversao(historico);
+        historicoConversaoService.salvarHistoricoConversao(auxHistorico);
     }
 }
-

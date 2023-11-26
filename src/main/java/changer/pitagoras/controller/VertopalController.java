@@ -7,15 +7,17 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/vertopal")
 public class VertopalController {
     @Autowired  
     VertopalService vertopalService = new VertopalService();
 
-    @PostMapping("/enviar")
-    public String enviarArquivo(@RequestParam("file") MultipartFile file){
-        return vertopalService.enviarArquivo(file);
+    @PostMapping("/enviar/")
+    public String enviarArquivo(@RequestParam("file") MultipartFile file, @PathVariable UUID user){
+        return vertopalService.enviarArquivo(file, user);
     }
 
     @PostMapping("/converter")

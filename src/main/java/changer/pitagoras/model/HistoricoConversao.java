@@ -20,7 +20,7 @@ public class HistoricoConversao {
     private UUID idConversao;
     private String nome;
     private BigDecimal tamanho;
-    private String extensaoAnterior;
+    private String extensaoInicial;
     private String extensaoAtual;
     private LocalDateTime dataConversao;
     @Lob
@@ -30,11 +30,19 @@ public class HistoricoConversao {
     @JoinColumn(name = "Usuario_id")
     private Usuario usuario;
 
-    public HistoricoConversao(String nome, BigDecimal tamanho, String extensaoAnterior, String extensaoAtual, byte[] bytesArquivo, Usuario usuario) {
+    public HistoricoConversao(String nome, BigDecimal tamanho, String extensaoAnterior) {
         this.idConversao = UUID.randomUUID();
         this.nome = nome;
         this.tamanho = tamanho;
-        this.extensaoAnterior = extensaoAnterior;
+        this.extensaoInicial = extensaoAnterior;
+        this.dataConversao = LocalDateTime.now();
+    }
+
+    public HistoricoConversao(String nome, BigDecimal tamanho, String extensaoAnterior, byte[] bytesArquivo, Usuario usuario) {
+        this.idConversao = UUID.randomUUID();
+        this.nome = nome;
+        this.tamanho = tamanho;
+        this.extensaoInicial = extensaoAnterior;
         this.extensaoAtual = extensaoAtual;
         this.dataConversao = LocalDateTime.now();
         this.bytesArquivo = bytesArquivo;
