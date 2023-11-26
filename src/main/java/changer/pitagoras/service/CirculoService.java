@@ -178,4 +178,8 @@ public class CirculoService {
         Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
         return circulo.map(Circulo::getHistoricoDoCirculo).orElse(null);
     }
+
+    public List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo) {
+        return circuloRepository.findByNomeCirculoContaining(nomeCirculo);
+    }
 }

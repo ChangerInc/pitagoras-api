@@ -1,5 +1,6 @@
 package changer.pitagoras.repository;
 
+import changer.pitagoras.dto.CirculoPesquisaDto;
 import changer.pitagoras.dto.CirculoSimplesDto;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.Usuario;
@@ -8,11 +9,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public interface CirculoRepository extends JpaRepository<Circulo, UUID> {
     @Query(
             """
@@ -31,4 +34,8 @@ public interface CirculoRepository extends JpaRepository<Circulo, UUID> {
     int updateNome(@Param("novoNome") String novoNome, @Param("id") UUID id);
 
     List<Circulo> findAllByDono(Usuario dono);
+
+
+    @Query("SELECT new changer.pitagoras.dto.CirculoPesquisaDto(c.id, c.nomeCirculo) FROM Circulo c WHERE c.nomeCirculo LIKE %?1%")
+    List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo);
 }

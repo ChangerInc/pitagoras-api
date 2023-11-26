@@ -57,7 +57,7 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/vertopal/**"),
             new AntPathRequestMatcher("/circulo/**"),
             new AntPathRequestMatcher("/historico/**"),
-            new AntPathRequestMatcher("/historicoconversao/**")
+            new AntPathRequestMatcher("/historico-conversao/**")
     };
 
     @Bean
