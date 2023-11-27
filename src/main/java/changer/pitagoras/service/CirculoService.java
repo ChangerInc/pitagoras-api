@@ -156,7 +156,16 @@ public class CirculoService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
         }
 
-        return converterListaCirculos(circuloRepository.findAllByDono(user));
+        List<CirculoMembrosDto> lista = converterListaCirculos(circuloRepository.findAllByDono(user));
+
+        for (Membro m :
+                membroRepository.findAllByMembroEquals(user)) {
+            Circulo c = m.getCirculo();
+
+            lista.add(gerarCirculoMembros(c.getDono().getId(), c.getId()));
+        }
+
+        return lista;
     }
 
     public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
