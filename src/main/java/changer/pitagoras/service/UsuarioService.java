@@ -20,6 +20,9 @@ import changer.pitagoras.util.ListaObj;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,14 +57,6 @@ public class UsuarioService {
         return usuarioRepository.findUsersAdm();
     }
 
-    public Usuario novoUsuario(Usuario usuario) {
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            return null;
-        }
-
-        return usuarioRepository.save(usuario);
-    }
-
     public Usuario encontrarUsuario(UUID uuid) {
         Optional<Usuario> usuarioOptional = usuarioRepository.findById(uuid);
         return usuarioOptional.orElse(null);
@@ -70,7 +65,6 @@ public class UsuarioService {
     public UsuarioNomeEmailDto encontrarUsuarioPorEmail(UsuarioEmailSenhaDto dto) {
         Optional<UsuarioNomeEmailDto> usuario =
                 usuarioRepository.buscarUsuarioEmailSenhaDto(dto.getEmail(), dto.getSenha());
-        System.out.println(usuario);
         return usuario.orElse(null);
     }
 
@@ -200,7 +194,7 @@ public class UsuarioService {
         return usuarioRepository.existsById(codigo);
     }
 
-    public HistoricoConversao salvarArquivo(UUID codigo, byte[] novoArquivo) {
+    public HistoricoConversao salvarArquivo(UUID codigo, MultipartFile file){
         Optional<Usuario> usuario = usuarioRepository.findById(codigo);
        if (usuario.isEmpty()){
            return null;
@@ -208,8 +202,26 @@ public class UsuarioService {
         HistoricoConversao historicoConversao = new HistoricoConversao();
         historicoConversao.setIdConversao(UUID.randomUUID());
         historicoConversao.setUsuario(usuario.get());
-        historicoConversao.setBytesArquivo(novoArquivo);
+        try {
+            historicoConversao.setBytesArquivo(file.getBytes());
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        historicoConversao.setDataConversao(LocalDateTime.now());
+        historicoConversao.setNome(file.getOriginalFilename());
+        historicoConversao.setExtensaoAtual(obterExtensaoArquivo(file.getOriginalFilename()));
+        historicoConversao.setTamanho(BigDecimal.valueOf(file.getSize()));
 
         return historicoConversaoRepository.save(historicoConversao);
+    }
+
+
+    public String obterExtensaoArquivo(String nomeArquivo) {
+        if (!nomeArquivo.contains(".")) {
+            throw new TypeNotPresentException("Ponto (.) não encontrado no nome do arquivo", null);
+        }
+
+        Path path = Paths.get(nomeArquivo);
+        return path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1);
     }
 }

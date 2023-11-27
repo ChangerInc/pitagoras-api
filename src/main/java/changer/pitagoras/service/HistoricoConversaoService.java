@@ -34,7 +34,7 @@ public class HistoricoConversaoService {
     }
 
     public ArquivoApenasBytesDto pegarArquivoBytesPeloId(UUID id){
-        ArquivoApenasBytesDto arquivo = historicoConversaoRepository.findBytesArquivoAndIdConversaoByIdConversao(id);
+        ArquivoApenasBytesDto arquivo = historicoConversaoRepository.findBytesArquivoAndIdConversaoAndNomeArquivoByIdConversao(id);
         if(arquivo == null){
             return null;
         }

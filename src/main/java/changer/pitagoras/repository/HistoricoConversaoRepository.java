@@ -14,6 +14,6 @@ public interface HistoricoConversaoRepository extends JpaRepository<HistoricoCon
 
     HistoricoConversao save(HistoricoConversao dto);
 
-    @Query("select new changer.pitagoras.dto.ArquivoApenasBytesDto(idConversao, bytesArquivo) from HistoricoConversao where idConversao = ?1")
-    ArquivoApenasBytesDto findBytesArquivoAndIdConversaoByIdConversao(UUID idArquivo);
+    @Query("select new changer.pitagoras.dto.ArquivoApenasBytesDto(idConversao, nome, bytesArquivo) from HistoricoConversao where idConversao = ?1")
+    ArquivoApenasBytesDto findBytesArquivoAndIdConversaoAndNomeArquivoByIdConversao(UUID idArquivo);
 }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.List;
@@ -132,9 +133,9 @@ public class UsuarioController {
     }
 
     @PostMapping(value = "/upload/{codigo}")
-    public ResponseEntity<byte[]> uploadArquivo(@PathVariable UUID codigo, @RequestBody byte[] novoArquivo){
+    public ResponseEntity<byte[]> uploadArquivo(@PathVariable UUID codigo, @RequestParam("file") MultipartFile file){
 
-        HistoricoConversao atualizado = usuarioService.salvarArquivo(codigo, novoArquivo);
+        HistoricoConversao atualizado = usuarioService.salvarArquivo(codigo, file);
         if (atualizado == null) {
             return ResponseEntity.status(404).build();
         }
