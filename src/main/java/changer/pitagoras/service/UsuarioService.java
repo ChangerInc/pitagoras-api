@@ -57,14 +57,6 @@ public class UsuarioService {
         return usuarioRepository.findUsersAdm();
     }
 
-    public Usuario novoUsuario(Usuario usuario) {
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            return null;
-        }
-
-        return usuarioRepository.save(usuario);
-    }
-
     public Usuario encontrarUsuario(UUID uuid) {
         Optional<Usuario> usuarioOptional = usuarioRepository.findById(uuid);
         return usuarioOptional.orElse(null);
@@ -73,7 +65,6 @@ public class UsuarioService {
     public UsuarioNomeEmailDto encontrarUsuarioPorEmail(UsuarioEmailSenhaDto dto) {
         Optional<UsuarioNomeEmailDto> usuario =
                 usuarioRepository.buscarUsuarioEmailSenhaDto(dto.getEmail(), dto.getSenha());
-        System.out.println(usuario);
         return usuario.orElse(null);
     }
 
@@ -225,10 +216,12 @@ public class UsuarioService {
     }
 
 
-    private static String obterExtensaoArquivo(String nomeArquivo) {
+    public String obterExtensaoArquivo(String nomeArquivo) {
+        if (!nomeArquivo.contains(".")) {
+            throw new TypeNotPresentException("Ponto (.) não encontrado no nome do arquivo", null);
+        }
+
         Path path = Paths.get(nomeArquivo);
-        return path.getFileName().toString().contains(".")
-                ? path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1)
-                : "";
+        return path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1);
     }
 }
