@@ -4,11 +4,13 @@ import changer.pitagoras.config.security.GerenciadorTokenJwt;
 import changer.pitagoras.dto.*;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
+import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.HistoricoConversaoRepository;
 import changer.pitagoras.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -223,5 +225,16 @@ public class UsuarioService {
 
         Path path = Paths.get(nomeArquivo);
         return path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1);
+    }
+
+    public Boolean deletarArquivo(UUID codigo, UUID idConversao) {
+        Optional<Usuario> usuario = usuarioRepository.findById(codigo);
+        Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idConversao);
+
+        if (usuario.isEmpty() || arquivo.isEmpty()) {
+            return false;
+        }
+        historicoConversaoRepository.deleteById(idConversao);
+        return true;
     }
 }
