@@ -87,4 +87,9 @@ public class CirculoController {
 
         return ResponseEntity.status(200).body(circulos);
     }
+
+    @DeleteMapping("/limpar/{idCirculo}")
+    public ResponseEntity<Boolean> removerATurminhaTodaDoCirculo(@PathVariable UUID idCirculo) {
+        return circuloService.removerTodosOsMembrosDoCIrculo(idCirculo) ? ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
+    }
 }

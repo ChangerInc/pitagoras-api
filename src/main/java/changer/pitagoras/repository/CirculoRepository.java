@@ -42,4 +42,9 @@ public interface CirculoRepository extends JpaRepository<Circulo, UUID> {
             WHERE c.nomeCirculo LIKE %?1% AND c.dono = ?2
             """)
     List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo, Usuario user);
+
+    @Modifying
+    @Transactional
+    @Query("update membro set membro = null where circulo.id = ?1")
+    Integer deletarTodosMembrosDoCirculo(UUID circuloId);
 }

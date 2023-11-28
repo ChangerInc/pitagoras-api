@@ -146,7 +146,7 @@ public class CirculoService {
             return null;
         }
         Usuario auxUser = usuarioService.encontrarUsuario(membroNovo.getIdDono());
-        Membro novo = new Membro(auxUser, auxCirc.get());
+        Membro novo = new Membro(usuario.get(), auxCirc.get());
         membroRepository.save(novo);
 
         return true;
@@ -217,5 +217,10 @@ public class CirculoService {
         circulo.get().getHistoricoDoCirculo().remove(arquivo.get());
         circuloRepository.save(circulo.get());
         return true;
+    }
+
+    public Boolean removerTodosOsMembrosDoCIrculo(UUID idCirculo){
+        Integer deletados = circuloRepository.deletarTodosMembrosDoCirculo(idCirculo);
+        return deletados > 0;
     }
 }
