@@ -9,6 +9,7 @@ import changer.pitagoras.repository.CirculoRepository;
 //import changer.pitagoras.repository.MembroRepository;
 import changer.pitagoras.repository.HistoricoConversaoRepository;
 import changer.pitagoras.repository.MembroRepository;
+import changer.pitagoras.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ public class CirculoService {
     private UsuarioService usuarioService;
     @Autowired
     private MembroRepository membroRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Autowired
     private HistoricoConversaoRepository historicoConversaoRepository;
@@ -132,21 +135,21 @@ public class CirculoService {
         circuloRepository.deleteById(ids.get("idCirc"));
     }
 
-    public CirculoMembrosDto addMembro(Map<String, UUID> novoMembro) {
-        UUID idUser = novoMembro.get("idUser");
-        UUID idCirc = novoMembro.get("idCirc");
-        UUID idDono = novoMembro.get("idDono");
+    public Boolean addMembro(NovoMembroDto membroNovo) {
+        Optional<Usuario> usuario = usuarioRepository.findByEmail(membroNovo.getEmail());
+        if(usuario.isEmpty()){
+            return null;
+        }
 
-        validacao(idCirc, idDono);
-
-        Circulo auxCirc = circuloRepository.findById(idCirc).get();
-        Usuario auxUser = usuarioService.encontrarUsuario(idUser);
-
-        Membro novo = new Membro(auxUser, auxCirc);
-
+        Optional<Circulo> auxCirc = circuloRepository.findById(membroNovo.getIdCirculo());
+        if(auxCirc.isEmpty()){
+            return null;
+        }
+        Usuario auxUser = usuarioService.encontrarUsuario(membroNovo.getIdDono());
+        Membro novo = new Membro(auxUser, auxCirc.get());
         membroRepository.save(novo);
 
-        return gerarCirculoMembros(idDono, idCirc);
+        return true;
     }
 
     public List<CirculoMembrosDto> getAllById(UUID idUser) {

@@ -3,9 +3,11 @@ package changer.pitagoras.controller;
 import changer.pitagoras.dto.CirculoMembrosDto;
 import changer.pitagoras.dto.CirculoPesquisaDto;
 import changer.pitagoras.dto.CirculoSimplesDto;
+import changer.pitagoras.dto.NovoMembroDto;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.service.CirculoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,8 +55,8 @@ public class CirculoController {
     }
 
     @PostMapping("/adicionar-membro")
-    public ResponseEntity<CirculoMembrosDto> adicionarRequestBody(@RequestBody Map<String, UUID> novoMembro) {
-        return ResponseEntity.status(201).body(circuloService.addMembro(novoMembro));
+    public ResponseEntity<Boolean> adicionarRequestBody(@RequestBody @Valid NovoMembroDto membroNovo) {
+        return ResponseEntity.status(201).body(circuloService.addMembro(membroNovo));
     }
 
     @PatchMapping("/publicar/{idCirculo}/{idArquivo}")
