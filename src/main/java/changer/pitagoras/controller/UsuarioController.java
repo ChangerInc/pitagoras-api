@@ -132,13 +132,13 @@ public class UsuarioController {
     }
 
     @PostMapping(value = "/upload/{codigo}")
-    public ResponseEntity<byte[]> uploadArquivo(@PathVariable UUID codigo, @RequestParam("file") MultipartFile file){
+    public ResponseEntity<UUID> uploadArquivo(@PathVariable UUID codigo, @RequestParam("file") MultipartFile file){
 
         HistoricoConversao atualizado = usuarioService.salvarArquivo(codigo, file);
         if (atualizado == null) {
             return ResponseEntity.status(404).build();
         }
-        return ResponseEntity.status(200).body(atualizado.getBytesArquivo());
+        return ResponseEntity.status(200).body(atualizado.getIdConversao());
 
     }
 
