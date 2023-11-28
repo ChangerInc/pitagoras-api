@@ -53,7 +53,6 @@ public class UsuarioController {
     }
 
     @PostMapping("/")
-    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Usuario> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
         Usuario usuario = usuarioService.criar(usuarioCriacaoDto);
         if (usuario == null)

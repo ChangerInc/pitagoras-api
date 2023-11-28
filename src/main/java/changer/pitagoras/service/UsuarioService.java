@@ -10,6 +10,7 @@ import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.HistoricoConversaoRepository;
 import changer.pitagoras.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -159,6 +161,7 @@ public class UsuarioService {
         final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
         novoUsuario.setPlano(false);
         novoUsuario.setDataCriacaoConta(LocalDateTime.now());
+        novoUsuario.setFotoPerfil(obterBytesDaImagemPadrao());
         String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
         novoUsuario.setSenha(senhaCriptografada);
         return usuarioRepository.save(novoUsuario);
@@ -236,5 +239,15 @@ public class UsuarioService {
         }
         historicoConversaoRepository.deleteById(idConversao);
         return true;
+    }
+
+    private byte[] obterBytesDaImagemPadrao() {
+        try {
+            ClassPathResource resource = new ClassPathResource("src/main/resources/perfil-de-usuario.png");
+            return Files.readAllBytes(resource.getFile().toPath());
+        } catch (IOException e) {
+            e.printStackTrace(); // Tratar a exceção adequadamente no seu aplicativo
+            return new byte[0]; // Retorna um array vazio em caso de falha na leitura
+        }
     }
 }
