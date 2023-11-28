@@ -1,6 +1,7 @@
 package changer.pitagoras.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ public class Circulo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Size(min = 3, max = 13)
     private String nomeCirculo;
     @ManyToOne
     @JoinColumn(name = "Usuario_id")

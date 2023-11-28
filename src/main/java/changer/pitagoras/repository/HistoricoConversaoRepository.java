@@ -1,7 +1,6 @@
 package changer.pitagoras.repository;
 
 import changer.pitagoras.dto.ArquivoApenasBytesDto;
-import changer.pitagoras.dto.HistoricoDto;
 import changer.pitagoras.model.HistoricoConversao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
