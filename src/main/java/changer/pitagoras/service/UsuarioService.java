@@ -243,7 +243,7 @@ public class UsuarioService {
 
     private byte[] obterBytesDaImagemPadrao() {
         try {
-            ClassPathResource resource = new ClassPathResource("src/main/resources/perfil-de-usuario.png");
+            ClassPathResource resource = new ClassPathResource("perfil-de-usuario.png");
             return Files.readAllBytes(resource.getFile().toPath());
         } catch (IOException e) {
             e.printStackTrace(); // Tratar a exceção adequadamente no seu aplicativo
