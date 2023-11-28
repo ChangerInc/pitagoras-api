@@ -202,4 +202,17 @@ public class CirculoService {
 
         return lista;
     }
+
+    public boolean removerArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
+        Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idArquivo);
+        Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
+
+        if (arquivo.isEmpty() || circulo.isEmpty()) {
+            return false;
+        }
+
+        circulo.get().getHistoricoDoCirculo().remove(arquivo.get());
+        circuloRepository.save(circulo.get());
+        return true;
+    }
 }
