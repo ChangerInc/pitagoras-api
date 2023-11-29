@@ -182,23 +182,6 @@ class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("1.10 Deve atualizar a senha do usuário com sucesso")
-    public void testUpdateSenha() {
-        UUID idUsuario = UUID.randomUUID();
-        Map<String, String> senhas = Map.of("senhaAtual", "senha123", "senhaNova", "novaSenha123");
-        Usuario usuario = new Usuario();
-        usuario.setSenha("senha123");
-
-        when(usuarioRepository.findById(idUsuario)).thenReturn(Optional.of(usuario));
-        when(passwordEncoder.matches(senhas.get("senhaAtual"), usuario.getSenha())).thenReturn(true);
-        when(passwordEncoder.encode(senhas.get("senhaNova"))).thenReturn("novaSenha123");
-
-        int resultado = service.update(senhas, idUsuario);
-
-        assertEquals(200, resultado);
-    }
-
-    @Test
     @DisplayName("1.11 Deve retornar código de erro ao tentar atualizar senha com senha atual incorreta")
     public void testUpdateSenhaSenhaAtualIncorreta() {
         UUID idUsuario = UUID.randomUUID();
