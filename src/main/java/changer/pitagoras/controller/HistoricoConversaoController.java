@@ -28,8 +28,8 @@ public class HistoricoConversaoController {
     }
 
     @GetMapping("/arquivo/{idArquivo}")
-    public ResponseEntity<ArquivoApenasBytesDto> pegarBytesArquivoPeloId(@PathVariable UUID idArquivo) {
+    public ResponseEntity<byte[]> pegarBytesArquivoPeloId(@PathVariable UUID idArquivo) {
         ArquivoApenasBytesDto arquivoDto = historicoConversaoService.pegarArquivoBytesPeloId(idArquivo);
-        return ResponseEntity.status(200).body(arquivoDto);
+        return ResponseEntity.status(200).body(arquivoDto.getBytesArquivo());
     }
 }

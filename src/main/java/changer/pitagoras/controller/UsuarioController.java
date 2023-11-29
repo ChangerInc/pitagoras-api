@@ -144,9 +144,9 @@ public class UsuarioController {
 
     @DeleteMapping("/excluir/{codigo}/{idConversao}")
     public ResponseEntity<Boolean[]> removerArquivo(@PathVariable UUID codigo, @PathVariable UUID idConversao){
-
+        System.out.println(codigo + "\n" + idConversao);
         Boolean atualizado = usuarioService.deletarArquivo(codigo, idConversao);
-        if (atualizado == null) {
+        if (!atualizado) {
             return ResponseEntity.status(404).build();
         }
         return ResponseEntity.status(200).build();

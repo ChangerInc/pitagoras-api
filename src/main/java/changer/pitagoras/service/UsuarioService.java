@@ -208,7 +208,7 @@ public class UsuarioService {
         historicoConversao.setIdConversao(UUID.randomUUID());
         historicoConversao.setUsuario(usuario.get());
         try {
-            historicoConversao.setBytesArquivo(file.getBytes());
+            historicoConversao.setBytesArquivo(file.getResource().getContentAsByteArray());
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -233,6 +233,7 @@ public class UsuarioService {
     public Boolean deletarArquivo(UUID codigo, UUID idConversao) {
         Optional<Usuario> usuario = usuarioRepository.findById(codigo);
         Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idConversao);
+
 
         if (usuario.isEmpty() || arquivo.isEmpty()) {
             return false;
