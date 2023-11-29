@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface HistoricoConversaoRepository extends JpaRepository<HistoricoConversao, UUID> {
-    List<HistoricoConversao> findByUsuarioId(UUID usuarioId);
+    List<HistoricoConversao> findByUsuarioIdOrderByDataConversao(UUID usuarioId);
 
     HistoricoConversao save(HistoricoConversao dto);
 

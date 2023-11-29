@@ -4,12 +4,14 @@ import changer.pitagoras.dto.ArquivoApenasBytesDto;
 import changer.pitagoras.dto.HistoricoMapper;
 import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.repository.HistoricoConversaoRepository;
+import changer.pitagoras.util.PilhaObj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,16 +30,27 @@ public class HistoricoConversaoService {
         return historicoConversaoRepository.save(historico);
     }
     public List<HistoricoConversao> buscarHistoricoPorUsuario(UUID usuarioId) {
-        List<HistoricoConversao> lista = historicoConversaoRepository.findByUsuarioId(usuarioId);
+        List<HistoricoConversao> lista = historicoConversaoRepository.findByUsuarioIdOrderByDataConversao(usuarioId);
         if (usuarioId == null) {
             throw new IllegalArgumentException("ID do usuário não pode ser nulo.");
         }
         if (lista.isEmpty()) {
-            throw new ResponseStatusException(HttpStatusCode.valueOf(204), "Não há arquivos recentes");
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Não há arquivos recentes");
         }
 
-        // Implemente a lógica para buscar o histórico por usuário
-        return lista;
+        // Criação da pilha e empilhamento dos elementos
+        PilhaObj<HistoricoConversao> pilha = new PilhaObj<>(lista.size());
+        for (HistoricoConversao historico : lista) {
+            pilha.push(historico);
+        }
+
+        // Criação da lista ordenada
+        List<HistoricoConversao> listaOrdenada = new ArrayList<>();
+        while (!pilha.isEmpty()) {
+            listaOrdenada.add(pilha.pop());
+        }
+
+        return listaOrdenada;
     }
 
     public ArquivoApenasBytesDto pegarArquivoBytesPeloId(UUID id){
