@@ -45,6 +45,6 @@ public interface CirculoRepository extends JpaRepository<Circulo, UUID> {
 
     @Modifying
     @Transactional
-    @Query("update membro set membro = null where circulo.id = ?1")
+    @Query("update membro set membro = null, circulo = null where circulo.id = ?1")
     Integer deletarTodosMembrosDoCirculo(UUID circuloId);
 }
