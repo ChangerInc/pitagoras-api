@@ -1,3 +1,8 @@
-00USERS2023220-11-2023 16:21:3202
-026107ea90-f440-40a4-a902-3d76a3e61f89 lele                     lele@gmail.com                          $2a$10$ry46vbAmboh5c2Exm7ukS.E96fEb15Qlo2xeiDef.6Y4vQjtxKnie    false 2023-11-20T16:19:33.321431 
-010000000001
+00USERS2023228-11-2023 20:57:5102
+0206a09470-3348-47be-861f-c82856bb7cee Usuario Teste 1          teste1@exemplo.com                      senha1                                                          true  2023-11-28T20:57:51.726317 
+02b90bcacb-a221-4a85-bd44-28a8bbdd2257 Usuario Teste 2          teste2@exemplo.com                      senha2                                                          false 2023-11-28T20:57:51.726317 
+010000000002
+00USERS2023228-11-2023 21:03:1902
+02f8f75376-2ee2-4866-ba8c-e00101d8fe4c Nome1                    email1@teste.com                        senha1                                                          true  null               
+02ded78b2c-56be-41d1-bcba-032481000b7c Nome2                    email2@teste.com                        senha2                                                          false null               
+010000000002

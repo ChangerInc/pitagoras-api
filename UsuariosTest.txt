@@ -1,0 +1,4 @@
+00USERS2023228-11-2023 21:03:1902
+02f8f75376-2ee2-4866-ba8c-e00101d8fe4c Nome1                    email1@teste.com                        senha1                                                          true  null               
+02ded78b2c-56be-41d1-bcba-032481000b7c Nome2                    email2@teste.com                        senha2                                                          false null               
+010000000002
