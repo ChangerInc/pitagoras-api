@@ -64,4 +64,9 @@ public class HistoricoConversaoService {
         return arquivo;
     }
 
+    public Boolean limparIdCirculoDoHistorico(UUID idCirculo, UUID idConversao){
+        Integer deletados = historicoConversaoRepository.limparIdCirculoDoHistorico(idCirculo, idConversao);
+        return deletados > 0;
+    }
+
 }

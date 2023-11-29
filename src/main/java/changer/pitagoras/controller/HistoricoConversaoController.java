@@ -32,4 +32,9 @@ public class HistoricoConversaoController {
         ArquivoApenasBytesDto arquivoDto = historicoConversaoService.pegarArquivoBytesPeloId(idArquivo);
         return ResponseEntity.status(200).body(arquivoDto.getBytesArquivo());
     }
+
+    @DeleteMapping("/limpar/{idCirculo}/{idConversao}")
+    public ResponseEntity<Boolean> removerATurminhaTodaDoCirculo(@PathVariable UUID idCirculo, @PathVariable UUID idConversao) {
+        return historicoConversaoService.limparIdCirculoDoHistorico(idCirculo, idConversao) ? ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
+    }
 }
