@@ -160,7 +160,7 @@ public class CirculoService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
         }
 
-        List<CirculoMembrosDto> lista = converterListaCirculos(circuloRepository.findAllByDonoOrderByDataCriacaoDesc(user));
+        List<CirculoMembrosDto> lista = converterListaCirculos(circuloRepository.findAllByDonoOrderByDataCriacao(user));
 
         for (Membro m : membroRepository.findAllByMembroEquals(user)) {
             Circulo c = m.getCirculo();
