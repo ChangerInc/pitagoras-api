@@ -10,6 +10,7 @@ import changer.pitagoras.repository.CirculoRepository;
 import changer.pitagoras.repository.HistoricoConversaoRepository;
 import changer.pitagoras.repository.MembroRepository;
 import changer.pitagoras.repository.UsuarioRepository;
+import changer.pitagoras.util.FilaObj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -159,17 +160,28 @@ public class CirculoService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
         }
 
-        List<CirculoMembrosDto> lista = converterListaCirculos(circuloRepository.findAllByDono(user));
+        List<CirculoMembrosDto> lista = converterListaCirculos(circuloRepository.findAllByDonoOrderByDataCriacao(user));
 
-        for (Membro m :
-                membroRepository.findAllByMembroEquals(user)) {
+        for (Membro m : membroRepository.findAllByMembroEquals(user)) {
             Circulo c = m.getCirculo();
-
             lista.add(gerarCirculoMembros(c.getDono().getId(), c.getId()));
         }
 
-        return lista;
+        // Criação da fila e inserção dos elementos
+        FilaObj<CirculoMembrosDto> fila = new FilaObj<>(lista.size());
+        for (CirculoMembrosDto circulo : lista) {
+            fila.insert(circulo);
+        }
+
+        // Criação da lista ordenada
+        List<CirculoMembrosDto> listaOrdenada = new ArrayList<>();
+        while (!fila.isEmpty()) {
+            listaOrdenada.add(fila.poll());
+        }
+
+        return listaOrdenada;
     }
+
 
     public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
         Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idArquivo);
