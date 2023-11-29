@@ -9,6 +9,7 @@ import changer.pitagoras.model.Usuario;
 import changer.pitagoras.service.ChangerService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import changer.pitagoras.service.UsuarioService;
 import org.springframework.http.HttpStatus;
@@ -112,14 +113,13 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(usuario);
     }
 
-    @PatchMapping(value = "/foto/{codigo}",
-            consumes = "image/*")
-    public ResponseEntity<Void> patchFoto(@PathVariable UUID codigo, @RequestBody byte[] novaFoto){
-
-        int atualizado = usuarioService.atualizarFoto(novaFoto, codigo);
+    @SneakyThrows
+    @PatchMapping(value = "/foto/{codigo}")
+    public ResponseEntity<byte[]> patchFoto(@PathVariable UUID codigo, @RequestParam("file") MultipartFile novaFoto){
+        int atualizado = usuarioService.atualizarFoto(novaFoto.getBytes(), codigo);
         int status = atualizado == 1 ? 200 : 404;
 
-        return ResponseEntity.status(status).build();
+        return ResponseEntity.status(status).body(novaFoto.getBytes());
     }
 
     @GetMapping(value = "/foto/{codigo}", produces = "image/**")
