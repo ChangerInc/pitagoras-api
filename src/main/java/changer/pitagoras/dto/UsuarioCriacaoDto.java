@@ -1,16 +1,21 @@
 package changer.pitagoras.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class UsuarioCriacaoDto {
 
     @Size(min = 3, max = 40)
+    @NotBlank
     @Schema(description = "Nome do usuário", example = "Rafael Reis")
     private String nome;
 
     @Email
+    @Column(unique = true)
     @Schema(description = "Email do usuário", example = "rafael.reis@sptech.school")
     private String email;
 
