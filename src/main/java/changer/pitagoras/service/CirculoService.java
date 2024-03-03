@@ -207,8 +207,7 @@ public class CirculoService {
                 nomeCirculo, user);
         List<Membro> circMembro = membroRepository.findAllByMembroEquals(user);
 
-        for (Membro m :
-                circMembro) {
+        for (Membro m : circMembro) {
             Circulo c = m.getCirculo();
             if (c.getNomeCirculo().contains(nomeCirculo)) {
                 lista.add(new CirculoPesquisaDto(c.getId(), c.getNomeCirculo()));

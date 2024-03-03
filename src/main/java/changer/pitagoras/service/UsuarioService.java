@@ -1,16 +1,19 @@
 package changer.pitagoras.service;
 
 import changer.pitagoras.config.security.GerenciadorTokenJwt;
+import changer.pitagoras.controller.CirculoController;
 import changer.pitagoras.dto.*;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.model.Usuario;
+import changer.pitagoras.repository.CirculoRepository;
 import changer.pitagoras.repository.HistoricoConversaoRepository;
 import changer.pitagoras.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,9 +52,10 @@ public class UsuarioService {
     private GerenciadorTokenJwt gerenciadorTokenJwt;
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private HistoricoConversaoRepository historicoConversaoRepository;
+    @Autowired
+    private CirculoRepository circuloRepository;
 
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
@@ -155,7 +159,7 @@ public class UsuarioService {
     }
 
     public Usuario criar(UsuarioCriacaoDto usuarioCriacaoDto) {
-        if(usuarioRepository.existsByEmail(usuarioCriacaoDto.getEmail())){
+        if (usuarioRepository.existsByEmail(usuarioCriacaoDto.getEmail())) {
             return null;
         }
         final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
@@ -199,17 +203,17 @@ public class UsuarioService {
         return usuarioRepository.existsById(codigo);
     }
 
-    public HistoricoConversao salvarArquivo(UUID codigo, MultipartFile file){
+    public HistoricoConversao salvarArquivo(UUID codigo, MultipartFile file) {
         Optional<Usuario> usuario = usuarioRepository.findById(codigo);
-       if (usuario.isEmpty()){
-           return null;
-       }
+        if (usuario.isEmpty()) {
+            return null;
+        }
         HistoricoConversao historicoConversao = new HistoricoConversao();
         historicoConversao.setIdConversao(UUID.randomUUID());
         historicoConversao.setUsuario(usuario.get());
         try {
             historicoConversao.setBytesArquivo(file.getResource().getContentAsByteArray());
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         historicoConversao.setDataConversao(LocalDateTime.now());
@@ -231,13 +235,24 @@ public class UsuarioService {
     }
 
     public Boolean deletarArquivo(UUID codigo, UUID idConversao) {
+        CirculoController circuloController = new CirculoController();
         Optional<Usuario> usuario = usuarioRepository.findById(codigo);
         Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idConversao);
-
 
         if (usuario.isEmpty() || arquivo.isEmpty()) {
             return false;
         }
+
+        if (circuloController.todosCircUser(codigo).getStatusCode() == HttpStatus.OK) {
+            List<CirculoMembrosDto> listaCirc = circuloController.todosCircUser(codigo).getBody();
+
+            if (!listaCirc.isEmpty()) {
+                for (CirculoMembrosDto c : listaCirc) {
+                    circuloController.removerArquivoNaTurminha(c.getId(), idConversao);
+                }
+            }
+        }
+
         historicoConversaoRepository.deleteById(idConversao);
         return true;
     }
