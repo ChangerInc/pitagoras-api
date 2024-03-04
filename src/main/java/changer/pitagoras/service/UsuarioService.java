@@ -5,12 +5,15 @@ import changer.pitagoras.controller.CirculoController;
 import changer.pitagoras.dto.*;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
+import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.model.Usuario;
+import changer.pitagoras.repository.ArquivoRepository;
 import changer.pitagoras.repository.CirculoRepository;
 import changer.pitagoras.repository.HistoricoConversaoRepository;
 import changer.pitagoras.repository.UsuarioRepository;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -33,13 +36,10 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 
 @Service
 public class UsuarioService {
@@ -54,6 +54,8 @@ public class UsuarioService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private HistoricoConversaoRepository historicoConversaoRepository;
+    @Autowired
+    ArquivoRepository arquivoRepository;
     @Autowired
     private CirculoRepository circuloRepository;
 
@@ -203,25 +205,30 @@ public class UsuarioService {
         return usuarioRepository.existsById(codigo);
     }
 
-    public HistoricoConversao salvarArquivo(UUID codigo, MultipartFile file) {
+    public Arquivo salvarArquivo(UUID codigo, MultipartFile file) {
         Optional<Usuario> usuario = usuarioRepository.findById(codigo);
         if (usuario.isEmpty()) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
         }
-        HistoricoConversao historicoConversao = new HistoricoConversao();
-        historicoConversao.setIdConversao(UUID.randomUUID());
-        historicoConversao.setUsuario(usuario.get());
+
+        Arquivo arquivo = new Arquivo();
+        arquivo.setIdArquivo(UUID.randomUUID());
+
         try {
-            historicoConversao.setBytesArquivo(file.getResource().getContentAsByteArray());
+            arquivo.setBytesArquivo(file.getResource().getContentAsByteArray());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        historicoConversao.setDataConversao(LocalDateTime.now());
-        historicoConversao.setNome(file.getOriginalFilename());
-        historicoConversao.setExtensaoAtual(obterExtensaoArquivo(file.getOriginalFilename()));
-        historicoConversao.setTamanho(BigDecimal.valueOf(file.getSize()));
 
-        return historicoConversaoRepository.save(historicoConversao);
+        arquivo.setCriacao((LocalDateTime.now()));
+        arquivo.setNome(file.getOriginalFilename());
+        arquivo.setExtensao(obterExtensaoArquivo(file.getOriginalFilename()));
+        arquivo.setTamanho(BigDecimal.valueOf(file.getSize()));
+
+        usuario.get().getArquivos().add(arquivo);
+        usuarioRepository.save(usuario.get());
+
+        return arquivoRepository.save(arquivo);
     }
 
 
@@ -234,7 +241,7 @@ public class UsuarioService {
         return path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1);
     }
 
-    public Boolean deletarArquivo(UUID codigo, UUID idConversao) {
+    /*public Boolean deletarArquivo(UUID codigo, UUID idConversao) {
         CirculoController circuloController = new CirculoController();
         Optional<Usuario> usuario = usuarioRepository.findById(codigo);
         Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idConversao);
@@ -242,20 +249,7 @@ public class UsuarioService {
         if (usuario.isEmpty() || arquivo.isEmpty()) {
             return false;
         }
-
-        if (circuloController.todosCircUser(codigo).getStatusCode() == HttpStatus.OK) {
-            List<CirculoMembrosDto> listaCirc = circuloController.todosCircUser(codigo).getBody();
-
-            if (!listaCirc.isEmpty()) {
-                for (CirculoMembrosDto c : listaCirc) {
-                    circuloController.removerArquivoNaTurminha(c.getId(), idConversao);
-                }
-            }
-        }
-
-        historicoConversaoRepository.deleteById(idConversao);
-        return true;
-    }
+    }*/
 
     private byte[] obterBytesDaImagemPadrao() {
         try {

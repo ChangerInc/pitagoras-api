@@ -9,6 +9,7 @@ import changer.pitagoras.util.Criptograma;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "Usuario")
@@ -26,6 +27,14 @@ public class Usuario {
     private byte[] fotoPerfil;
     private Boolean plano;
     private LocalDateTime dataCriacaoConta;
+    @ManyToMany
+    @JoinTable(
+            name = "arquivos_usuario",
+            joinColumns = @JoinColumn(name = "circulo_fk"),
+            inverseJoinColumns = @JoinColumn(name = "arquivo_fk")
+    )
+    private List<Arquivo> arquivos;
+
     public Usuario(String nome, String email, String senha) {
         this.id = UUID.randomUUID();
         this.nome = nome;

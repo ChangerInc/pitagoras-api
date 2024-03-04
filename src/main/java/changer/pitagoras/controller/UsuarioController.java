@@ -4,6 +4,7 @@ import changer.pitagoras.dto.UsuarioCriacaoDto;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
+import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.service.ChangerService;
@@ -133,16 +134,12 @@ public class UsuarioController {
 
     @PostMapping(value = "/upload/{codigo}")
     public ResponseEntity<UUID> uploadArquivo(@PathVariable UUID codigo, @RequestParam("file") MultipartFile file){
+        Arquivo arquivo = usuarioService.salvarArquivo(codigo, file);
 
-        HistoricoConversao atualizado = usuarioService.salvarArquivo(codigo, file);
-        if (atualizado == null) {
-            return ResponseEntity.status(404).build();
-        }
-        return ResponseEntity.status(200).body(atualizado.getIdConversao());
-
+        return ResponseEntity.status(200).body(arquivo.getIdArquivo());
     }
 
-    @DeleteMapping("/excluir/{codigo}/{idConversao}")
+    /*@DeleteMapping("/excluir/{codigo}/{idConversao}")
     public ResponseEntity<Boolean[]> removerArquivo(@PathVariable UUID codigo, @PathVariable UUID idConversao){
         System.out.println(codigo + "\n" + idConversao);
         Boolean atualizado = usuarioService.deletarArquivo(codigo, idConversao);
@@ -150,5 +147,5 @@ public class UsuarioController {
             return ResponseEntity.status(404).build();
         }
         return ResponseEntity.status(200).build();
-    }
+    }*/
 }

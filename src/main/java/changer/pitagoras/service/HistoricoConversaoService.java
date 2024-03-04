@@ -30,10 +30,12 @@ public class HistoricoConversaoService {
         return historicoConversaoRepository.save(historico);
     }
     public List<HistoricoConversao> buscarHistoricoPorUsuario(UUID usuarioId) {
-        List<HistoricoConversao> lista = historicoConversaoRepository.findByUsuarioIdOrderByDataConversao(usuarioId);
         if (usuarioId == null) {
             throw new IllegalArgumentException("ID do usuário não pode ser nulo.");
         }
+
+        List<HistoricoConversao> lista = historicoConversaoRepository.findByUsuarioIdOrderByDataConversao(usuarioId);
+
         if (lista.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NO_CONTENT, "Não há arquivos recentes");
         }
@@ -54,14 +56,17 @@ public class HistoricoConversaoService {
     }
 
     public ArquivoApenasBytesDto pegarArquivoBytesPeloId(UUID id){
-        ArquivoApenasBytesDto arquivo = historicoConversaoRepository.findBytesArquivoAndIdConversaoAndNomeArquivoByIdConversao(id);
         if (id == null) {
             throw new IllegalArgumentException("ID do arquivo não pode ser nulo.");
         }
+
+        ArquivoApenasBytesDto arquivo = historicoConversaoRepository
+                .findBytesArquivoAndIdConversaoAndNomeArquivoByIdConversao(id);
+
         if(arquivo == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Arquivo não encontrado");
         }
+
         return arquivo;
     }
-
 }

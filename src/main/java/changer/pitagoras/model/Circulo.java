@@ -26,6 +26,13 @@ public class Circulo {
     private LocalDateTime dataCriacao;
     @OneToMany
     private List<HistoricoConversao> historicoDoCirculo;
+    @ManyToMany
+    @JoinTable(
+            name = "arquivos_grupo",
+            joinColumns = @JoinColumn(name = "circulo_fk"),
+            inverseJoinColumns = @JoinColumn(name = "arquivo_fk")
+    )
+    private List<Arquivo> arquivos;
 
     public Circulo(String nomeCirculo, Usuario dono) {
         this.id = UUID.randomUUID();
