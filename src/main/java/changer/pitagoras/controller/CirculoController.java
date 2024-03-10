@@ -4,6 +4,7 @@ import changer.pitagoras.dto.CirculoMembrosDto;
 import changer.pitagoras.dto.CirculoPesquisaDto;
 import changer.pitagoras.dto.CirculoSimplesDto;
 import changer.pitagoras.dto.NovoMembroDto;
+import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.service.CirculoService;
@@ -74,14 +75,12 @@ public class CirculoController {
     }
 
     @GetMapping("/arquivos/{idCirculo}")
-    public ResponseEntity<List<HistoricoConversao>> pegarTodosArquivosDoCirculo(@PathVariable UUID idCirculo) {
-        List<HistoricoConversao> arquivos = circuloService.resgatarArquivosDoCirculo(idCirculo);
+    public ResponseEntity<List<Arquivo>> pegarTodosArquivosDoCirculo(@PathVariable UUID idCirculo) {
+        List<Arquivo> arquivos = circuloService.resgatarArquivos(idCirculo);
 
-        if(arquivos.isEmpty()){
-            return ResponseEntity.status(204).build();
-        }
-
-        return ResponseEntity.status(200).body(arquivos);
+        return arquivos.isEmpty()
+                ? ResponseEntity.status(204).build()
+                : ResponseEntity.status(200).body(arquivos);
     }
 
     @GetMapping("/pesquisar/{nomeCirculo}/{idUser}")

@@ -134,18 +134,14 @@ public class UsuarioController {
 
     @PostMapping(value = "/upload/{codigo}")
     public ResponseEntity<UUID> uploadArquivo(@PathVariable UUID codigo, @RequestParam("file") MultipartFile file){
-        Arquivo arquivo = usuarioService.salvarArquivo(codigo, file);
-
-        return ResponseEntity.status(200).body(arquivo.getIdArquivo());
+        return ResponseEntity.status(200).body(usuarioService.salvarArquivo(codigo, file).getIdArquivo());
     }
 
-    /*@DeleteMapping("/excluir/{codigo}/{idConversao}")
-    public ResponseEntity<Boolean[]> removerArquivo(@PathVariable UUID codigo, @PathVariable UUID idConversao){
+    @DeleteMapping("/excluir/{codigo}/{idConversao}")
+    public ResponseEntity<Boolean> removerArquivo(@PathVariable UUID codigo, @PathVariable UUID idConversao){
         System.out.println(codigo + "\n" + idConversao);
-        Boolean atualizado = usuarioService.deletarArquivo(codigo, idConversao);
-        if (!atualizado) {
-            return ResponseEntity.status(404).build();
-        }
-        return ResponseEntity.status(200).build();
-    }*/
+        return usuarioService.deletarArquivo(codigo, idConversao)
+                ? ResponseEntity.status(200).build()
+                : ResponseEntity.status(404).build();
+    }
 }

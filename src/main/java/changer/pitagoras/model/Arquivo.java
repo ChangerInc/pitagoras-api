@@ -24,4 +24,12 @@ public class Arquivo {
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] bytesArquivo;
+
+    public Arquivo(String nome, LocalDateTime criacao, BigDecimal tamanho, String extensao) {
+        idArquivo = UUID.randomUUID();
+        this.nome = nome;
+        this.criacao = LocalDateTime.now();
+        this.tamanho = tamanho;
+        this.extensao = extensao;
+    }
 }

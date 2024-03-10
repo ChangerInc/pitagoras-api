@@ -53,9 +53,7 @@ public class UsuarioService {
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private HistoricoConversaoRepository historicoConversaoRepository;
-    @Autowired
-    ArquivoRepository arquivoRepository;
+    private ArquivoService arquivoService;
     @Autowired
     private CirculoRepository circuloRepository;
 
@@ -76,6 +74,14 @@ public class UsuarioService {
         Optional<UsuarioNomeEmailDto> usuario =
                 usuarioRepository.buscarUsuarioEmailSenhaDto(dto.getEmail(), dto.getSenha());
         return usuario.orElse(null);
+    }
+
+    public Usuario encontrarUsuarioPorEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+        if (usuario == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.");
+        }
+        return usuario;
     }
 
     public void deletarUsuario(Usuario user) {
@@ -211,24 +217,12 @@ public class UsuarioService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
         }
 
-        Arquivo arquivo = new Arquivo();
-        arquivo.setIdArquivo(UUID.randomUUID());
-
-        try {
-            arquivo.setBytesArquivo(file.getResource().getContentAsByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        arquivo.setCriacao((LocalDateTime.now()));
-        arquivo.setNome(file.getOriginalFilename());
-        arquivo.setExtensao(obterExtensaoArquivo(file.getOriginalFilename()));
-        arquivo.setTamanho(BigDecimal.valueOf(file.getSize()));
+        Arquivo arquivo = arquivoService.salvar(file);
 
         usuario.get().getArquivos().add(arquivo);
         usuarioRepository.save(usuario.get());
 
-        return arquivoRepository.save(arquivo);
+        return arquivo;
     }
 
 
@@ -241,15 +235,25 @@ public class UsuarioService {
         return path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1);
     }
 
-    /*public Boolean deletarArquivo(UUID codigo, UUID idConversao) {
-        CirculoController circuloController = new CirculoController();
-        Optional<Usuario> usuario = usuarioRepository.findById(codigo);
-        Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idConversao);
+    public Boolean deletarArquivo(UUID codigo, UUID idArquivo) {
+        if (codigo == null || idArquivo == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
 
-        if (usuario.isEmpty() || arquivo.isEmpty()) {
+        Usuario user = encontrarUsuario(codigo);
+        if (user == null) {
             return false;
         }
-    }*/
+
+        Arquivo arq = arquivoService.buscarArquivo(idArquivo);
+        if (arq == null) {
+            return false;
+        }
+
+        user.getArquivos().remove(arq);
+        usuarioRepository.save(user);
+        return true;
+    }
 
     private byte[] obterBytesDaImagemPadrao() {
         try {

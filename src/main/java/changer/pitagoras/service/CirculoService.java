@@ -1,10 +1,7 @@
 package changer.pitagoras.service;
 
 import changer.pitagoras.dto.*;
-import changer.pitagoras.model.Circulo;
-import changer.pitagoras.model.HistoricoConversao;
-import changer.pitagoras.model.Membro;
-import changer.pitagoras.model.Usuario;
+import changer.pitagoras.model.*;
 import changer.pitagoras.repository.CirculoRepository;
 //import changer.pitagoras.repository.MembroRepository;
 import changer.pitagoras.repository.HistoricoConversaoRepository;
@@ -137,17 +134,16 @@ public class CirculoService {
     }
 
     public Boolean addMembro(NovoMembroDto membroNovo) {
-        Optional<Usuario> usuario = usuarioRepository.findByEmail(membroNovo.getEmail());
-        if(usuario.isEmpty()){
-            return null;
+        Optional<Circulo> auxCirc = circuloRepository.findById(membroNovo.getIdCirculo());
+
+        if(auxCirc.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Circulo não encontrado");
         }
 
-        Optional<Circulo> auxCirc = circuloRepository.findById(membroNovo.getIdCirculo());
-        if(auxCirc.isEmpty()){
-            return null;
-        }
-        Usuario auxUser = usuarioService.encontrarUsuario(membroNovo.getIdDono());
-        Membro novo = new Membro(usuario.get(), auxCirc.get());
+        Membro novo = new Membro(
+                usuarioService.encontrarUsuarioPorEmail(membroNovo.getEmail()),
+                auxCirc.get()
+        );
         membroRepository.save(novo);
 
         return true;
@@ -184,7 +180,7 @@ public class CirculoService {
 
 
     public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
-        Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idArquivo);
+        Optional<Arquivo> arquivo = arquivoSer.findById(idArquivo);
         Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
 
         if (arquivo.isEmpty() || circulo.isEmpty()) {
@@ -196,9 +192,14 @@ public class CirculoService {
         return true;
     }
 
-    public List<HistoricoConversao> resgatarArquivosDoCirculo(UUID idCirculo) {
-        Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
-        return circulo.map(Circulo::getHistoricoDoCirculo).orElse(null);
+    public List<Arquivo> resgatarArquivos(UUID idCirculo) {
+        Circulo circulo = circuloRepository.findById(idCirculo).orElse(null);
+
+        if (circulo == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID inválido");
+        }
+
+        return circulo.getArquivos();
     }
 
     public List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo, UUID idUser) {
@@ -218,14 +219,19 @@ public class CirculoService {
     }
 
     public boolean removerArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
-        Optional<HistoricoConversao> arquivo = historicoConversaoRepository.findById(idArquivo);
         Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
-
-        if (arquivo.isEmpty() || circulo.isEmpty()) {
+        if (circulo.isEmpty()) {
             return false;
         }
 
-        circulo.get().getHistoricoDoCirculo().remove(arquivo.get());
+        List<Arquivo> arquivos = circulo.get().getArquivos();
+        for (Arquivo a : arquivos) {
+            if (a.getIdArquivo().equals(idArquivo)) {
+                arquivos.remove(a);
+                break;
+            }
+        }
+
         circuloRepository.save(circulo.get());
         return true;
     }

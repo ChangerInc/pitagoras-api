@@ -30,8 +30,10 @@ public class VertopalService {
     @Autowired
     private HistoricoConversaoService historicoConversaoService;
     @Autowired
+    private ArquivoService arquivoService;
+    @Autowired
     private UsuarioService usuarioService;
-    private HistoricoConversao auxHistorico;
+    private HistoricoConversao auxArquivo;
     @Value("${api.access.token}")
     private String accessToken;
     @Value("${api.data.app}")
@@ -84,8 +86,8 @@ public class VertopalService {
             String nome = mapa.get("nome");
             String extensao = mapa.get("extensao");
 
-            this.auxHistorico = new HistoricoConversao(
-                    nome,
+            this.auxArquivo = new HistoricoConversao(
+                    ArquivoService.obterExtensaoArquivo(file.getOriginalFilename()),
                     BigDecimal.valueOf(file.getSize()),
                     extensao
             );
@@ -97,7 +99,7 @@ public class VertopalService {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
                 }
 
-                auxHistorico.setUsuario(userObj);
+                auxArquivo.setUsuario(userObj);
             }
 
             MultiValueMap<String, Object> data = new LinkedMultiValueMap<>();
@@ -138,7 +140,7 @@ public class VertopalService {
                     restTemplate.exchange(VertopalConnector.CONVERT.getURL(), HttpMethod.POST, requestEntity, String.class);
 
             jsonObject = new JSONObject(requisicao.getBody());
-            auxHistorico.setExtensaoAtual(extensao);
+            auxArquivo.setExtensaoAtual(extensao);
             return requisicao.getBody();
         } else {
             throw new ResponseStatusException(
@@ -213,11 +215,11 @@ public class VertopalService {
         BigDecimal size = new BigDecimal(output.getLong("size"));
 
         // Salvar informações no banco de dados
-        auxHistorico.setIdConversao(UUID.randomUUID());
-        auxHistorico.setTamanho(size);
-        auxHistorico.setBytesArquivo(documento);
+        auxArquivo.setIdConversao(UUID.randomUUID());
+        auxArquivo.setTamanho(size);
+        auxArquivo.setBytesArquivo(documento);
         // Definir outros campos necessários, como extensões e link de download
 
-        historicoConversaoService.salvarHistoricoConversao(auxHistorico);
+        historicoConversaoService.salvarHistoricoConversao(auxArquivo);
     }
 }
