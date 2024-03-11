@@ -4,13 +4,16 @@ import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.repository.ArquivoRepository;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.AbstractQueue;
 import java.util.UUID;
 
 @Service
@@ -22,13 +25,14 @@ public class ArquivoService {
     @Getter
     private String nomeAux;
 
-    public static String obterExtensaoArquivo(String nomeArquivo) {
-        if (!nomeArquivo.contains(".")) {
-            throw new TypeNotPresentException("Ponto (.) não encontrado no nome do arquivo", null);
+    public Arquivo encontrarArq(UUID id) {
+        Arquivo arq = repository.findByIdArquivo(id).orElse(null);
+
+        if (arq == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Arquivo não encontrado");
         }
 
-        Path path = Paths.get(nomeArquivo);
-        return path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1);
+        return arq;
     }
 
     public void separarExtensao(String nomeDocumento) {
@@ -61,17 +65,22 @@ public class ArquivoService {
     }
 
     public Arquivo salvar(MultipartFile file) {
-        Arquivo arquivo = new Arquivo();
-        arquivo.setIdArquivo(UUID.randomUUID());
+        if (file == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Arquivo vazio");
+        }
+
+        separarExtensao(file.getOriginalFilename());
+        Arquivo arquivo = new Arquivo(
+                nomeAux,
+                BigDecimal.valueOf(file.getSize()),
+                extensaoAux
+        );
 
         try {
             arquivo.setBytesArquivo(file.getResource().getContentAsByteArray());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        arquivo.setNome(file.getOriginalFilename());
-        arquivo.setExtensao(obterExtensaoArquivo(file.getOriginalFilename()));
-        arquivo.setTamanho(BigDecimal.valueOf(file.getSize()));
 
         return repository.save(arquivo);
     }

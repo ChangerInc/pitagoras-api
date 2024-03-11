@@ -66,8 +66,13 @@ public class UsuarioService {
     }
 
     public Usuario encontrarUsuario(UUID uuid) {
-        Optional<Usuario> usuarioOptional = usuarioRepository.findById(uuid);
-        return usuarioOptional.orElse(null);
+        Usuario usuarioOptional = usuarioRepository.findById(uuid).orElse(null);
+
+        if (usuarioOptional == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
+        }
+
+        return usuarioOptional;
     }
 
     public UsuarioNomeEmailDto encontrarUsuarioPorEmail(UsuarioEmailSenhaDto dto) {
@@ -212,19 +217,23 @@ public class UsuarioService {
     }
 
     public Arquivo salvarArquivo(UUID codigo, MultipartFile file) {
-        Optional<Usuario> usuario = usuarioRepository.findById(codigo);
-        if (usuario.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
-        }
-
+        Usuario usuario = encontrarUsuario(codigo);
         Arquivo arquivo = arquivoService.salvar(file);
 
-        usuario.get().getArquivos().add(arquivo);
-        usuarioRepository.save(usuario.get());
+        usuario.getArquivos().add(arquivo);
+        usuarioRepository.save(usuario);
 
         return arquivo;
     }
 
+    public Arquivo salvarArquivo(UUID id, Arquivo arq) {
+        Usuario usuario = encontrarUsuario(id);
+
+        usuario.getArquivos().add(arq);
+        usuarioRepository.save(usuario);
+
+        return arq;
+    }
 
     public String obterExtensaoArquivo(String nomeArquivo) {
         if (!nomeArquivo.contains(".")) {

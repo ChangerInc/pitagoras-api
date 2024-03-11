@@ -32,8 +32,4 @@ public class Arquivo {
         this.tamanho = tamanho;
         this.extensao = extensao;
     }
-
-    public Arquivo(String nome, String extensao) {
-
-    }
 }

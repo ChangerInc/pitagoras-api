@@ -43,61 +43,19 @@ public class VertopalService {
     private JSONObject result;
     private JSONObject output;
     private JSONObject error;
+    private UUID user;
 
     public VertopalService() {
     }
-
-    // Métodos úteis para esta classe:
-    protected Map<String, String> separarExtensao(String nomeDocumento) {
-        StringBuilder extensao = new StringBuilder();
-        StringBuilder nome = new StringBuilder();
-        Map<String, String> mapa = new HashMap<>();
-
-        boolean ponto = false;
-        for (int i = 0; i < nomeDocumento.length(); i++) {
-            char charAtual = nomeDocumento.charAt(i);
-
-            if (charAtual == '.') {
-                ponto = true;
-            }
-
-            if (!ponto) {
-                nome.append(charAtual);
-            }
-
-            if (ponto && charAtual != '.') {
-                extensao.append(charAtual);
-            }
-        }
-
-        mapa.put("nome", nome.toString());
-        mapa.put("extensao", extensao.toString());
-
-        return mapa;
-    }
-    /*---------------------------------------------------*/
 
     public String enviarArquivo(MultipartFile file, UUID user) {
         if (file != null && !file.isEmpty()) {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Authorization", "Bearer " + accessToken);
-            arquivoService.separarExtensao(file.getOriginalFilename());
-
-            /*this.auxArquivo = new Arquivo(
-                    ArquivoService.obterExtensaoArquivo(),
-                    BigDecimal.valueOf(file.getSize()),
-                    extensao
-            );*/
 
             if (user != null) {
-                Usuario userObj = usuarioService.encontrarUsuario(user);
-
-                if (userObj == null) {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
-                }
-
-//                auxArquivo.setUsuario(userObj);
+                this.user = user;
             }
 
             MultiValueMap<String, Object> data = new LinkedMultiValueMap<>();
@@ -204,20 +162,21 @@ public class VertopalService {
     }
 
     public void processarArquivo(byte[] documento) {
-
         // Processar resposta
         result = jsonObject.getJSONObject("result");
         output = result.getJSONObject("output");
 
-        String name = output.getString("name");
-        BigDecimal size = new BigDecimal(output.getLong("size"));
-
-        // Salvar informações no banco de dados
-//        auxArquivo.setIdConversao(UUID.randomUUID());
-        auxArquivo.setTamanho(size);
-        auxArquivo.setBytesArquivo(documento);
-        // Definir outros campos necessários, como extensões e link de download
-
-//        historicoConversaoService.salvarHistoricoConversao(auxArquivo);
+        // separar o nome da extensão do arquivo
+        arquivoService.separarExtensao(output.getString("name"));
+        usuarioService.salvarArquivo(
+                user,
+                arquivoService.salvar(
+                        new Arquivo(
+                                arquivoService.getNomeAux(),
+                                new BigDecimal(output.getLong("size")),
+                                arquivoService.getExtensaoAux()
+                        )
+                )
+        );
     }
 }

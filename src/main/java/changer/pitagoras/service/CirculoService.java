@@ -179,14 +179,14 @@ public class CirculoService {
 
 
     public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
-//        Optional<Arquivo> arquivo = arquivoService.findById(idArquivo);
+        Arquivo arquivo = arquivoService.encontrarArq(idArquivo);
         Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
 
-        /*if (arquivo.isEmpty() || circulo.isEmpty()) {
-            return false;
-        }*/
+        if (circulo.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Círculo não encontrado");
+        }
 
-//        circulo.get().getHistoricoDoCirculo().add(arquivo.get());
+        circulo.get().getArquivos().add(arquivo);
         circuloRepository.save(circulo.get());
         return true;
     }
