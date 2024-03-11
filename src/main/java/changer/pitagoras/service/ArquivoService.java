@@ -2,6 +2,7 @@ package changer.pitagoras.service;
 
 import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.repository.ArquivoRepository;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,16 +11,15 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
 public class ArquivoService {
     @Autowired
     private ArquivoRepository repository;
+    @Getter
     private String extensaoAux;
+    @Getter
     private String nomeAux;
 
     public static String obterExtensaoArquivo(String nomeArquivo) {
@@ -31,10 +31,9 @@ public class ArquivoService {
         return path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1);
     }
 
-    protected Map<String, String> separarExtensao(String nomeDocumento) {
+    public void separarExtensao(String nomeDocumento) {
         StringBuilder extensao = new StringBuilder();
         StringBuilder nome = new StringBuilder();
-        Map<String, String> mapa = new HashMap<>();
 
         boolean ponto = false;
         for (int i = 0; i < nomeDocumento.length(); i++) {
@@ -55,8 +54,10 @@ public class ArquivoService {
 
         nomeAux = nome.toString();
         extensaoAux = extensao.toString();
+    }
 
-        return mapa;
+    public Arquivo salvar(Arquivo arq) {
+        return repository.save(arq);
     }
 
     public Arquivo salvar(MultipartFile file) {

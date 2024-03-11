@@ -2,11 +2,8 @@ package changer.pitagoras.service;
 
 import changer.pitagoras.dto.*;
 import changer.pitagoras.model.*;
-import changer.pitagoras.repository.CirculoRepository;
+import changer.pitagoras.repository.*;
 //import changer.pitagoras.repository.MembroRepository;
-import changer.pitagoras.repository.HistoricoConversaoRepository;
-import changer.pitagoras.repository.MembroRepository;
-import changer.pitagoras.repository.UsuarioRepository;
 import changer.pitagoras.util.FilaObj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +25,8 @@ public class CirculoService {
 
     @Autowired
     private HistoricoConversaoRepository historicoConversaoRepository;
+    @Autowired
+    private ArquivoService arquivoService;
 
     protected void validacao(UUID idCirc, UUID idDono) {
 
@@ -180,14 +179,14 @@ public class CirculoService {
 
 
     public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
-        Optional<Arquivo> arquivo = arquivoSer.findById(idArquivo);
+//        Optional<Arquivo> arquivo = arquivoService.findById(idArquivo);
         Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
 
-        if (arquivo.isEmpty() || circulo.isEmpty()) {
+        /*if (arquivo.isEmpty() || circulo.isEmpty()) {
             return false;
-        }
+        }*/
 
-        circulo.get().getHistoricoDoCirculo().add(arquivo.get());
+//        circulo.get().getHistoricoDoCirculo().add(arquivo.get());
         circuloRepository.save(circulo.get());
         return true;
     }
