@@ -1,23 +1,16 @@
 package changer.pitagoras.service;
 
 import changer.pitagoras.config.security.GerenciadorTokenJwt;
-import changer.pitagoras.controller.CirculoController;
 import changer.pitagoras.dto.*;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Arquivo;
-import changer.pitagoras.model.Circulo;
-import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.model.Usuario;
-import changer.pitagoras.repository.ArquivoRepository;
 import changer.pitagoras.repository.CirculoRepository;
-import changer.pitagoras.repository.HistoricoConversaoRepository;
 import changer.pitagoras.repository.UsuarioRepository;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,7 +22,6 @@ import changer.pitagoras.util.ListaObj;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,9 +45,11 @@ public class UsuarioService {
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private ArquivoService arquivoService;
-    @Autowired
     private CirculoRepository circuloRepository;
+
+    public Usuario salvarUser(Usuario user) {
+        return usuarioRepository.save(user);
+    }
 
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
@@ -66,13 +60,13 @@ public class UsuarioService {
     }
 
     public Usuario encontrarUsuario(UUID uuid) {
-        Usuario usuarioOptional = usuarioRepository.findById(uuid).orElse(null);
+        Usuario usuario = usuarioRepository.findById(uuid).orElse(null);
 
-        if (usuarioOptional == null) {
+        if (usuario == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
         }
 
-        return usuarioOptional;
+        return usuario;
     }
 
     public UsuarioNomeEmailDto encontrarUsuarioPorEmail(UsuarioEmailSenhaDto dto) {
@@ -216,25 +210,6 @@ public class UsuarioService {
         return usuarioRepository.existsById(codigo);
     }
 
-    public Arquivo salvarArquivo(UUID codigo, MultipartFile file) {
-        Usuario usuario = encontrarUsuario(codigo);
-        Arquivo arquivo = arquivoService.salvar(file);
-
-        usuario.getArquivos().add(arquivo);
-        usuarioRepository.save(usuario);
-
-        return arquivo;
-    }
-
-    public Arquivo salvarArquivo(UUID id, Arquivo arq) {
-        Usuario usuario = encontrarUsuario(id);
-
-        usuario.getArquivos().add(arq);
-        usuarioRepository.save(usuario);
-
-        return arq;
-    }
-
     public String obterExtensaoArquivo(String nomeArquivo) {
         if (!nomeArquivo.contains(".")) {
             throw new TypeNotPresentException("Ponto (.) não encontrado no nome do arquivo", null);
@@ -242,26 +217,6 @@ public class UsuarioService {
 
         Path path = Paths.get(nomeArquivo);
         return path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1);
-    }
-
-    public Boolean deletarArquivo(UUID codigo, UUID idArquivo) {
-        if (codigo == null || idArquivo == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        Usuario user = encontrarUsuario(codigo);
-        if (user == null) {
-            return false;
-        }
-
-        Arquivo arq = arquivoService.buscarArquivo(idArquivo);
-        if (arq == null) {
-            return false;
-        }
-
-        user.getArquivos().remove(arq);
-        usuarioRepository.save(user);
-        return true;
     }
 
     private byte[] obterBytesDaImagemPadrao() {
@@ -272,5 +227,9 @@ public class UsuarioService {
             e.printStackTrace(); // Tratar a exceção adequadamente no seu aplicativo
             return new byte[0]; // Retorna um array vazio em caso de falha na leitura
         }
+    }
+
+    public List<Arquivo> pegarArq(UUID id) {
+        return encontrarUsuario(id).getArquivos();
     }
 }

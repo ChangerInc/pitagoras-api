@@ -4,6 +4,7 @@ import changer.pitagoras.dto.*;
 import changer.pitagoras.model.*;
 import changer.pitagoras.repository.*;
 //import changer.pitagoras.repository.MembroRepository;
+import changer.pitagoras.util.Criptograma;
 import changer.pitagoras.util.FilaObj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,11 +24,6 @@ public class CirculoService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private HistoricoConversaoRepository historicoConversaoRepository;
-    @Autowired
-    private ArquivoService arquivoService;
-
     protected void validacao(UUID idCirc, UUID idDono) {
 
         if (!circuloRepository.existsById(idCirc)) {
@@ -37,6 +33,16 @@ public class CirculoService {
         if (circuloRepository.existe(idCirc, idDono).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    private Circulo pegarCirc(UUID id) {
+        Circulo circ = circuloRepository.findById(id).orElse(null);
+
+        if (circ == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Circulo não encontrado");
+        }
+
+        return circ;
     }
 
     protected CirculoMembrosDto gerarCirculoMembros(UUID dono, UUID idCirc) {
@@ -177,25 +183,11 @@ public class CirculoService {
         return listaOrdenada;
     }
 
-
-    public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
-        Arquivo arquivo = arquivoService.encontrarArq(idArquivo);
-        Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
-
-        if (circulo.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Círculo não encontrado");
-        }
-
-        circulo.get().getArquivos().add(arquivo);
-        circuloRepository.save(circulo.get());
-        return true;
-    }
-
     public List<Arquivo> resgatarArquivos(UUID idCirculo) {
         Circulo circulo = circuloRepository.findById(idCirculo).orElse(null);
 
         if (circulo == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID inválido");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Circulo não encontrado");
         }
 
         return circulo.getArquivos();

@@ -2,8 +2,6 @@ package changer.pitagoras.service;
 
 
 import changer.pitagoras.dto.ArquivoApenasBytesDto;
-import changer.pitagoras.model.HistoricoConversao;
-import changer.pitagoras.repository.HistoricoConversaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;

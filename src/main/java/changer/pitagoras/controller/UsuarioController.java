@@ -4,11 +4,9 @@ import changer.pitagoras.dto.UsuarioCriacaoDto;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
-import changer.pitagoras.model.Arquivo;
-import changer.pitagoras.model.HistoricoConversao;
 import changer.pitagoras.model.Usuario;
+import changer.pitagoras.service.ArquivoService;
 import changer.pitagoras.service.ChangerService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +34,11 @@ public class UsuarioController {
     private UsuarioService usuarioService;
     @Autowired
     private ChangerService changerService;
+    @Autowired
+    private ArquivoService arquivoService;
 
     public UsuarioController() {
     }
-
 
     @GetMapping("/{email}")
     public ResponseEntity<Usuario> getByNome(@PathVariable String email) {
@@ -134,13 +133,13 @@ public class UsuarioController {
 
     @PostMapping(value = "/upload/{codigo}")
     public ResponseEntity<UUID> uploadArquivo(@PathVariable UUID codigo, @RequestParam("file") MultipartFile file){
-        return ResponseEntity.status(200).body(usuarioService.salvarArquivo(codigo, file).getIdArquivo());
+        return ResponseEntity.status(200).body(arquivoService.salvar(codigo, file).getIdArquivo());
     }
 
     @DeleteMapping("/excluir/{codigo}/{idConversao}")
     public ResponseEntity<Boolean> removerArquivo(@PathVariable UUID codigo, @PathVariable UUID idConversao){
         System.out.println(codigo + "\n" + idConversao);
-        return usuarioService.deletarArquivo(codigo, idConversao)
+        return arquivoService.deletarArquivo(codigo, idConversao)
                 ? ResponseEntity.status(200).build()
                 : ResponseEntity.status(404).build();
     }

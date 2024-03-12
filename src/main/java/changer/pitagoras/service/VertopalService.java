@@ -2,8 +2,6 @@ package changer.pitagoras.service;
 
 import changer.pitagoras.config.VertopalConnector;
 import changer.pitagoras.model.Arquivo;
-import changer.pitagoras.model.HistoricoConversao;
-import changer.pitagoras.model.Usuario;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -28,8 +24,6 @@ import java.util.UUID;
 public class VertopalService {
     @Autowired
     private RestTemplate restTemplate = new RestTemplate();
-    @Autowired
-    private HistoricoConversaoService historicoConversaoService;
     @Autowired
     private ArquivoService arquivoService;
     @Autowired
@@ -168,7 +162,7 @@ public class VertopalService {
 
         // separar o nome da extensão do arquivo
         arquivoService.separarExtensao(output.getString("name"));
-        usuarioService.salvarArquivo(
+        arquivoService.salvar(
                 user,
                 arquivoService.salvar(
                         new Arquivo(

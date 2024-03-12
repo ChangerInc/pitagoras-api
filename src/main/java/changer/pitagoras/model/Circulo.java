@@ -24,8 +24,6 @@ public class Circulo {
     @JoinColumn(name = "Usuario_id")
     private Usuario dono;
     private LocalDateTime dataCriacao;
-    @OneToMany
-    private List<HistoricoConversao> historicoDoCirculo;
     @ManyToMany
     @JoinTable(
             name = "arquivos_grupo",
@@ -39,6 +37,6 @@ public class Circulo {
         this.nomeCirculo = nomeCirculo;
         this.dono = dono;
         this.dataCriacao = LocalDateTime.now();
-        this.historicoDoCirculo = new ArrayList<>();
+        this.arquivos = new ArrayList<>();
     }
 }

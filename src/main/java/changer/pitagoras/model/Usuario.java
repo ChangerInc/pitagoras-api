@@ -9,6 +9,7 @@ import changer.pitagoras.util.Criptograma;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +44,7 @@ public class Usuario {
         this.fotoPerfil = null;
         this.plano = false;
         this.dataCriacaoConta = LocalDateTime.now();
-
+        this.arquivos = new ArrayList<>();
     }
 
 

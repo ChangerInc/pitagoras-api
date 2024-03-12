@@ -6,7 +6,7 @@ import changer.pitagoras.dto.CirculoSimplesDto;
 import changer.pitagoras.dto.NovoMembroDto;
 import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.model.Circulo;
-import changer.pitagoras.model.HistoricoConversao;
+import changer.pitagoras.service.ArquivoService;
 import changer.pitagoras.service.CirculoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,8 @@ import java.util.UUID;
 public class CirculoController {
     @Autowired
     CirculoService circuloService;
-
+    @Autowired
+    private ArquivoService arquivoService;
     @GetMapping("/")
     public ResponseEntity<List<CirculoMembrosDto>> get() {
         return ResponseEntity.status(200).body(circuloService.getAll());
