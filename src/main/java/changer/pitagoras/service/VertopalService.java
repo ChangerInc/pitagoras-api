@@ -162,7 +162,7 @@ public class VertopalService {
 
         // separar o nome da extensão do arquivo
         arquivoService.separarExtensao(output.getString("name"));
-        arquivoService.salvar(
+        usuarioService.salvar(
                 user,
                 arquivoService.salvar(
                         new Arquivo(

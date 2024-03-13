@@ -4,6 +4,7 @@ import changer.pitagoras.dto.UsuarioCriacaoDto;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
+import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.service.ArquivoService;
 import changer.pitagoras.service.ChangerService;
@@ -131,16 +132,26 @@ public class UsuarioController {
         return ResponseEntity.status(404).build();
     }
 
-    @PostMapping(value = "/upload/{codigo}")
+    @PostMapping(value = "/arquivos/{codigo}")
     public ResponseEntity<UUID> uploadArquivo(@PathVariable UUID codigo, @RequestParam("file") MultipartFile file){
-        return ResponseEntity.status(200).body(arquivoService.salvar(codigo, file).getIdArquivo());
+        return ResponseEntity.status(200).body(usuarioService.salvar(codigo, file).getIdArquivo());
     }
 
     @DeleteMapping("/excluir/{codigo}/{idConversao}")
     public ResponseEntity<Boolean> removerArquivo(@PathVariable UUID codigo, @PathVariable UUID idConversao){
         System.out.println(codigo + "\n" + idConversao);
-        return arquivoService.deletarArquivo(codigo, idConversao)
+        return usuarioService.deletarArquivo(codigo, idConversao)
                 ? ResponseEntity.status(200).build()
                 : ResponseEntity.status(404).build();
+    }
+
+    @GetMapping("/arquivos/{id}")
+    public ResponseEntity<List<Arquivo>> getArquivosById(
+            @PathVariable UUID id) {
+        List<Arquivo> arqs = usuarioService.resgatarArquivos(id);
+
+        return arqs.isEmpty()
+                ? ResponseEntity.status(204).build()
+                : ResponseEntity.status(200).body(arqs);
     }
 }

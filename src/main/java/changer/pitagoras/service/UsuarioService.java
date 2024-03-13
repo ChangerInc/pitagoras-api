@@ -46,6 +46,8 @@ public class UsuarioService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private CirculoRepository circuloRepository;
+    @Autowired
+    private ArquivoService arquivoService;
 
     public Usuario salvarUser(Usuario user) {
         return usuarioRepository.save(user);
@@ -231,5 +233,53 @@ public class UsuarioService {
 
     public List<Arquivo> pegarArq(UUID id) {
         return encontrarUsuario(id).getArquivos();
+    }
+
+    public Arquivo salvar(UUID codigo, MultipartFile file) {
+        Usuario usuario = encontrarUsuario(codigo);
+        Arquivo arquivo = arquivoService.salvar(file);
+
+        usuario.getArquivos().add(arquivo);
+        salvarUser(usuario);
+
+        return arquivo;
+    }
+
+    public Arquivo salvar(UUID codigo, Arquivo arq) {
+        Usuario usuario = encontrarUsuario(codigo);
+        Arquivo arquivo = arquivoService.salvar(arq);
+
+        usuario.getArquivos().add(arquivo);
+        salvarUser(usuario);
+
+        return arquivo;
+    }
+
+    public Boolean deletarArquivo(UUID codigo, UUID idArquivo) {
+        if (codigo == null || idArquivo == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        Usuario user = encontrarUsuario(codigo);
+        if (user == null) {
+            return false;
+        }
+
+        Arquivo arq = arquivoService.buscarArquivo(idArquivo);
+        if (arq == null) {
+            return false;
+        }
+
+        user.getArquivos().remove(arq);
+        salvarUser(user);
+        return true;
+    }
+
+    public List<Arquivo> resgatarArquivos(UUID id) {
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informações faltando");
+        }
+
+        return pegarArq(id);
     }
 }

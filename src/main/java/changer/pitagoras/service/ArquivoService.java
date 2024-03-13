@@ -24,10 +24,6 @@ import java.util.UUID;
 public class ArquivoService {
     @Autowired
     private ArquivoRepository repository;
-    @Autowired
-    private UsuarioService usuarioService;
-    @Autowired
-    private CirculoService circuloService;
     @Getter
     private String extensaoAux;
     @Getter
@@ -97,69 +93,8 @@ public class ArquivoService {
         return repository.save(arquivo);
     }
 
-    public Arquivo salvar(UUID codigo, MultipartFile file) {
-        Usuario usuario = usuarioService.encontrarUsuario(codigo);
-        Arquivo arquivo = salvar(file);
-
-        usuario.getArquivos().add(arquivo);
-        usuarioService.salvarUser(usuario);
-
-        return arquivo;
-    }
-
-    public Arquivo salvar(UUID codigo, Arquivo arq) {
-        Usuario usuario = usuarioService.encontrarUsuario(codigo);
-        Arquivo arquivo = salvar(arq);
-
-        usuario.getArquivos().add(arquivo);
-        usuarioService.salvarUser(usuario);
-
-        return arquivo;
-    }
-
-    public Boolean deletarArquivo(UUID codigo, UUID idArquivo) {
-        if (codigo == null || idArquivo == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        Usuario user = usuarioService.encontrarUsuario(codigo);
-        if (user == null) {
-            return false;
-        }
-
-        Arquivo arq = buscarArquivo(idArquivo);
-        if (arq == null) {
-            return false;
-        }
-
-        user.getArquivos().remove(arq);
-        usuarioService.salvarUser(user);
-        return true;
-    }
-
-    public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
-        Arquivo arquivo = encontrarArq(idArquivo);
-        Optional<Circulo> circulo = circuloService.(idCirculo);
-
-        if (circulo.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Círculo não encontrado");
-        }
-
-        circulo.get().getArquivos().add(arquivo);
-        circuloRepository.save(circulo.get());
-        return true;
-    }
-
     public Arquivo buscarArquivo(UUID id) {
         return repository.findByIdArquivo(id).orElse(null);
-    }
-
-    public List<Arquivo> resgatarArquivos(UUID id, Boolean user) {
-        if (id == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informações faltando");
-        }
-
-        return user ? usuarioService.pegarArq(id) : circuloService.resgatarArquivos(id);
     }
 
     public byte[] pegarArquivo(UUID id) {

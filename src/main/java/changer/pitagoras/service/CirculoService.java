@@ -20,6 +20,8 @@ public class CirculoService {
     @Autowired
     private UsuarioService usuarioService;
     @Autowired
+    private ArquivoService arquivoService;
+    @Autowired
     private MembroRepository membroRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -230,5 +232,14 @@ public class CirculoService {
     public Boolean removerTodosOsMembrosDoCIrculo(UUID idCirculo){
         Integer deletados = circuloRepository.deletarTodosMembrosDoCirculo(idCirculo);
         return deletados > 0;
+    }
+
+    public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
+        Arquivo arquivo = arquivoService.encontrarArq(idArquivo);
+        Circulo circulo = pegarCirc(idCirculo);
+
+        circulo.getArquivos().add(arquivo);
+        circuloRepository.save(circulo);
+        return true;
     }
 }

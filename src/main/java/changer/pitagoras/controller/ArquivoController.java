@@ -21,14 +21,6 @@ public class ArquivoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<Arquivo>> getArquivosById(
-            @PathVariable UUID id, @RequestParam(name = "user", defaultValue = "false") Boolean user) {
-        List<Arquivo> arqs = service.resgatarArquivos(id, user);
-
-        return arqs.isEmpty() ? ResponseEntity.status(204).build() : ResponseEntity.status(200).body(arqs);
-    }
-
-    @GetMapping("/{id}")
     public ResponseEntity<byte[]> downloadArquivo(@PathVariable UUID id) {
         return ResponseEntity.status(200).body(service.pegarArquivo(id));
     }
