@@ -137,7 +137,7 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(usuarioService.salvar(codigo, file).getIdArquivo());
     }
 
-    @DeleteMapping("/excluir/{codigo}/{idConversao}")
+    @DeleteMapping("/arquivos/{codigo}/{idConversao}")
     public ResponseEntity<Boolean> removerArquivo(@PathVariable UUID codigo, @PathVariable UUID idConversao){
         System.out.println(codigo + "\n" + idConversao);
         return usuarioService.deletarArquivo(codigo, idConversao)
