@@ -8,6 +8,7 @@ import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.service.ArquivoService;
 import changer.pitagoras.service.CirculoService;
+import changer.pitagoras.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,8 @@ import java.util.UUID;
 public class CirculoController {
     @Autowired
     CirculoService circuloService;
+    @Autowired
+    UsuarioService usuarioService;
     @Autowired
     private ArquivoService arquivoService;
     @GetMapping("/")
@@ -104,4 +107,5 @@ public class CirculoController {
         return circuloService.convidarPessoa(idCirculo, idAnfitriao, emailDoConvidado) ?
         ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
     }
+
 }

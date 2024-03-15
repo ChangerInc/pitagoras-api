@@ -138,7 +138,7 @@ public class CirculoService {
 
     public void deletar(Map<String, UUID> ids) {
         validacao(ids.get("idCirc"), ids.get("idDono"));
-
+        setStatusConvite(3,ids.get("idCirc"));
         circuloRepository.deleteById(ids.get("idCirc"));
     }
 
@@ -248,5 +248,9 @@ public class CirculoService {
     public Boolean convidarPessoa(UUID idCirculo, UUID idAnfitriao, String emailDoConvidado) {
         conviteRepository.save(new Convite(idCirculo, idAnfitriao, emailDoConvidado));
         return true;
+    }
+
+    public int setStatusConvite(Integer status, UUID idCirculo){
+        return conviteRepository.mudarStatusConvite(status, idCirculo);
     }
 }

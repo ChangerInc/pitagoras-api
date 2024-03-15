@@ -26,6 +26,7 @@ public class Convite {
     private String emailConvidado;
 
     private Integer statusConvite;
+    /* 0 = nao lido / 1 = aceito / 2 = rejeitado / 3 = grupo excluido */
 
     private LocalDateTime dataRegistro;
 

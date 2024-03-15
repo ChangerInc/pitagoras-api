@@ -53,4 +53,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     @Query("select new changer.pitagoras.dto.UsuarioTxtDto(u.id as idUsuario, u.nome, u.email, u.senha, u.plano, u.dataCriacaoConta) from Usuario u")
     List<UsuarioTxtDto> findUsuarioTxtDto();
+
+    NomeProjection findNomeById(UUID id);
+    interface NomeProjection {
+        String getNome();
+    }
 }

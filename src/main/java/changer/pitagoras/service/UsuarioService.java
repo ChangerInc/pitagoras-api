@@ -5,6 +5,7 @@ import changer.pitagoras.dto.*;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Arquivo;
+import changer.pitagoras.model.Convite;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.CirculoRepository;
 import changer.pitagoras.repository.ConviteRepository;
@@ -27,11 +28,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import java.io.IOException;
 
 @Service
@@ -290,7 +288,20 @@ public class UsuarioService {
         return conviteRepository.consultarQtdNotificacoes(email);
     }
 
-    public List<ConviteDto> buscarConvites(String email){
-        return conviteRepository.findConviteInfoByEmailConvidado(email);
+    public List<ConviteDto> buscarConvites(String email, int statusConvite){
+        List<Convite> convites = conviteRepository.findAllByEmailConvidadoAndStatusConvite(email, 0);
+        List<ConviteDto> conviteDtos = new ArrayList<>();
+        for (Convite con : convites){
+            UUID idDoCirculo = con.getIdCirculo();
+            CirculoRepository.NomeCirculoProjection projecaoCirculo = circuloRepository.findNomeCirculoById(idDoCirculo);
+            String nomeDoCirculo = projecaoCirculo.getNomeCirculo();
+
+            UsuarioRepository.NomeProjection projecaoUser = usuarioRepository.findNomeById(con.getIdAnfitriao());
+            String nomeUsuario = projecaoUser.getNome();
+
+            ConviteDto dto = new ConviteDto(nomeUsuario, nomeDoCirculo, idDoCirculo, con.getDataRegistro());
+            conviteDtos.add(dto);
+        }
+        return conviteDtos;
     }
 }

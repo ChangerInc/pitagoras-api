@@ -6,6 +6,7 @@ import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Arquivo;
+import changer.pitagoras.model.Convite;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.service.ArquivoService;
 import changer.pitagoras.service.ChangerService;
@@ -172,7 +173,9 @@ public class UsuarioController {
 
     @GetMapping("/convites/{email}")
     public ResponseEntity<List<ConviteDto>> getConvites(@PathVariable String email){
-        List<ConviteDto> convites = usuarioService.buscarConvites(email);
+        List<ConviteDto> convites = usuarioService.buscarConvites(email, 0);
         return ResponseEntity.status(200).body(convites);
     }
+
+
 }

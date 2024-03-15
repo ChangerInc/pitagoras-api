@@ -2,7 +2,9 @@ package changer.pitagoras.repository;
 
 import changer.pitagoras.dto.ConviteDto;
 import changer.pitagoras.model.Convite;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -15,11 +17,11 @@ public interface ConviteRepository extends JpaRepository<Convite, UUID> {
     @Query("select count(emailConvidado) from Convite where emailConvidado = ?1 and statusConvite = 0")
     Integer consultarQtdNotificacoes(String email);
 
-    @Query("SELECT DISTINCT new changer.pitagoras.dto.ConviteDto(u.fotoPerfil, u.nome, cir.nomeCirculo) " +
-            "FROM Usuario u " +
-            "JOIN Circulo cir ON u.id = cir.dono.id " +
-            "JOIN Convite con ON con.idAnfitriao = cir.dono.id " +
-            "WHERE con.emailConvidado = ?1 AND con.statusConvite = 0")
-    List<ConviteDto> findConviteInfoByEmailConvidado(String emailConvidado);
+    @Transactional
+    @Modifying
+    @Query("UPDATE Convite c SET c.statusConvite = ?1 WHERE c.idCirculo = ?2")
+    int mudarStatusConvite(int status, UUID idCirculo);
+
+    List<Convite> findAllByEmailConvidadoAndStatusConvite(String emailConvidado, int statusConvite);
 
 }
