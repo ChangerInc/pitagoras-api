@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -95,5 +96,12 @@ public class CirculoController {
     @DeleteMapping("/limpar/{idCirculo}")
     public ResponseEntity<Boolean> removerATurminhaTodaDoCirculo(@PathVariable UUID idCirculo) {
         return circuloService.removerTodosOsMembrosDoCIrculo(idCirculo) ? ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
+    }
+
+    @PostMapping("/convidar/{idCirculo}")
+    public ResponseEntity<Boolean> convidarPessoaProCirculo
+            (@PathVariable UUID idCirculo, @RequestParam UUID idAnfitriao, @RequestParam String emailDoConvidado) {
+        return circuloService.convidarPessoa(idCirculo, idAnfitriao, emailDoConvidado) ?
+        ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
     }
 }

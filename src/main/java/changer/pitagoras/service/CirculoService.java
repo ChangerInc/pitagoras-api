@@ -25,6 +25,8 @@ public class CirculoService {
     private MembroRepository membroRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private ConviteRepository conviteRepository;
 
     protected void validacao(UUID idCirc, UUID idDono) {
 
@@ -240,6 +242,11 @@ public class CirculoService {
 
         circulo.getArquivos().add(arquivo);
         circuloRepository.save(circulo);
+        return true;
+    }
+
+    public Boolean convidarPessoa(UUID idCirculo, UUID idAnfitriao, String emailDoConvidado) {
+        conviteRepository.save(new Convite(idCirculo, idAnfitriao, emailDoConvidado));
         return true;
     }
 }

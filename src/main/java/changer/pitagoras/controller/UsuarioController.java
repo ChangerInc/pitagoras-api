@@ -1,5 +1,6 @@
 package changer.pitagoras.controller;
 
+import changer.pitagoras.dto.ConviteDto;
 import changer.pitagoras.dto.UsuarioCriacaoDto;
 import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
@@ -153,5 +154,17 @@ public class UsuarioController {
         return arqs.isEmpty()
                 ? ResponseEntity.status(204).build()
                 : ResponseEntity.status(200).body(arqs);
+    }
+
+    @GetMapping("/notificacoes/{email}")
+    public ResponseEntity<Integer> getQtdNotificacoes(@PathVariable String email){
+        Integer notificacoes = usuarioService.buscarNotificacoes(email);
+        return ResponseEntity.status(200).body(notificacoes);
+    }
+
+    @GetMapping("/convites/{email}")
+    public ResponseEntity<List<ConviteDto>> getConvites(@PathVariable String email){
+        List<ConviteDto> convites = usuarioService.buscarConvites(email);
+        return ResponseEntity.status(200).body(convites);
     }
 }

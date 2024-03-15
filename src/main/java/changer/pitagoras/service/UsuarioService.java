@@ -7,6 +7,7 @@ import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.CirculoRepository;
+import changer.pitagoras.repository.ConviteRepository;
 import changer.pitagoras.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -48,6 +49,8 @@ public class UsuarioService {
     private CirculoRepository circuloRepository;
     @Autowired
     private ArquivoService arquivoService;
+    @Autowired
+    private ConviteRepository conviteRepository;
 
     public Usuario salvarUser(Usuario user) {
         return usuarioRepository.save(user);
@@ -281,5 +284,13 @@ public class UsuarioService {
         }
 
         return pegarArq(id);
+    }
+
+    public Integer buscarNotificacoes(String email) {
+        return conviteRepository.consultarQtdNotificacoes(email);
+    }
+
+    public List<ConviteDto> buscarConvites(String email){
+        return conviteRepository.findConviteInfoByEmailConvidado(email);
     }
 }
