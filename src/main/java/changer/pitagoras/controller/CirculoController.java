@@ -62,14 +62,14 @@ public class CirculoController {
         return ResponseEntity.status(201).body(circuloService.addMembro(membroNovo));
     }
 
-    @PatchMapping("/publicar/{idCirculo}/{idArquivo}")
+    @PatchMapping("/arquivos/{idCirculo}/{idArquivo}")
     public ResponseEntity<Boolean> adicionarArquivoNaTurminha(@PathVariable UUID idCirculo, @PathVariable UUID idArquivo) {
         return circuloService.adicionarArquivoNoGrupo(idCirculo, idArquivo)
                 ? ResponseEntity.status(200).build()
                 : ResponseEntity.status(400).build();
     }
 
-    @DeleteMapping("/excluir/{idCirculo}/{idArquivo}")
+    @DeleteMapping("/arquivos/{idCirculo}/{idArquivo}")
     public ResponseEntity<Boolean> removerArquivoNaTurminha(@PathVariable UUID idCirculo, @PathVariable UUID idArquivo) {
         return circuloService.removerArquivoNoGrupo(idCirculo, idArquivo)
                 ? ResponseEntity.status(200).build()

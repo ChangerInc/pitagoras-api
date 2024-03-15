@@ -31,7 +31,7 @@ public class Usuario {
     @ManyToMany
     @JoinTable(
             name = "arquivos_usuario",
-            joinColumns = @JoinColumn(name = "circulo_fk"),
+            joinColumns = @JoinColumn(name = "usuario_fk"),
             inverseJoinColumns = @JoinColumn(name = "arquivo_fk")
     )
     private List<Arquivo> arquivos;
