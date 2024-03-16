@@ -266,4 +266,19 @@ public class CirculoService {
         conviteRepository.mudarStatusConvite(2, idCirculo);
         return false;
     }
+
+    public Boolean sairDoCirculo(UUID idUsuario, UUID idCirculo) {
+        Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
+        Optional<Usuario> usuario = usuarioRepository.findById(idUsuario);
+        if(circulo.isEmpty() || usuario.isEmpty()){
+            return false;
+        }
+        Membro membro = membroRepository.findByCirculoAndMembro(circulo.get(), usuario.get());
+        try {
+            membroRepository.delete(membro);
+        } catch (Exception e){
+            return false;
+        }
+        return true;
+    }
 }

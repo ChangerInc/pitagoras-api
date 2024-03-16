@@ -118,4 +118,10 @@ public class CirculoController {
         return ResponseEntity.status(200).build();
     }
 
+    @PatchMapping("/sair/{idCirculo}/{idUsuario}")
+    public ResponseEntity<Boolean> sairDoCirculo(@PathVariable UUID idCirculo, @PathVariable UUID idUsuario){
+        return circuloService.sairDoCirculo(idUsuario, idCirculo) ?
+            ResponseEntity.status(200).build() : ResponseEntity.status(404).build();
+    }
+
 }

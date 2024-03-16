@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface MembroRepository extends JpaRepository<Membro, UUID> {
     List<Membro> findAllByCirculoEquals(Circulo id);
     List<Membro> findAllByMembroEquals(Usuario user);
+    Membro findByCirculoAndMembro(Circulo circulo, Usuario membro);
 }
