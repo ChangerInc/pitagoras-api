@@ -253,4 +253,17 @@ public class CirculoService {
     public int setStatusConvite(Integer status, UUID idCirculo){
         return conviteRepository.mudarStatusConvite(status, idCirculo);
     }
+
+    public Boolean decisaoConvite(UUID idCirculo, String email, UUID idUsuario, Integer acaoBotao){
+        if(acaoBotao.equals(1)){
+            Circulo circulo = circuloRepository.getReferenceById(idCirculo);
+            UUID dono = circulo.getDono().getId();
+
+            NovoMembroDto membroDto = new NovoMembroDto(idCirculo, email, dono, idUsuario);
+            conviteRepository.mudarStatusConvite(1, idCirculo);
+            return addMembro(membroDto);
+        }
+        conviteRepository.mudarStatusConvite(2, idCirculo);
+        return false;
+    }
 }
