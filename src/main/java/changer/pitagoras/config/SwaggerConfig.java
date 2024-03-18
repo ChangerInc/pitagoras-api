@@ -29,3 +29,4 @@ public class SwaggerConfig {
         return new OpenAPI().info(info).addServersItem(localServer);
     }
 }
+

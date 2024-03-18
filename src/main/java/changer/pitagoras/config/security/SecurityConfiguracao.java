@@ -30,7 +30,7 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguracao {
-    private static final String ORIGENS_PERMITIDAS = "*";
+    private static final String ORIGENS_PERMITIDAS = "**";
 
     @Autowired
     private AutenticacaoService autenticacaoService;
@@ -39,6 +39,8 @@ public class SecurityConfiguracao {
     private AutenticacaoEntryPoint autenticacaoJwtEntryPoint;
 
     private static final AntPathRequestMatcher[] URLS_PERMITIDAS = {
+            new AntPathRequestMatcher("/api/**"),
+	    new AntPathRequestMatcher("/**"),
             new AntPathRequestMatcher("/swagger-ui/**"),
             new AntPathRequestMatcher("/swagger-ui.html"),
             new AntPathRequestMatcher("/swagger-resources"),
