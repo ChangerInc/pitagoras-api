@@ -162,10 +162,6 @@ public class CirculoService {
     public List<CirculoMembrosDto> getAllById(UUID idUser) {
         Usuario user = usuarioService.encontrarUsuario(idUser);
 
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado");
-        }
-
         List<CirculoMembrosDto> lista = converterListaCirculos(circuloRepository.findAllByDonoOrderByDataCriacao(user));
 
         for (Membro m : membroRepository.findAllByMembroEquals(user)) {
@@ -198,20 +194,17 @@ public class CirculoService {
         return circulo.getArquivos();
     }
 
-    public List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo, UUID idUser) {
-        Usuario user = usuarioService.encontrarUsuario(idUser);
-        List<CirculoPesquisaDto> lista = circuloRepository.findByNomeCirculoContaining(
-                nomeCirculo, user);
-        List<Membro> circMembro = membroRepository.findAllByMembroEquals(user);
+    public List<CirculoMembrosDto> findByNomeCirculoContaining(String nomeCirculo, UUID idUser) {
+        List<CirculoMembrosDto> listCompleta = getAllById(idUser);
+        List<CirculoMembrosDto> listPesquisa = new ArrayList<>();
 
-        for (Membro m : circMembro) {
-            Circulo c = m.getCirculo();
+        for (CirculoMembrosDto c : listCompleta) {
             if (c.getNomeCirculo().contains(nomeCirculo)) {
-                lista.add(new CirculoPesquisaDto(c.getId(), c.getNomeCirculo()));
+                listPesquisa.add(c);
             }
         }
 
-        return lista;
+        return listPesquisa;
     }
 
     public boolean removerArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {

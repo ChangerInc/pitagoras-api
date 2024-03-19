@@ -88,11 +88,9 @@ public class CirculoController {
     }
 
     @GetMapping("/pesquisar/{nomeCirculo}/{idUser}")
-    public ResponseEntity<List<CirculoPesquisaDto>> searchByName(
+    public ResponseEntity<List<CirculoMembrosDto>> searchByName(
             @PathVariable String nomeCirculo, @PathVariable UUID idUser) {
-        List<CirculoPesquisaDto> circulos = circuloService.findByNomeCirculoContaining(nomeCirculo, idUser);
-
-        return ResponseEntity.status(200).body(circulos);
+        return ResponseEntity.status(200).body(circuloService.findByNomeCirculoContaining(nomeCirculo, idUser));
     }
 
     @DeleteMapping("/limpar/{idCirculo}")
