@@ -38,6 +38,7 @@ public class VertopalService {
     private JSONObject output;
     private JSONObject error;
     private UUID user;
+    private String nomeExtensao;
 
     public VertopalService() {
     }
@@ -90,7 +91,7 @@ public class VertopalService {
                     restTemplate.exchange(VertopalConnector.CONVERT.getURL(), HttpMethod.POST, requestEntity, String.class);
 
             jsonObject = new JSONObject(requisicao.getBody());
-            auxArquivo.setExtensao(extensao);
+            this.nomeExtensao = extensao;
             return requisicao.getBody();
         } else {
             throw new ResponseStatusException(
@@ -121,8 +122,9 @@ public class VertopalService {
         jsonObject = new JSONObject(requisicao.getBody());
         result = jsonObject.getJSONObject("result");
         output = result.getJSONObject("output");
+        nomeExtensao = output.getString("name");
 
-        return output.getString("name");
+        return nomeExtensao;
     }
 
     public byte[] recuperarArquivo() {
@@ -143,7 +145,11 @@ public class VertopalService {
         ResponseEntity<byte[]> requisicao = restTemplate
                 .exchange(output.getString("url"), HttpMethod.POST, requestEntity, byte[].class);
         System.out.println(requisicao.getBody());
-        processarArquivo(requisicao.getBody());
+
+        if (user != null) {
+            processarArquivo(requisicao.getBody());
+        }
+
         return requisicao.getBody();
     }
 
@@ -161,7 +167,7 @@ public class VertopalService {
         output = result.getJSONObject("output");
 
         // separar o nome da extensão do arquivo
-        arquivoService.separarExtensao(output.getString("name"));
+        arquivoService.separarExtensao(nomeExtensao);
         usuarioService.salvar(
                 user,
                 arquivoService.salvar(

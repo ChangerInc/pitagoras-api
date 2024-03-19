@@ -44,6 +44,24 @@ public class ArquivoService {
     }
 
     public void separarExtensao(String nomeDocumento) {
+        int dots = 0;
+        for (char c : nomeDocumento.toCharArray()){
+            if (c == '.') {
+                dots++;
+            }
+        }
+
+        if (dots == 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "O arquivo não possui extensão"
+            );
+        }
+        
+        if (dots > 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "O arquivo não pode possuir mais de um ponto no nome"
+            );
+        }
 
         if (nomeDocumento != null && nomeDocumento.contains(".")) {
             int lastIndex = nomeDocumento.lastIndexOf(".");
