@@ -67,7 +67,8 @@ public class CirculoService {
                 auxCirc.getNomeCirculo(),
                 converteUserSimples(auxUser),
                 auxCirc.getDataCriacao(),
-                membros
+                membros,
+                auxCirc.getArquivos()
         );
     }
 
