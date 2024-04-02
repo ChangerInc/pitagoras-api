@@ -1,5 +1,6 @@
 package changer.pitagoras.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -24,6 +25,14 @@ public class Circulo {
     @JoinColumn(name = "Usuario_id")
     private Usuario dono;
     private LocalDateTime dataCriacao;
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "membros",
+            joinColumns = @JoinColumn(name = "circulo_fk"),
+            inverseJoinColumns = @JoinColumn(name = "usuario_fk")
+    )
+    private List<Usuario> membros;
     @ManyToMany
     @JoinTable(
             name = "arquivos_grupo",
@@ -38,5 +47,7 @@ public class Circulo {
         this.dono = dono;
         this.dataCriacao = LocalDateTime.now();
         this.arquivos = new ArrayList<>();
+        this.membros = new ArrayList<>();
+        membros.add(dono);
     }
 }

@@ -26,4 +26,12 @@ public class UsuarioMapper {
 
         return usuarioTokenDto;
     }
+
+    public static UsuarioFotoDto of(Usuario u) {
+        return new UsuarioFotoDto(
+                u.getId(),
+                u.getNome(),
+                u.getFotoPerfil()
+        );
+    }
 }

@@ -15,8 +15,7 @@ import java.util.UUID;
 public class CirculoMembrosDto {
     private UUID id;
     private String nomeCirculo;
-    private UsuarioFotoDto dono;
-    private LocalDateTime dataCriacao;
+    private UUID dono;
     private List<UsuarioFotoDto> membros;
     private List<Arquivo> arquivos;
 }

@@ -4,7 +4,6 @@ import changer.pitagoras.dto.*;
 import changer.pitagoras.model.*;
 import changer.pitagoras.repository.*;
 //import changer.pitagoras.repository.MembroRepository;
-import changer.pitagoras.util.Criptograma;
 import changer.pitagoras.util.FilaObj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,14 +28,27 @@ public class CirculoService {
     private ConviteRepository conviteRepository;
 
     protected void validacao(UUID idCirc, UUID idDono) {
-
         if (!circuloRepository.existsById(idCirc)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Circulo não encontrado");
         }
 
-        if (circuloRepository.existe(idCirc, idDono).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        if (!circuloRepository.findById(idCirc).get().getDono().getId().equals(idDono)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não é dono do circulo");
         }
+    }
+
+    protected Circulo validacaoGet(UUID idCirc, UUID idDono) {
+        Circulo auxCirc = circuloRepository.findById(idCirc).orElse(null);
+
+        if (auxCirc == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Circulo não encontrado");
+        }
+
+        if (!auxCirc.getDono().getId().equals(idDono)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não é dono do circulo");
+        }
+
+        return auxCirc;
     }
 
     private Circulo pegarCirc(UUID id) {
@@ -53,34 +65,39 @@ public class CirculoService {
         validacao(idCirc, dono);
 
         Circulo auxCirc = circuloRepository.findById(idCirc).get();
-        Usuario auxUser = usuarioService.encontrarUsuario(dono);
 
-        List<Membro> auxMembro = membroRepository.findAllByCirculoEquals(auxCirc);
-        List<UsuarioFotoDto> membros = new ArrayList<>();
-
-        if (!auxMembro.isEmpty()) {
-            membros = converterListaMembros(auxMembro);
-        }
+        List<UsuarioFotoDto> membros = !auxCirc.getMembros().isEmpty()
+                ? converterListaMembros(auxCirc.getMembros())
+                : new ArrayList<>();
 
         return new CirculoMembrosDto(
                 idCirc,
                 auxCirc.getNomeCirculo(),
-                converteUserSimples(auxUser),
-                auxCirc.getDataCriacao(),
+                dono,
                 membros,
                 auxCirc.getArquivos()
         );
     }
 
-    protected UsuarioFotoDto converteUserSimples(Usuario membro) {
-        return new UsuarioFotoDto(membro.getId(), membro.getNome(), membro.getFotoPerfil());
+    protected CirculoMembrosDto gerarCirculoMembros(Circulo c) {
+        List<UsuarioFotoDto> membros = c.getMembros().isEmpty()
+                ? new ArrayList<>()
+                : converterListaMembros(c.getMembros());
+
+        return new CirculoMembrosDto(
+                c.getId(),
+                c.getNomeCirculo(),
+                c.getDono().getId(),
+                membros,
+                c.getArquivos()
+        );
     }
 
-    protected List<UsuarioFotoDto> converterListaMembros(List<Membro> lista) {
+    protected List<UsuarioFotoDto> converterListaMembros(List<Usuario> lista) {
         List<UsuarioFotoDto> membros = new ArrayList<>();
 
-        for (Membro m : lista) {
-            membros.add(converteUserSimples(m.getMembro()));
+        for (Usuario m : lista) {
+            membros.add(UsuarioMapper.of(m));
         }
 
         return membros;
@@ -100,38 +117,24 @@ public class CirculoService {
         return converterListaCirculos(circuloRepository.findAll());
     }
 
-    public CirculoMembrosDto getOne(Map<String, UUID> ids) {
-        validacao(ids.get("idCirc"), ids.get("idDono"));
 
-        return gerarCirculoMembros(ids.get("idDono"), ids.get("idCirc"));
+    public Circulo getOne(Map<String, UUID> ids) {
+        return validacaoGet(ids.get("idCirc"), ids.get("idDono"));
     }
 
     public CirculoMembrosDto insert(String nome, UUID idDono) {
-        Usuario dono = usuarioService.encontrarUsuario(idDono);
-
-        if (dono == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        Circulo auxCirculo = circuloRepository.save(new Circulo(nome, dono));
-
-        return gerarCirculoMembros(idDono, auxCirculo.getId());
+        return gerarCirculoMembros(circuloRepository.save(new Circulo(nome, usuarioService.encontrarUsuario(idDono))));
     }
 
     public CirculoMembrosDto alterarNome(CirculoSimplesDto c) {
-        UUID idCirc = c.getIdCirc();
-        UUID idDono = c.getIdDono();
-
-        if (idDono == null || idCirc == null) {
+        if (c.getIdDono() == null || c.getIdCirc() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Body faltando informações");
         }
 
-        validacao(idCirc, idDono);
+        Circulo auxCirc = validacaoGet(c.getIdCirc(), c.getIdDono());
 
-        Optional<Circulo> auxCirc = circuloRepository.findById(idCirc);
-
-        if (circuloRepository.updateNome(c.getNome(), c.getIdCirc()) != 0 && auxCirc.isPresent()) {
-            return gerarCirculoMembros(idDono, idCirc);
+        if (circuloRepository.updateNome(c.getNome(), c.getIdCirc()) != 0) {
+            return gerarCirculoMembros(auxCirc.getDono().getId(), auxCirc.getId());
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Circulo não encontrado");
         }
@@ -144,44 +147,18 @@ public class CirculoService {
     }
 
     public Boolean addMembro(NovoMembroDto membroNovo) {
-        Optional<Circulo> auxCirc = circuloRepository.findById(membroNovo.getIdCirculo());
+        Circulo auxCirc = pegarCirc(membroNovo.getIdCirculo());
 
-        if(auxCirc.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Circulo não encontrado");
-        }
+        auxCirc.getMembros().add(usuarioService.encontrarUsuario(membroNovo.getIdUsuario()));
 
-        Membro novo = new Membro(
-                usuarioService.encontrarUsuarioPorEmail(membroNovo.getEmail()),
-                auxCirc.get()
-        );
-        membroRepository.save(novo);
-
+        circuloRepository.save(auxCirc);
         return true;
     }
 
     public List<CirculoMembrosDto> getAllById(UUID idUser) {
-        Usuario user = usuarioService.encontrarUsuario(idUser);
-
-        List<CirculoMembrosDto> lista = converterListaCirculos(circuloRepository.findAllByDonoOrderByDataCriacao(user));
-
-        for (Membro m : membroRepository.findAllByMembroEquals(user)) {
-            Circulo c = m.getCirculo();
-            lista.add(gerarCirculoMembros(c.getDono().getId(), c.getId()));
-        }
-
-        // Criação da fila e inserção dos elementos
-        FilaObj<CirculoMembrosDto> fila = new FilaObj<>(lista.size());
-        for (CirculoMembrosDto circulo : lista) {
-            fila.insert(circulo);
-        }
-
-        // Criação da lista ordenada
-        List<CirculoMembrosDto> listaOrdenada = new ArrayList<>();
-        while (!fila.isEmpty()) {
-            listaOrdenada.add(fila.poll());
-        }
-
-        return listaOrdenada;
+        return converterListaCirculos(
+                usuarioService.encontrarUsuario(idUser).getCirculos()
+        );
     }
 
     public List<Arquivo> resgatarArquivos(UUID idCirculo) {
@@ -240,6 +217,10 @@ public class CirculoService {
     }
 
     public Boolean convidarPessoa(UUID idCirculo, UUID idAnfitriao, String emailDoConvidado) {
+        validacao(idCirculo, idAnfitriao);
+
+        usuarioService.encontrarUsuarioPorEmail(emailDoConvidado);
+
         conviteRepository.save(new Convite(idCirculo, idAnfitriao, emailDoConvidado));
         return true;
     }
@@ -248,15 +229,16 @@ public class CirculoService {
         return conviteRepository.mudarStatusConvite(status, idCirculo);
     }
 
-    public Boolean decisaoConvite(UUID idCirculo, String email, UUID idUsuario, Integer acaoBotao){
-        if(acaoBotao.equals(1)){
-            Circulo circulo = circuloRepository.getReferenceById(idCirculo);
-            UUID dono = circulo.getDono().getId();
-
-            NovoMembroDto membroDto = new NovoMembroDto(idCirculo, email, dono, idUsuario);
-            conviteRepository.mudarStatusConvite(1, idCirculo);
-            return addMembro(membroDto);
+    public Boolean decisaoConvite(UUID idCirculo, UUID idUsuario, Integer acaoBotao){
+        if (!circuloRepository.existsById(idCirculo)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Circulo não encontrado");
         }
+
+        if(acaoBotao.equals(1)){
+            conviteRepository.mudarStatusConvite(1, idCirculo);
+            return addMembro(new NovoMembroDto(idCirculo, idUsuario));
+        }
+
         conviteRepository.mudarStatusConvite(2, idCirculo);
         return false;
     }
