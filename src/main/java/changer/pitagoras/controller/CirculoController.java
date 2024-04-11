@@ -91,7 +91,9 @@ public class CirculoController {
 
     @DeleteMapping("/limpar/{idCirculo}")
     public ResponseEntity<Boolean> removerATurminhaTodaDoCirculo(@PathVariable UUID idCirculo) {
-        return circuloService.removerTodosOsMembrosDoCIrculo(idCirculo) ? ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
+        return circuloService.removerTodosOsMembrosDoCIrculo(idCirculo)
+                ? ResponseEntity.status(200).build()
+                : ResponseEntity.status(400).build();
     }
 
     @PostMapping("/convidar/{idCirculo}")

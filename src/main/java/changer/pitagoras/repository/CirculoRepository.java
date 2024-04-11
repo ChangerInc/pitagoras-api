@@ -36,11 +36,6 @@ public interface CirculoRepository extends JpaRepository<Circulo, UUID> {
             """)
     List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo, Usuario user);
 
-    @Modifying
-    @Transactional
-    @Query("update membro set membro = null, circulo = null where circulo.id = ?1")
-    Integer deletarTodosMembrosDoCirculo(UUID circuloId);
-
     NomeCirculoProjection findNomeCirculoById(UUID idCirculo);
 
     interface NomeCirculoProjection {

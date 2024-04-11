@@ -21,8 +21,6 @@ public class CirculoService {
     @Autowired
     private ArquivoService arquivoService;
     @Autowired
-    private MembroRepository membroRepository;
-    @Autowired
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ConviteRepository conviteRepository;
@@ -203,8 +201,13 @@ public class CirculoService {
     }
 
     public Boolean removerTodosOsMembrosDoCIrculo(UUID idCirculo){
-        Integer deletados = circuloRepository.deletarTodosMembrosDoCirculo(idCirculo);
-        return deletados > 0;
+        Circulo c = pegarCirc(idCirculo);
+        List<Usuario> membros = c.getMembros();
+
+        c.getMembros().removeAll(membros);
+        circuloRepository.save(c);
+
+        return membros.isEmpty();
     }
 
     public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
@@ -244,17 +247,16 @@ public class CirculoService {
     }
 
     public Boolean sairDoCirculo(UUID idUsuario, UUID idCirculo) {
-        Optional<Circulo> circulo = circuloRepository.findById(idCirculo);
-        Optional<Usuario> usuario = usuarioRepository.findById(idUsuario);
-        if(circulo.isEmpty() || usuario.isEmpty()){
-            return false;
+        Circulo circulo = pegarCirc(idCirculo);
+
+        for (Usuario m : circulo.getMembros()) {
+            if (m.getId().equals(idUsuario)) {
+                circulo.getMembros().remove(m);
+                circuloRepository.save(circulo);
+                return true;
+            }
         }
-        Membro membro = membroRepository.findByCirculoAndMembro(circulo.get(), usuario.get());
-        try {
-            membroRepository.delete(membro);
-        } catch (Exception e){
-            return false;
-        }
-        return true;
+
+        return false;
     }
 }

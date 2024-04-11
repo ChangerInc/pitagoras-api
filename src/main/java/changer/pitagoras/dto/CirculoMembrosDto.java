@@ -1,12 +1,9 @@
 package changer.pitagoras.dto;
 
-import changer.pitagoras.dto.autenticacao.MembroDto;
 import changer.pitagoras.model.Arquivo;
-import changer.pitagoras.model.Membro;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
