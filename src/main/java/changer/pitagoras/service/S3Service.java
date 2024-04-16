@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,14 +37,15 @@ public class S3Service implements ContratoS3{
     }
 
     @Override
-    public String saveArquivo(MultipartFile arquivo) {
+    public String saveArquivo(MultipartFile arquivo, UUID idUsuario) {
         String originalNomeArquivo = arquivo.getOriginalFilename();
+        String pasta = idUsuario+"/";
         int count = 0;
         int maxTries = 3;
         while(true) {
             try {
                 File arquivo1 = converterMultiPartParaArquivo(arquivo);
-                PutObjectResult putObjectResult = s3.putObject(bucketName, originalNomeArquivo, arquivo1);
+                PutObjectResult putObjectResult = s3.putObject(bucketName, pasta+originalNomeArquivo, arquivo1);
                 return putObjectResult.getContentMd5();
             } catch (IOException e) {
                 if (++count == maxTries) throw new RuntimeException(e);
@@ -53,8 +55,9 @@ public class S3Service implements ContratoS3{
     }
 
     @Override
-    public byte[] downloadArquivo(String nomeArquivo) {
-        S3Object object = s3.getObject(bucketName, nomeArquivo);
+    public byte[] downloadArquivo(String nomeArquivo, UUID idUsuario) {
+        String pasta = idUsuario+"/";
+        S3Object object = s3.getObject(bucketName, pasta+nomeArquivo);
         S3ObjectInputStream objectContent = object.getObjectContent();
         try {
             return IOUtils.toByteArray(objectContent);
@@ -64,8 +67,8 @@ public class S3Service implements ContratoS3{
     }
 
     @Override
-    public String deleteArquivo(String nomeArquivo) {
-        s3.deleteObject(bucketName,nomeArquivo);
+    public String deleteArquivo(String nomeArquivo, UUID idUsuario) {
+        s3.deleteObject(bucketName,idUsuario+"/"+nomeArquivo);
         return "Arquivo deletado";
     }
 

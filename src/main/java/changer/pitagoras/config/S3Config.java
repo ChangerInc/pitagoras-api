@@ -2,7 +2,7 @@ package changer.pitagoras.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.BasicSessionCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.Data;
@@ -20,6 +20,8 @@ public class S3Config {
     private String accessKey;
     @Value("${secret}")
     private String secret;
+    @Value("${sessionToken}")
+    private String sessionToken;
     @Value("${region}")
     private String region;
     @Value("${bucketName}")
@@ -27,7 +29,7 @@ public class S3Config {
 
     @Bean
     public AmazonS3 s3(){
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secret);
+        AWSCredentials credentials = new BasicSessionCredentials(accessKey, secret, sessionToken);
         return AmazonS3ClientBuilder.standard().withRegion(region).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
     }
 }

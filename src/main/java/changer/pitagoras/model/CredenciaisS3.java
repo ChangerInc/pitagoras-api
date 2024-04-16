@@ -7,7 +7,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class CredenciaisS3 {
     private String accessKey;
-    private String secret;
-    private String region;
     private String bucketName;
+    private String secret;
+    private String sessionToken;
+    private String region;
 }
