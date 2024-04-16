@@ -6,6 +6,7 @@ import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Arquivo;
+import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.Convite;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.service.ArquivoService;
@@ -54,8 +55,9 @@ public class UsuarioController {
     @GetMapping("/{email}")
     public ResponseEntity<Usuario> getByNome(@PathVariable String email) {
         List<Usuario> lista = usuarioService.listarUsuarios();
-        if (lista.isEmpty())
+        if (lista.isEmpty()) {
             return ResponseEntity.status(204).build();
+        }
 
         Usuario userPesquisado = usuarioService.pesquisaBinaria(
                 usuarioService.ordenaPorNome(usuarioService.listarUsuarios()), email
@@ -176,6 +178,4 @@ public class UsuarioController {
         List<ConviteDto> convites = usuarioService.buscarConvites(email, 0);
         return ResponseEntity.status(200).body(convites);
     }
-
-
 }
