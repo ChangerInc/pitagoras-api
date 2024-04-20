@@ -1,5 +1,6 @@
 package changer.pitagoras.service;
 
+import changer.pitagoras.config.S3Config;
 import changer.pitagoras.config.security.GerenciadorTokenJwt;
 import changer.pitagoras.dto.*;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;

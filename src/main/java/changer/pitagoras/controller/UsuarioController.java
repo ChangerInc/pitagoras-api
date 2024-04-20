@@ -10,6 +10,7 @@ import changer.pitagoras.model.Convite;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.service.ArquivoService;
 import changer.pitagoras.service.ChangerService;
+import changer.pitagoras.service.S3Service;
 import changer.pitagoras.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.SneakyThrows;
@@ -36,6 +37,8 @@ public class UsuarioController {
     private ChangerService changerService;
     @Autowired
     private ArquivoService arquivoService;
+    @Autowired
+    private S3Service s3Service;;
 
     public UsuarioController() {
     }
@@ -126,11 +129,10 @@ public class UsuarioController {
 
     @SneakyThrows
     @PatchMapping(value = "/foto/{codigo}")
-    public ResponseEntity<byte[]> patchFoto(@PathVariable UUID codigo, @RequestParam("file") MultipartFile novaFoto){
-        int atualizado = usuarioService.atualizarFoto(novaFoto.getBytes(), codigo);
-        int status = atualizado == 1 ? 200 : 404;
-
-        return ResponseEntity.status(status).body(novaFoto.getBytes());
+    public ResponseEntity<String> patchFoto(@PathVariable UUID codigo, @RequestParam("file") MultipartFile novaFoto){
+        s3Service.saveArquivo(novaFoto, codigo);
+        String urlImagem = s3Service.obterUrlPublica(novaFoto.getOriginalFilename(), codigo.toString());
+        return ResponseEntity.status(200).body(urlImagem);
     }
 
     @GetMapping(value = "/foto/{codigo}", produces = "image/**")

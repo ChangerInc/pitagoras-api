@@ -86,4 +86,9 @@ public class S3Service implements ContratoS3{
         fos.close();
         return convertArquivo;
     }
+
+    public String obterUrlPublica(String nomeArquivo,String codigo){
+        String path = codigo+"/"+nomeArquivo;
+        return s3.getUrl(bucketName,path).toString();
+    }
 }

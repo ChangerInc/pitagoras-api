@@ -43,6 +43,13 @@ public class S3Controller {
         return  ResponseEntity.status(200).headers(headers).body(bytes);
     }
 
+    @GetMapping("/url/{nomeArquivo}")
+    public ResponseEntity<String> url(@PathVariable("nomeArquivo") String nomeArquivo,
+                                           @RequestParam UUID idUsuario){
+        String urlImagem = s3Service.obterUrlPublica(nomeArquivo, idUsuario.toString());
+        return  ResponseEntity.status(200).body(urlImagem);
+    }
+
 
     @DeleteMapping("/delete/{nomeArquivo}")
     public  String deleteArquivo(@PathVariable("nomeArquivo") String nomeArquivo,
