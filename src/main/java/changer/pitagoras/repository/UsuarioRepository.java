@@ -43,7 +43,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     @Transactional
     @Modifying
     @Query("update Usuario u set u.fotoPerfil = ?1 where u.id = ?2")
-    int atualizarFoto(byte[] foto, UUID codigo);
+    int atualizarFoto(String foto, UUID idUsuario);
 
     @Query("select u.fotoPerfil from Usuario u where u.id = ?1")
     byte[] getFoto(UUID codigo);

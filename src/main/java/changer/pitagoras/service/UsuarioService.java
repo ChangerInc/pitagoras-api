@@ -179,7 +179,6 @@ public class UsuarioService {
         final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
         novoUsuario.setPlano(false);
         novoUsuario.setDataCriacaoConta(LocalDateTime.now());
-        novoUsuario.setFotoPerfil(null);
         String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
         novoUsuario.setSenha(senhaCriptografada);
         return usuarioRepository.save(novoUsuario);
@@ -205,8 +204,8 @@ public class UsuarioService {
         return UsuarioMapper.of(usuarioAutenticado, token);
     }
 
-    public int atualizarFoto(byte[] novaFoto, UUID codigo) {
-        return usuarioRepository.atualizarFoto(novaFoto, codigo);
+    public int atualizarFoto(String novaFoto, UUID idUsuario) {
+        return usuarioRepository.atualizarFoto(novaFoto, idUsuario);
     }
 
     public byte[] getFoto(UUID codigo) {

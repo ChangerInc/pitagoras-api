@@ -131,9 +131,10 @@ public class UsuarioController {
 
     @SneakyThrows
     @PatchMapping(value = "/foto/{codigo}")
-    public ResponseEntity<String> patchFoto(@PathVariable UUID codigo, @RequestParam("file") MultipartFile novaFoto){
-        s3Service.saveArquivo(novaFoto, codigo);
-        String urlImagem = s3Service.obterUrlPublica(novaFoto.getOriginalFilename(), codigo.toString());
+    public ResponseEntity<String> patchFoto(@PathVariable UUID idUsuario, @RequestParam("file") MultipartFile novaFoto){
+        s3Service.saveArquivo(novaFoto, idUsuario);
+        String urlImagem = s3Service.obterUrlPublica(novaFoto.getOriginalFilename(), idUsuario.toString());
+        usuarioService.atualizarFoto(urlImagem, idUsuario);
         return ResponseEntity.status(200).body(urlImagem);
     }
 
