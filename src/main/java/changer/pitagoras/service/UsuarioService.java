@@ -179,7 +179,7 @@ public class UsuarioService {
         final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
         novoUsuario.setPlano(false);
         novoUsuario.setDataCriacaoConta(LocalDateTime.now());
-        novoUsuario.setFotoPerfil(obterBytesDaImagemPadrao());
+        novoUsuario.setFotoPerfil(null);
         String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
         novoUsuario.setSenha(senhaCriptografada);
         return usuarioRepository.save(novoUsuario);

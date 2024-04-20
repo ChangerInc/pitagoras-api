@@ -26,8 +26,8 @@ public class Usuario {
     private String senha;
     @JsonIgnore
     @Lob
-    @Column(length = 16 * 1024 * 1024) // 16 MB
-    private byte[] fotoPerfil;
+    //@Column(length = 16 * 1024 * 1024) // 16 MB
+    private String fotoPerfil;
     private Boolean plano;
     private LocalDateTime dataCriacaoConta;
     @JsonIgnore

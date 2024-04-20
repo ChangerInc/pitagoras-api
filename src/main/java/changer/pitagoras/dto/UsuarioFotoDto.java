@@ -10,5 +10,5 @@ import java.util.UUID;
 public class UsuarioFotoDto {
     private UUID id;
     private String nome;
-    private byte[] fotoPerfil;
+    private String fotoPerfil;
 }
