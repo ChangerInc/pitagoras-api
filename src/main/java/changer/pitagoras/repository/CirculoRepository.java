@@ -17,13 +17,6 @@ import java.util.UUID;
 
 @Repository
 public interface CirculoRepository extends JpaRepository<Circulo, UUID> {
-    @Query(
-            """
-                SELECT c FROM Circulo as c WHERE c.id = :idCirc AND c.dono.id = :idDono
-            """
-    )
-    Optional<Circulo> existe(@Param("idCirc") UUID idCirc, @Param("idDono") UUID idDono);
-
     @Modifying
     @Transactional
     @Query(
@@ -42,11 +35,6 @@ public interface CirculoRepository extends JpaRepository<Circulo, UUID> {
             WHERE c.nomeCirculo LIKE %?1% AND c.dono = ?2
             """)
     List<CirculoPesquisaDto> findByNomeCirculoContaining(String nomeCirculo, Usuario user);
-
-    @Modifying
-    @Transactional
-    @Query("update membro set membro = null, circulo = null where circulo.id = ?1")
-    Integer deletarTodosMembrosDoCirculo(UUID circuloId);
 
     NomeCirculoProjection findNomeCirculoById(UUID idCirculo);
 

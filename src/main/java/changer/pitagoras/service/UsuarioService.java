@@ -6,6 +6,7 @@ import changer.pitagoras.dto.*;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Arquivo;
+import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.Convite;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.CirculoRepository;
@@ -81,9 +82,11 @@ public class UsuarioService {
 
     public Usuario encontrarUsuarioPorEmail(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+
         if (usuario == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.");
         }
+
         return usuario;
     }
 
@@ -304,5 +307,9 @@ public class UsuarioService {
             conviteDtos.add(dto);
         }
         return conviteDtos;
+    }
+
+    public List<Circulo> getGrupos(UUID uuid) {
+        return encontrarUsuario(uuid).getCirculos();
     }
 }
