@@ -38,6 +38,8 @@ public interface CirculoRepository extends JpaRepository<Circulo, UUID> {
 
     NomeCirculoProjection findNomeCirculoById(UUID idCirculo);
 
+    UUID findDonoById(UUID idDoCirculo);
+
     interface NomeCirculoProjection {
         String getNomeCirculo();
     }
