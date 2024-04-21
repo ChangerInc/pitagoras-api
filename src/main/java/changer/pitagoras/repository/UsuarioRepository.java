@@ -58,4 +58,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     interface NomeProjection {
         String getNome();
     }
+
 }

@@ -12,6 +12,7 @@ import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.CirculoRepository;
 import changer.pitagoras.repository.ConviteRepository;
 import changer.pitagoras.repository.UsuarioRepository;
+import changer.pitagoras.util.FotoPerfilGerador;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import changer.pitagoras.util.ListaObj;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,6 +53,8 @@ public class UsuarioService {
     private ArquivoService arquivoService;
     @Autowired
     private ConviteRepository conviteRepository;
+    @Autowired
+    private S3Service s3Service;
 
     public Usuario salvarUser(Usuario user) {
         return usuarioRepository.save(user);
@@ -172,6 +176,13 @@ public class UsuarioService {
         return null;
     }
 
+    public Usuario cadastrarUsuario(UsuarioCriacaoDto usuarioCriacaoDto) {
+        Usuario novoUsuario = criar(usuarioCriacaoDto);
+        String urlDoAvatar = gerarFoto(novoUsuario);
+        atualizarFoto(urlDoAvatar, novoUsuario.getId());
+        return novoUsuario;
+    }
+
     public Usuario criar(UsuarioCriacaoDto usuarioCriacaoDto) {
         if (usuarioRepository.existsByEmail(usuarioCriacaoDto.getEmail())) {
             return null;
@@ -181,6 +192,7 @@ public class UsuarioService {
         novoUsuario.setDataCriacaoConta(LocalDateTime.now());
         String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
         novoUsuario.setSenha(senhaCriptografada);
+
         return usuarioRepository.save(novoUsuario);
     }
 
@@ -310,5 +322,20 @@ public class UsuarioService {
 
     public List<Circulo> getGrupos(UUID uuid) {
         return encontrarUsuario(uuid).getCirculos();
+    }
+
+    public String gerarFoto(Usuario novoUsuario) {
+        String iniciais = FotoPerfilGerador.gerarLetras(novoUsuario.getNome());
+        BufferedImage fotoPerfil = FotoPerfilGerador.gerarFotoPerfil(iniciais);
+        String urlDoAvatar = "";
+        // Convertendo BufferedImage para MultipartFile
+        try {
+            MultipartFile multipartFile = FotoPerfilGerador.convertBufferedImageToMultipartFile(fotoPerfil, "perfil-de-usuario.png");
+            s3Service.saveArquivo(multipartFile, novoUsuario.getId());
+            urlDoAvatar = s3Service.obterUrlPublica("perfil-de-usuario.png", novoUsuario.getId().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return urlDoAvatar;
     }
 }
