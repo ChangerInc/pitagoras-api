@@ -178,6 +178,9 @@ public class UsuarioService {
 
     public Usuario cadastrarUsuario(UsuarioCriacaoDto usuarioCriacaoDto) {
         Usuario novoUsuario = criar(usuarioCriacaoDto);
+        if(novoUsuario == null){
+            return null;
+        }
         String urlDoAvatar = gerarFoto(novoUsuario);
         atualizarFoto(urlDoAvatar, novoUsuario.getId());
         return novoUsuario;
