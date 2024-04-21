@@ -311,14 +311,14 @@ public class UsuarioService {
         List<ConviteDto> conviteDtos = new ArrayList<>();
         for (Convite con : convites){
             UUID idDoCirculo = con.getIdCirculo();
-            String fotoAnfitriao = usuarioRepository.findById(circuloRepository.findDonoById(idDoCirculo)).get().getFotoPerfil();
+            Usuario dono = encontrarUsuario(con.getIdAnfitriao());
             CirculoRepository.NomeCirculoProjection projecaoCirculo = circuloRepository.findNomeCirculoById(idDoCirculo);
             String nomeDoCirculo = projecaoCirculo.getNomeCirculo();
 
             UsuarioRepository.NomeProjection projecaoUser = usuarioRepository.findNomeById(con.getIdAnfitriao());
             String nomeUsuario = projecaoUser.getNome();
 
-            ConviteDto dto = new ConviteDto(fotoAnfitriao, nomeUsuario, nomeDoCirculo, idDoCirculo, con.getDataRegistro());
+            ConviteDto dto = new ConviteDto(dono.getFotoPerfil(), nomeUsuario, nomeDoCirculo, idDoCirculo, con.getDataRegistro());
             conviteDtos.add(dto);
         }
         return conviteDtos;
