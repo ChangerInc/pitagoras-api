@@ -233,16 +233,18 @@ public class CirculoService {
     }
 
     public Boolean decisaoConvite(UUID idCirculo, UUID idUsuario, Integer acaoBotao){
+        Usuario usuario = usuarioService.encontrarUsuario(idUsuario);
+
         if (!circuloRepository.existsById(idCirculo)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Circulo não encontrado");
         }
 
         if(acaoBotao.equals(1)){
-            conviteRepository.mudarStatusConvite(1, idCirculo);
+            conviteRepository.mudarStatusConvite(1, idCirculo, usuario.getEmail());
             return addMembro(new NovoMembroDto(idCirculo, idUsuario));
         }
 
-        conviteRepository.mudarStatusConvite(2, idCirculo);
+        conviteRepository.mudarStatusConvite(2, idCirculo, usuario.getEmail());
         return false;
     }
 

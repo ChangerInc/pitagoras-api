@@ -22,6 +22,11 @@ public interface ConviteRepository extends JpaRepository<Convite, UUID> {
     @Query("UPDATE Convite c SET c.statusConvite = ?1 WHERE c.idCirculo = ?2")
     int mudarStatusConvite(int status, UUID idCirculo);
 
+    @Transactional
+    @Modifying
+    @Query("UPDATE Convite c SET c.statusConvite = ?1 WHERE c.idCirculo = ?2 AND c.emailConvidado = ?3")
+    int mudarStatusConvite(int status, UUID idCirculo, String emailConvidado);
+
     List<Convite> findAllByEmailConvidadoAndStatusConvite(String emailConvidado, int statusConvite);
 
 }
