@@ -1,8 +1,6 @@
 package changer.pitagoras.service;
 
 import changer.pitagoras.model.Arquivo;
-import changer.pitagoras.model.Circulo;
-import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.ArquivoRepository;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.AbstractQueue;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,6 +21,8 @@ public class ArquivoService {
     private String extensaoAux;
     @Getter
     private String nomeAux;
+    @Autowired
+    private S3Service s3Service;
 
     public Arquivo encontrarArq(UUID id) {
         if (id == null) {
@@ -73,37 +68,26 @@ public class ArquivoService {
         }
     }
 
-    public Arquivo salvar(Arquivo arq) {
-        return repository.save(arq);
-    }
-
-    public Arquivo salvar(MultipartFile file) {
-
+    public Arquivo salvar(MultipartFile file, String urlArquivo) {
         if (file == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Arquivo vazio");
         }
-
-        separarExtensao(file.getOriginalFilename());
-        Arquivo arquivo = new Arquivo(
-                nomeAux,
-                BigDecimal.valueOf(file.getSize()),
-                extensaoAux
-        );
-
-        try {
-            arquivo.setBytesArquivo(file.getResource().getContentAsByteArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        String[] partes = file.getContentType().split("/");
+        String extensao = partes[1];
+        Arquivo arquivo = new Arquivo(file.getOriginalFilename(), BigDecimal.valueOf(file.getSize()),
+                extensao, urlArquivo);
         return repository.save(arquivo);
+    }
+
+    public Arquivo salvar(Arquivo arq) {
+        return repository.save(arq);
     }
 
     public Arquivo buscarArquivo(UUID id) {
         return repository.findByIdArquivo(id).orElse(null);
     }
 
-    public byte[] pegarArquivo(UUID id) {
-        return encontrarArq(id).getBytesArquivo();
+    public String pegarUrlArquivo(UUID id) {
+        return encontrarArq(id).getUrlArquivo();
     }
 }

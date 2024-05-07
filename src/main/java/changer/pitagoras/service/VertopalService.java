@@ -174,7 +174,8 @@ public class VertopalService {
                         new Arquivo(
                                 arquivoService.getNomeAux(),
                                 new BigDecimal(output.getLong("size")),
-                                arquivoService.getExtensaoAux()
+                                arquivoService.getExtensaoAux(),
+                                "processamento Arquivo"
                         )
                 )
         );

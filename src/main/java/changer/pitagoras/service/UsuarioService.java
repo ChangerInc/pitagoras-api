@@ -223,7 +223,7 @@ public class UsuarioService {
         return usuarioRepository.atualizarFoto(novaFoto, idUsuario);
     }
 
-    public byte[] getFoto(UUID codigo) {
+    public String getFoto(UUID codigo) {
         return usuarioRepository.getFoto(codigo);
     }
 
@@ -256,7 +256,8 @@ public class UsuarioService {
 
     public Arquivo salvar(UUID codigo, MultipartFile file) {
         Usuario usuario = encontrarUsuario(codigo);
-        Arquivo arquivo = arquivoService.salvar(file);
+        String url = s3Service.saveArquivo(file, codigo);
+        Arquivo arquivo = arquivoService.salvar(file, url);
 
         usuario.getArquivos().add(arquivo);
         salvarUser(usuario);

@@ -23,6 +23,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,8 +139,8 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(urlImagem);
     }
 
-    @GetMapping(value = "/foto/{codigo}", produces = "image/**")
-    public ResponseEntity<byte[]> getFoto(@PathVariable UUID codigo){
+    @GetMapping(value = "/foto/{codigo}")
+    public ResponseEntity<String> getFoto(@PathVariable UUID codigo){
 
         if (usuarioService.fotoExiste(codigo))
             return ResponseEntity.status(200).body(usuarioService.getFoto(codigo));
@@ -148,8 +149,11 @@ public class UsuarioController {
     }
 
     @PostMapping(value = "/arquivos/{codigo}")
-    public ResponseEntity<UUID> uploadArquivo(@PathVariable UUID codigo, @RequestParam("file") MultipartFile file){
-        return ResponseEntity.status(200).body(usuarioService.salvar(codigo, file).getIdArquivo());
+    public ResponseEntity<String> uploadArquivo(@PathVariable UUID idUsuario, @RequestParam("file") MultipartFile file){
+        s3Service.saveArquivo(file, idUsuario);
+        String urlArquivo = s3Service.obterUrlPublica(file.getOriginalFilename(), idUsuario.toString());
+        arquivoService.salvar(file, urlArquivo);
+        return ResponseEntity.status(200).body(usuarioService.salvar(idUsuario, file).getUrlArquivo());
     }
 
     @DeleteMapping("/arquivos/{codigo}/{idConversao}")

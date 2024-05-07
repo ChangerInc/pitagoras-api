@@ -46,7 +46,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     int atualizarFoto(String foto, UUID idUsuario);
 
     @Query("select u.fotoPerfil from Usuario u where u.id = ?1")
-    byte[] getFoto(UUID codigo);
+    String getFoto(UUID codigo);
 
     @Query("select new changer.pitagoras.dto.UsuarioAdmDto(u.id, u.nome, u.email, u.senha) from Usuario u")
     List<UsuarioAdmDto> findUsersAdm();
