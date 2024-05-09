@@ -10,6 +10,7 @@ import java.util.UUID;
 @Getter
 public class ConviteDto {
 
+    private String fotoAnfitriao;
     private String anfitriao;
     private String nomeCirculo;
     private UUID idCirculo;

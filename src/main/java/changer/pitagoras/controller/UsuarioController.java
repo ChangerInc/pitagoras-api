@@ -6,10 +6,12 @@ import changer.pitagoras.dto.UsuarioNomeEmailDto;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Arquivo;
+import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.Convite;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.service.ArquivoService;
 import changer.pitagoras.service.ChangerService;
+import changer.pitagoras.service.S3Service;
 import changer.pitagoras.service.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.SneakyThrows;
@@ -36,6 +38,8 @@ public class UsuarioController {
     private ChangerService changerService;
     @Autowired
     private ArquivoService arquivoService;
+    @Autowired
+    private S3Service s3Service;;
 
     public UsuarioController() {
     }
@@ -54,8 +58,9 @@ public class UsuarioController {
     @GetMapping("/{email}")
     public ResponseEntity<Usuario> getByNome(@PathVariable String email) {
         List<Usuario> lista = usuarioService.listarUsuarios();
-        if (lista.isEmpty())
+        if (lista.isEmpty()) {
             return ResponseEntity.status(204).build();
+        }
 
         Usuario userPesquisado = usuarioService.pesquisaBinaria(
                 usuarioService.ordenaPorNome(usuarioService.listarUsuarios()), email
@@ -66,7 +71,7 @@ public class UsuarioController {
 
     @PostMapping("/")
     public ResponseEntity<Usuario> criar(@RequestBody @Valid UsuarioCriacaoDto usuarioCriacaoDto) {
-        Usuario usuario = usuarioService.criar(usuarioCriacaoDto);
+        Usuario usuario = usuarioService.cadastrarUsuario(usuarioCriacaoDto);
         if (usuario == null)
             return ResponseEntity.status(409).build();
 
@@ -126,11 +131,11 @@ public class UsuarioController {
 
     @SneakyThrows
     @PatchMapping(value = "/foto/{codigo}")
-    public ResponseEntity<byte[]> patchFoto(@PathVariable UUID codigo, @RequestParam("file") MultipartFile novaFoto){
-        int atualizado = usuarioService.atualizarFoto(novaFoto.getBytes(), codigo);
-        int status = atualizado == 1 ? 200 : 404;
-
-        return ResponseEntity.status(status).body(novaFoto.getBytes());
+    public ResponseEntity<String> patchFoto(@PathVariable UUID idUsuario, @RequestParam("file") MultipartFile novaFoto){
+        s3Service.saveArquivo(novaFoto, idUsuario);
+        String urlImagem = s3Service.obterUrlPublica(novaFoto.getOriginalFilename(), idUsuario.toString());
+        usuarioService.atualizarFoto(urlImagem, idUsuario);
+        return ResponseEntity.status(200).body(urlImagem);
     }
 
     @GetMapping(value = "/foto/{codigo}", produces = "image/**")
@@ -176,6 +181,4 @@ public class UsuarioController {
         List<ConviteDto> convites = usuarioService.buscarConvites(email, 0);
         return ResponseEntity.status(200).body(convites);
     }
-
-
 }

@@ -1,11 +1,9 @@
 package changer.pitagoras.dto;
 
-import changer.pitagoras.dto.autenticacao.MembroDto;
-import changer.pitagoras.model.Membro;
+import changer.pitagoras.model.Arquivo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +12,7 @@ import java.util.UUID;
 public class CirculoMembrosDto {
     private UUID id;
     private String nomeCirculo;
-    private UsuarioFotoDto dono;
-    private LocalDateTime dataCriacao;
+    private UUID dono;
     private List<UsuarioFotoDto> membros;
+    private List<Arquivo> arquivos;
 }

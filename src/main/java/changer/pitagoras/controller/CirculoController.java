@@ -1,15 +1,12 @@
 package changer.pitagoras.controller;
 
 import changer.pitagoras.dto.CirculoMembrosDto;
-import changer.pitagoras.dto.CirculoPesquisaDto;
 import changer.pitagoras.dto.CirculoSimplesDto;
 import changer.pitagoras.dto.NovoMembroDto;
 import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.model.Circulo;
-import changer.pitagoras.service.ArquivoService;
 import changer.pitagoras.service.CirculoService;
 import changer.pitagoras.service.UsuarioService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +22,7 @@ public class CirculoController {
     CirculoService circuloService;
     @Autowired
     UsuarioService usuarioService;
-    @Autowired
-    private ArquivoService arquivoService;
+
     @GetMapping("/")
     public ResponseEntity<List<CirculoMembrosDto>> get() {
         return ResponseEntity.status(200).body(circuloService.getAll());
@@ -38,7 +34,7 @@ public class CirculoController {
     }
 
     @GetMapping("/acesso")
-    public ResponseEntity<CirculoMembrosDto> getOne(@RequestBody Map<String, UUID> ids) {
+    public ResponseEntity<Circulo> getOne(@RequestBody Map<String, UUID> ids) {
         return ResponseEntity.status(200).body(circuloService.getOne(ids));
     }
 
@@ -60,8 +56,8 @@ public class CirculoController {
     }
 
     @PostMapping("/adicionar-membro")
-    public ResponseEntity<Boolean> adicionarRequestBody(@RequestBody @Valid NovoMembroDto membroNovo) {
-        return ResponseEntity.status(201).body(circuloService.addMembro(membroNovo));
+    public ResponseEntity<Boolean> adicionarRequestBody(@RequestBody NovoMembroDto membro) {
+        return ResponseEntity.status(201).body(circuloService.addMembro(membro));
     }
 
     @PatchMapping("/arquivos/{idCirculo}/{idArquivo}")
@@ -88,16 +84,16 @@ public class CirculoController {
     }
 
     @GetMapping("/pesquisar/{nomeCirculo}/{idUser}")
-    public ResponseEntity<List<CirculoPesquisaDto>> searchByName(
+    public ResponseEntity<List<CirculoMembrosDto>> searchByName(
             @PathVariable String nomeCirculo, @PathVariable UUID idUser) {
-        List<CirculoPesquisaDto> circulos = circuloService.findByNomeCirculoContaining(nomeCirculo, idUser);
-
-        return ResponseEntity.status(200).body(circulos);
+        return ResponseEntity.status(200).body(circuloService.findByNomeCirculoContaining(nomeCirculo, idUser));
     }
 
     @DeleteMapping("/limpar/{idCirculo}")
     public ResponseEntity<Boolean> removerATurminhaTodaDoCirculo(@PathVariable UUID idCirculo) {
-        return circuloService.removerTodosOsMembrosDoCIrculo(idCirculo) ? ResponseEntity.status(200).build() : ResponseEntity.status(400).build();
+        return circuloService.removerTodosOsMembrosDoCIrculo(idCirculo)
+                ? ResponseEntity.status(200).build()
+                : ResponseEntity.status(400).build();
     }
 
     @PostMapping("/convidar/{idCirculo}")
@@ -109,12 +105,11 @@ public class CirculoController {
 
     @PatchMapping("/convite/botao/{acaoBotao}")
     public ResponseEntity<Boolean> acaoBotaoDoConvite
-            (@RequestParam String email,
-             @RequestParam UUID idCirculo,
+            (@RequestParam UUID idCirculo,
              @RequestParam UUID idUsuario,
              @PathVariable Integer acaoBotao){
 
-        circuloService.decisaoConvite(idCirculo, email, idUsuario, acaoBotao);
+        circuloService.decisaoConvite(idCirculo, idUsuario, acaoBotao);
         return ResponseEntity.status(200).build();
     }
 

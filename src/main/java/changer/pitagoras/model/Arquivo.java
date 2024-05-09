@@ -1,5 +1,6 @@
 package changer.pitagoras.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -21,6 +22,7 @@ public class Arquivo {
     private LocalDateTime criacao;
     private BigDecimal tamanho;
     private String extensao;
+    @JsonIgnore
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] bytesArquivo;

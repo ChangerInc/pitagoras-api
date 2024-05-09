@@ -1,15 +1,18 @@
 package changer.pitagoras.service;
 
+import changer.pitagoras.config.S3Config;
 import changer.pitagoras.config.security.GerenciadorTokenJwt;
 import changer.pitagoras.dto.*;
 import changer.pitagoras.dto.autenticacao.UsuarioLoginDto;
 import changer.pitagoras.dto.autenticacao.UsuarioTokenDto;
 import changer.pitagoras.model.Arquivo;
+import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.Convite;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.CirculoRepository;
 import changer.pitagoras.repository.ConviteRepository;
 import changer.pitagoras.repository.UsuarioRepository;
+import changer.pitagoras.util.FotoPerfilGerador;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,7 @@ import changer.pitagoras.util.ListaObj;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,6 +53,8 @@ public class UsuarioService {
     private ArquivoService arquivoService;
     @Autowired
     private ConviteRepository conviteRepository;
+    @Autowired
+    private S3Service s3Service;
 
     public Usuario salvarUser(Usuario user) {
         return usuarioRepository.save(user);
@@ -80,9 +86,11 @@ public class UsuarioService {
 
     public Usuario encontrarUsuarioPorEmail(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+
         if (usuario == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.");
         }
+
         return usuario;
     }
 
@@ -168,6 +176,16 @@ public class UsuarioService {
         return null;
     }
 
+    public Usuario cadastrarUsuario(UsuarioCriacaoDto usuarioCriacaoDto) {
+        Usuario novoUsuario = criar(usuarioCriacaoDto);
+        if(novoUsuario == null){
+            return null;
+        }
+        String urlDoAvatar = gerarFoto(novoUsuario);
+        atualizarFoto(urlDoAvatar, novoUsuario.getId());
+        return novoUsuario;
+    }
+
     public Usuario criar(UsuarioCriacaoDto usuarioCriacaoDto) {
         if (usuarioRepository.existsByEmail(usuarioCriacaoDto.getEmail())) {
             return null;
@@ -175,9 +193,9 @@ public class UsuarioService {
         final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
         novoUsuario.setPlano(false);
         novoUsuario.setDataCriacaoConta(LocalDateTime.now());
-        novoUsuario.setFotoPerfil(obterBytesDaImagemPadrao());
         String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
         novoUsuario.setSenha(senhaCriptografada);
+
         return usuarioRepository.save(novoUsuario);
     }
 
@@ -201,8 +219,8 @@ public class UsuarioService {
         return UsuarioMapper.of(usuarioAutenticado, token);
     }
 
-    public int atualizarFoto(byte[] novaFoto, UUID codigo) {
-        return usuarioRepository.atualizarFoto(novaFoto, codigo);
+    public int atualizarFoto(String novaFoto, UUID idUsuario) {
+        return usuarioRepository.atualizarFoto(novaFoto, idUsuario);
     }
 
     public byte[] getFoto(UUID codigo) {
@@ -293,15 +311,35 @@ public class UsuarioService {
         List<ConviteDto> conviteDtos = new ArrayList<>();
         for (Convite con : convites){
             UUID idDoCirculo = con.getIdCirculo();
+            Usuario dono = encontrarUsuario(con.getIdAnfitriao());
             CirculoRepository.NomeCirculoProjection projecaoCirculo = circuloRepository.findNomeCirculoById(idDoCirculo);
             String nomeDoCirculo = projecaoCirculo.getNomeCirculo();
 
             UsuarioRepository.NomeProjection projecaoUser = usuarioRepository.findNomeById(con.getIdAnfitriao());
             String nomeUsuario = projecaoUser.getNome();
 
-            ConviteDto dto = new ConviteDto(nomeUsuario, nomeDoCirculo, idDoCirculo, con.getDataRegistro());
+            ConviteDto dto = new ConviteDto(dono.getFotoPerfil(), nomeUsuario, nomeDoCirculo, idDoCirculo, con.getDataRegistro());
             conviteDtos.add(dto);
         }
         return conviteDtos;
+    }
+
+    public List<Circulo> getGrupos(UUID uuid) {
+        return encontrarUsuario(uuid).getCirculos();
+    }
+
+    public String gerarFoto(Usuario novoUsuario) {
+        String iniciais = FotoPerfilGerador.gerarLetras(novoUsuario.getNome());
+        BufferedImage fotoPerfil = FotoPerfilGerador.gerarFotoPerfil(iniciais);
+        String urlDoAvatar = "";
+        // Convertendo BufferedImage para MultipartFile
+        try {
+            MultipartFile multipartFile = FotoPerfilGerador.convertBufferedImageToMultipartFile(fotoPerfil, "perfil-de-usuario.png");
+            s3Service.saveArquivo(multipartFile, novoUsuario.getId());
+            urlDoAvatar = s3Service.obterUrlPublica("perfil-de-usuario.png", novoUsuario.getId().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return urlDoAvatar;
     }
 }

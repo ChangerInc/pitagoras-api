@@ -44,28 +44,33 @@ public class ArquivoService {
     }
 
     public void separarExtensao(String nomeDocumento) {
-        StringBuilder extensao = new StringBuilder();
-        StringBuilder nome = new StringBuilder();
-
-        boolean ponto = false;
-        for (int i = 0; i < nomeDocumento.length(); i++) {
-            char charAtual = nomeDocumento.charAt(i);
-
-            if (charAtual == '.') {
-                ponto = true;
-            }
-
-            if (!ponto) {
-                nome.append(charAtual);
-            }
-
-            if (ponto && charAtual != '.') {
-                extensao.append(charAtual);
+        int dots = 0;
+        for (char c : nomeDocumento.toCharArray()){
+            if (c == '.') {
+                dots++;
             }
         }
 
-        nomeAux = nome.toString();
-        extensaoAux = extensao.toString();
+        if (dots == 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "O arquivo não possui extensão"
+            );
+        }
+        
+        if (dots > 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "O arquivo não pode possuir mais de um ponto no nome"
+            );
+        }
+
+        if (nomeDocumento != null && nomeDocumento.contains(".")) {
+            int lastIndex = nomeDocumento.lastIndexOf(".");
+            if (lastIndex != -1 && lastIndex != 0 && lastIndex != nomeDocumento.length() - 1) {
+                String extension = nomeDocumento.substring(lastIndex + 1);
+                nomeAux = nomeDocumento.toString();
+                extensaoAux = extension;
+            }
+        }
     }
 
     public Arquivo salvar(Arquivo arq) {
@@ -73,6 +78,7 @@ public class ArquivoService {
     }
 
     public Arquivo salvar(MultipartFile file) {
+
         if (file == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Arquivo vazio");
         }

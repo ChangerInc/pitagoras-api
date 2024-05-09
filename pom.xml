@@ -131,8 +131,20 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>1.12.318</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api -->
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>4.0.0-RC3</version>
+		</dependency>
 
-    </dependencies>
+
+	</dependencies>
 
 	<build>
 		<plugins>

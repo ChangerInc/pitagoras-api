@@ -7,14 +7,14 @@ public class UsuarioTokenDto {
     private UUID userId;
     private String nome;
     private String email;
-    private byte[] fotoPerfil;
+    private String fotoPerfil;
     private String token;
 
-    public byte[] getFotoPerfil() {
+    public String getFotoPerfil() {
         return fotoPerfil;
     }
 
-    public void setFotoPerfil(byte[] fotoPerfil) {
+    public void setFotoPerfil(String fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
     }
 
