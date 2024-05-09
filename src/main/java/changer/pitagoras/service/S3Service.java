@@ -51,8 +51,8 @@ public class S3Service implements ContratoS3{
     }
 
     @Override
-    public byte[] downloadArquivo(String nomeArquivo, UUID idUsuario) {
-        String pasta = idUsuario+"/";
+    public byte[] downloadArquivo(String nomeArquivo, UUID idUsuarioOuIdCirculo) {
+        String pasta = idUsuarioOuIdCirculo+"/";
         S3Object object = s3.getObject(bucketName, pasta+nomeArquivo);
         S3ObjectInputStream objectContent = object.getObjectContent();
         try {
