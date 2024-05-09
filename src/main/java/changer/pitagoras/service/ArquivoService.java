@@ -1,18 +1,23 @@
 package changer.pitagoras.service;
 
 import changer.pitagoras.model.Arquivo;
+import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.Usuario;
 import changer.pitagoras.repository.ArquivoRepository;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,7 +32,8 @@ public class ArquivoService {
     private S3Service s3Service;
     @Autowired
     private UsuarioService usuarioService;
-
+    @Autowired
+    private CirculoService circuloService;
 
     public Arquivo fluxoDeUploadArquivo(UUID idUsuario, MultipartFile file) {
         s3Service.saveArquivo(file, idUsuario);
@@ -137,4 +143,29 @@ public class ArquivoService {
         Arquivo arquivo = new Arquivo(nomeArquivo, tamanhoArquivo, extensao, urlArquivo);
         return arquivo;
     }
+
+
+    // ======================================= CIRCULO =================================================================
+
+    public Arquivo fluxoDeUploadArquivoNoCirculo(UUID idCirculo, MultipartFile file) {
+        s3Service.saveArquivo(file, idCirculo);
+        String urlArquivo = s3Service.obterUrlPublica(file.getOriginalFilename(), idCirculo.toString());
+        Arquivo arquivoModel = transformarMultipartFileEmArquivoModel(file, urlArquivo);
+        arquivoRepository.save(arquivoModel);
+
+        Circulo circulo = circuloService.pegarCirc(idCirculo);
+        circulo.getArquivos().add(arquivoModel);
+        circuloService.salvarCirculo(circulo);
+        return arquivoModel;
+    }
+
+    public List<Arquivo> resgatarArquivosDoCirculo(UUID idCirculo) {
+        Circulo circulo = circuloService.pegarCirc(idCirculo);
+        if (circulo == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Circulo não encontrado");
+        }
+        return circulo.getArquivos();
+    }
+
+
 }

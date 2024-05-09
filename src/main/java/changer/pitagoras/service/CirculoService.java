@@ -19,11 +19,13 @@ public class CirculoService {
     @Autowired
     private UsuarioService usuarioService;
     @Autowired
-    private ArquivoService arquivoService;
-    @Autowired
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ConviteRepository conviteRepository;
+
+    public Circulo salvarCirculo(Circulo circulo) {
+        return circuloRepository.save(circulo);
+    }
 
     protected void validacao(UUID idCirc, UUID idDono) {
         if (!circuloRepository.existsById(idCirc)) {
@@ -49,7 +51,7 @@ public class CirculoService {
         return auxCirc;
     }
 
-    private Circulo pegarCirc(UUID id) {
+    public Circulo pegarCirc(UUID id) {
         Circulo circ = circuloRepository.findById(id).orElse(null);
 
         if (circ == null) {
@@ -159,15 +161,6 @@ public class CirculoService {
         );
     }
 
-    public List<Arquivo> resgatarArquivos(UUID idCirculo) {
-        Circulo circulo = circuloRepository.findById(idCirculo).orElse(null);
-
-        if (circulo == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Circulo não encontrado");
-        }
-
-        return circulo.getArquivos();
-    }
 
     public List<CirculoMembrosDto> findByNomeCirculoContaining(String nomeCirculo, UUID idUser) {
         List<CirculoMembrosDto> listCompleta = getAllById(idUser);
@@ -208,15 +201,6 @@ public class CirculoService {
         circuloRepository.save(c);
 
         return membros.isEmpty();
-    }
-
-    public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
-        Arquivo arquivo = arquivoService.encontrarArq(idArquivo);
-        Circulo circulo = pegarCirc(idCirculo);
-
-        circulo.getArquivos().add(arquivo);
-        circuloRepository.save(circulo);
-        return true;
     }
 
     public Boolean convidarPessoa(UUID idCirculo, UUID idAnfitriao, String emailDoConvidado) {

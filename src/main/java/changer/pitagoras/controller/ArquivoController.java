@@ -22,21 +22,23 @@ public class ArquivoController {
     @Autowired
     private UsuarioService usuarioService;
 
+    // ============================================= USUARIO ===========================================================
+
     @PostMapping("/{idUsuario}")
-    public ResponseEntity<String> uploadArquivo(@PathVariable UUID idUsuario, @RequestParam("file") MultipartFile file){
+    public ResponseEntity<String> uploadArquivo(@PathVariable UUID idUsuario, @RequestParam("file") MultipartFile file) {
         Arquivo arquivo = arquivoService.fluxoDeUploadArquivo(idUsuario, file);
         return ResponseEntity.status(201).body(arquivo.getUrlArquivo());
     }
 
     @DeleteMapping("/{idUsuario}/{idArquivo}")
-    public ResponseEntity<Boolean> removerArquivo(@PathVariable UUID idUsuario, @PathVariable UUID idArquivo){
+    public ResponseEntity<Boolean> removerArquivo(@PathVariable UUID idUsuario, @PathVariable UUID idArquivo) {
         return arquivoService.fluxoDeDeleteArquivo(idUsuario, idArquivo)
                 ? ResponseEntity.status(200).build()
                 : ResponseEntity.status(404).build();
     }
 
     @GetMapping("/{idUsuario}/{idArquivo}")
-    public ResponseEntity<byte[]> downloadArquivo(@PathVariable UUID idArquivo,@PathVariable UUID idUsuario) {
+    public ResponseEntity<byte[]> downloadArquivo(@PathVariable UUID idUsuario, @PathVariable UUID idArquivo) {
         Arquivo arquivo = arquivoService.buscarArquivo(idArquivo);
         String nomeArquivo = arquivo.getNome();
         return ResponseEntity.status(200).body(s3Service.downloadArquivo(nomeArquivo, idUsuario));
@@ -52,5 +54,24 @@ public class ArquivoController {
                 : ResponseEntity.status(200).body(arqs);
     }
 
+
+    // ============================================= CIRCULO ===========================================================
+
+    @PatchMapping("/circulo/{idCirculo}/{idArquivo}")
+    public ResponseEntity<String> adicionarArquivoNaTurminha
+            (@PathVariable UUID idCirculo, @RequestParam("file") MultipartFile file) {
+
+        Arquivo arquivo = arquivoService.fluxoDeUploadArquivoNoCirculo(idCirculo, file);
+        return ResponseEntity.status(201).body(arquivo.getUrlArquivo());
+    }
+
+    @GetMapping("/circulo/{idCirculo}")
+    public ResponseEntity<List<Arquivo>> pegarTodosArquivosDoCirculo(@PathVariable UUID idCirculo) {
+        List<Arquivo> arquivos = arquivoService.resgatarArquivosDoCirculo(idCirculo);
+
+        return arquivos.isEmpty()
+                ? ResponseEntity.status(204).build()
+                : ResponseEntity.status(200).body(arquivos);
+    }
 
 }
