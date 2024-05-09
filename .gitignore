@@ -1,5 +1,5 @@
 ### CHANGER
-\src\main\resources\s3.properties
+!**/src/main/resources/s3.properties
 
 HELP.md
 target/
