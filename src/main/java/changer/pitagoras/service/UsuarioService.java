@@ -49,8 +49,7 @@ public class UsuarioService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private CirculoRepository circuloRepository;
-    @Autowired
-    private ArquivoService arquivoService;
+
     @Autowired
     private ConviteRepository conviteRepository;
     @Autowired
@@ -231,15 +230,6 @@ public class UsuarioService {
         return usuarioRepository.existsById(codigo);
     }
 
-    public String obterExtensaoArquivo(String nomeArquivo) {
-        if (!nomeArquivo.contains(".")) {
-            throw new TypeNotPresentException("Ponto (.) não encontrado no nome do arquivo", null);
-        }
-
-        Path path = Paths.get(nomeArquivo);
-        return path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf('.') + 1);
-    }
-
     private byte[] obterBytesDaImagemPadrao() {
         try {
             ClassPathResource resource = new ClassPathResource("perfil-de-usuario.png");
@@ -251,48 +241,8 @@ public class UsuarioService {
     }
 
     public List<Arquivo> pegarArq(UUID id) {
-        return encontrarUsuario(id).getArquivos();
-    }
-
-    public Arquivo salvar(UUID codigo, MultipartFile file) {
-        Usuario usuario = encontrarUsuario(codigo);
-        String url = s3Service.saveArquivo(file, codigo);
-        Arquivo arquivo = arquivoService.salvar(file, url);
-
-        usuario.getArquivos().add(arquivo);
-        salvarUser(usuario);
-
-        return arquivo;
-    }
-
-    public Arquivo salvar(UUID codigo, Arquivo arq) {
-        Usuario usuario = encontrarUsuario(codigo);
-        Arquivo arquivo = arquivoService.salvar(arq);
-
-        usuario.getArquivos().add(arquivo);
-        salvarUser(usuario);
-
-        return arquivo;
-    }
-
-    public Boolean deletarArquivo(UUID codigo, UUID idArquivo) {
-        if (codigo == null || idArquivo == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        Usuario user = encontrarUsuario(codigo);
-        if (user == null) {
-            return false;
-        }
-
-        Arquivo arq = arquivoService.buscarArquivo(idArquivo);
-        if (arq == null) {
-            return false;
-        }
-
-        user.getArquivos().remove(arq);
-        salvarUser(user);
-        return true;
+        Usuario usuario = encontrarUsuario(id);
+        return usuario.getArquivos();
     }
 
     public List<Arquivo> resgatarArquivos(UUID id) {

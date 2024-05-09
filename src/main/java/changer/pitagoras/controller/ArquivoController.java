@@ -16,21 +16,28 @@ import java.util.UUID;
 @RequestMapping("/arquivo")
 public class ArquivoController {
     @Autowired
-    private ArquivoService service;
+    private ArquivoService arquivoService;
     @Autowired
     private S3Service s3Service;
     @Autowired
     private UsuarioService usuarioService;
 
     @PostMapping("/{idUsuario}")
-    public ResponseEntity<Arquivo> criarArquivo(@RequestBody MultipartFile file, @PathVariable UUID idUsuario) {
-        String url = s3Service.saveArquivo(file, idUsuario);
-        return ResponseEntity.status(201).body(service.salvar(file, url));
+    public ResponseEntity<String> uploadArquivo(@PathVariable UUID idUsuario, @RequestParam("file") MultipartFile file){
+        Arquivo arquivo = arquivoService.fluxoDeUploadArquivo(idUsuario, file);
+        return ResponseEntity.status(201).body(arquivo.getUrlArquivo());
+    }
+
+    @DeleteMapping("/{idUsuario}/{idArquivo}")
+    public ResponseEntity<Boolean> removerArquivo(@PathVariable UUID idUsuario, @PathVariable UUID idArquivo){
+        return arquivoService.fluxoDeDeleteArquivo(idUsuario, idArquivo)
+                ? ResponseEntity.status(200).build()
+                : ResponseEntity.status(404).build();
     }
 
     @GetMapping("/{idUsuario}/{idArquivo}")
     public ResponseEntity<byte[]> downloadArquivo(@PathVariable UUID idArquivo,@PathVariable UUID idUsuario) {
-        Arquivo arquivo = service.buscarArquivo(idArquivo);
+        Arquivo arquivo = arquivoService.buscarArquivo(idArquivo);
         String nomeArquivo = arquivo.getNome();
         return ResponseEntity.status(200).body(s3Service.downloadArquivo(nomeArquivo, idUsuario));
     }
@@ -44,4 +51,6 @@ public class ArquivoController {
                 ? ResponseEntity.status(204).build()
                 : ResponseEntity.status(200).body(arqs);
     }
+
+
 }

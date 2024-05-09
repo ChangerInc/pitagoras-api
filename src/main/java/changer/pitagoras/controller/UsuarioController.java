@@ -9,10 +9,7 @@ import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.Convite;
 import changer.pitagoras.model.Usuario;
-import changer.pitagoras.service.ArquivoService;
-import changer.pitagoras.service.ChangerService;
-import changer.pitagoras.service.S3Service;
-import changer.pitagoras.service.UsuarioService;
+import changer.pitagoras.service.*;
 import jakarta.validation.Valid;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +38,8 @@ public class UsuarioController {
     private ArquivoService arquivoService;
     @Autowired
     private S3Service s3Service;;
+    @Autowired
+    private CirculoService circuloService;;
 
     public UsuarioController() {
     }
@@ -146,32 +145,6 @@ public class UsuarioController {
             return ResponseEntity.status(200).body(usuarioService.getFoto(codigo));
 
         return ResponseEntity.status(404).build();
-    }
-
-    @PostMapping(value = "/arquivos/{codigo}")
-    public ResponseEntity<String> uploadArquivo(@PathVariable UUID idUsuario, @RequestParam("file") MultipartFile file){
-        s3Service.saveArquivo(file, idUsuario);
-        String urlArquivo = s3Service.obterUrlPublica(file.getOriginalFilename(), idUsuario.toString());
-        arquivoService.salvar(file, urlArquivo);
-        return ResponseEntity.status(200).body(usuarioService.salvar(idUsuario, file).getUrlArquivo());
-    }
-
-    @DeleteMapping("/arquivos/{codigo}/{idConversao}")
-    public ResponseEntity<Boolean> removerArquivo(@PathVariable UUID codigo, @PathVariable UUID idConversao){
-        System.out.println(codigo + "\n" + idConversao);
-        return usuarioService.deletarArquivo(codigo, idConversao)
-                ? ResponseEntity.status(200).build()
-                : ResponseEntity.status(404).build();
-    }
-
-    @GetMapping("/arquivos/{id}")
-    public ResponseEntity<List<Arquivo>> getArquivosById(
-            @PathVariable UUID id) {
-        List<Arquivo> arqs = usuarioService.resgatarArquivos(id);
-
-        return arqs.isEmpty()
-                ? ResponseEntity.status(204).build()
-                : ResponseEntity.status(200).body(arqs);
     }
 
     @GetMapping("/notificacoes/{email}")
