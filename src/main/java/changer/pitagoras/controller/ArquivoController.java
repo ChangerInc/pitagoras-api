@@ -57,7 +57,7 @@ public class ArquivoController {
 
     // ============================================= CIRCULO ===========================================================
 
-    @PatchMapping("/circulo/{idCirculo}/{idArquivo}")
+    @PatchMapping("/circulo/{idCirculo}")
     public ResponseEntity<String> adicionarArquivoNaTurminha
             (@PathVariable UUID idCirculo, @RequestParam("file") MultipartFile file) {
 
