@@ -85,21 +85,21 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(usuarioTokenDto);
     }
 
-    @PutMapping("/{uuid}")
+    @PutMapping("/{idUsuario}")
     public ResponseEntity<?> atualizarSenha(
-            @PathVariable UUID uuid,
+            @PathVariable UUID idUsuario,
             @RequestBody Map<String, String> senhas) {
 
         if (senhas == null || !senhas.containsKey("senhaAtual") || !senhas.containsKey("senhaNova")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        int result = usuarioService.update(senhas, uuid);
+        int result = usuarioService.update(senhas, idUsuario);
 
         HttpStatus httpStatus;
 
         if (result == 200) {
-            UsuarioNomeEmailDto usuario = usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(uuid));
+            UsuarioNomeEmailDto usuario = usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(idUsuario));
             httpStatus = HttpStatus.OK;
             return ResponseEntity.status(httpStatus).body(usuario);
         } else {
@@ -109,9 +109,9 @@ public class UsuarioController {
     }
 
 
-    @DeleteMapping("/{uuid}")
-    public ResponseEntity<Usuario> excluirUsuario(@PathVariable UUID uuid) {
-        Usuario encontrado = usuarioService.encontrarUsuario(uuid);
+    @DeleteMapping("/{idUsuario}")
+    public ResponseEntity<Usuario> excluirUsuario(@PathVariable UUID idUsuario) {
+        Usuario encontrado = usuarioService.encontrarUsuario(idUsuario);
         if (encontrado == null) {
             return ResponseEntity.status(404).build();
         }
@@ -119,10 +119,10 @@ public class UsuarioController {
         return ResponseEntity.status(200).build();
     }
 
-    @GetMapping("/home/{id}")
-    public ResponseEntity<UsuarioNomeEmailDto> chamarUsuarioPorIdSemSenha(@PathVariable UUID id) {
+    @GetMapping("/home/{idUsuario}")
+    public ResponseEntity<UsuarioNomeEmailDto> chamarUsuarioPorIdSemSenha(@PathVariable UUID idUsuario) {
         UsuarioNomeEmailDto usuario =
-                usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(id));
+                usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(idUsuario));
         if (usuario == null) {
             return ResponseEntity.status(404).build();
         }
@@ -130,7 +130,7 @@ public class UsuarioController {
     }
 
     @SneakyThrows
-    @PatchMapping(value = "/foto/{codigo}")
+    @PatchMapping(value = "/foto/{idUsuario}")
     public ResponseEntity<String> patchFoto(@PathVariable UUID idUsuario, @RequestParam("file") MultipartFile novaFoto){
         s3Service.saveArquivo(novaFoto, idUsuario);
         String urlImagem = s3Service.obterUrlPublica(novaFoto.getOriginalFilename(), idUsuario.toString());
@@ -138,11 +138,11 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(urlImagem);
     }
 
-    @GetMapping(value = "/foto/{codigo}")
-    public ResponseEntity<String> getFoto(@PathVariable UUID codigo){
+    @GetMapping(value = "/foto/{idUsuario}")
+    public ResponseEntity<String> getFoto(@PathVariable UUID idUsuario){
 
-        if (usuarioService.fotoExiste(codigo))
-            return ResponseEntity.status(200).body(usuarioService.getFoto(codigo));
+        if (usuarioService.fotoExiste(idUsuario))
+            return ResponseEntity.status(200).body(usuarioService.getFoto(idUsuario));
 
         return ResponseEntity.status(404).build();
     }
