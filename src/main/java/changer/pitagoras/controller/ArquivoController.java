@@ -57,7 +57,7 @@ public class ArquivoController {
 
     // ============================================= CIRCULO ===========================================================
 
-    @PatchMapping("/circulo/{idCirculo}/{idArquivo}")
+    @PatchMapping("/circulo/{idCirculo}")
     public ResponseEntity<String> adicionarArquivoNaTurminha
             (@PathVariable UUID idCirculo, @RequestParam("file") MultipartFile file) {
 
@@ -66,12 +66,26 @@ public class ArquivoController {
     }
 
     @GetMapping("/circulo/{idCirculo}")
-    public ResponseEntity<List<Arquivo>> pegarTodosArquivosDoCirculo(@PathVariable UUID idCirculo) {
+    public ResponseEntity<List<Arquivo>> exibirTodosArquivosDoCirculo(@PathVariable UUID idCirculo) {
         List<Arquivo> arquivos = arquivoService.resgatarArquivosDoCirculo(idCirculo);
 
         return arquivos.isEmpty()
                 ? ResponseEntity.status(204).build()
                 : ResponseEntity.status(200).body(arquivos);
+    }
+
+    @GetMapping("/circulo/{idCirculo}/{idArquivo}")
+    public ResponseEntity<byte[]> downloadArquivoDoCirculo(@PathVariable UUID idCirculo, @PathVariable UUID idArquivo) {
+        Arquivo arquivo = arquivoService.buscarArquivo(idArquivo);
+        String nomeArquivo = arquivo.getNome();
+        return ResponseEntity.status(200).body(s3Service.downloadArquivo(nomeArquivo, idCirculo));
+    }
+
+    @DeleteMapping("/circulo/{idCirculo}/{idArquivo}")
+    public ResponseEntity<Boolean> removerArquivoDoCIrculo(@PathVariable UUID idCirculo, @PathVariable UUID idArquivo) {
+        return arquivoService.fluxoDeDeleteArquivoDoCirculo(idCirculo, idArquivo)
+                ? ResponseEntity.status(200).build()
+                : ResponseEntity.status(404).build();
     }
 
 }

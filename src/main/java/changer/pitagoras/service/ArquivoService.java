@@ -159,6 +159,23 @@ public class ArquivoService {
         return arquivoModel;
     }
 
+    public Boolean fluxoDeDeleteArquivoDoCirculo(UUID idCirculo, UUID idArquivo){
+        if (idCirculo == null || idArquivo == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        Circulo circulo = circuloService.pegarCirc(idCirculo);
+        if (circulo == null) {
+            return false;
+        }
+        Arquivo arq = buscarArquivo(idArquivo);
+        if (arq == null) {
+            return false;
+        }
+        circulo.getArquivos().remove(arq);
+        circuloService.salvarCirculo(circulo);
+        return true;
+    }
+
     public List<Arquivo> resgatarArquivosDoCirculo(UUID idCirculo) {
         Circulo circulo = circuloService.pegarCirc(idCirculo);
         if (circulo == null) {

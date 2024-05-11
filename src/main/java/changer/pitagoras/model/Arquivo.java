@@ -3,6 +3,7 @@ package changer.pitagoras.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 @Entity(name = "Arquivo")
 @NoArgsConstructor
-@Data
+@Getter
 public class Arquivo {
     @Id
     private UUID idArquivo;
