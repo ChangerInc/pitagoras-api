@@ -17,6 +17,9 @@ public interface ConviteRepository extends JpaRepository<Convite, UUID> {
     @Query("select count(emailConvidado) from Convite where emailConvidado = ?1 and statusConvite = 0")
     Integer consultarQtdNotificacoes(String email);
 
+    @Query("select count(emailConvidado) from Convite where emailConvidado = ?1 and statusConvite = 0 and idCirculo = ?2")
+    Integer conferirDuplicidadeConvite(String email, UUID idCirculo);
+
     @Transactional
     @Modifying
     @Query("UPDATE Convite c SET c.statusConvite = ?1 WHERE c.idCirculo = ?2")
