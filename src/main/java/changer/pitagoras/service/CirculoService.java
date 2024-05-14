@@ -5,6 +5,7 @@ import changer.pitagoras.model.*;
 import changer.pitagoras.repository.*;
 //import changer.pitagoras.repository.MembroRepository;
 import changer.pitagoras.util.FilaObj;
+import changer.pitagoras.util.enums.StatusConviteEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,13 @@ public class CirculoService {
     @Autowired
     private UsuarioService usuarioService;
     @Autowired
-    private ArquivoService arquivoService;
-    @Autowired
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ConviteRepository conviteRepository;
+
+    public Circulo salvarCirculo(Circulo circulo) {
+        return circuloRepository.save(circulo);
+    }
 
     protected void validacao(UUID idCirc, UUID idDono) {
         if (!circuloRepository.existsById(idCirc)) {
@@ -49,7 +52,7 @@ public class CirculoService {
         return auxCirc;
     }
 
-    private Circulo pegarCirc(UUID id) {
+    public Circulo pegarCirc(UUID id) {
         Circulo circ = circuloRepository.findById(id).orElse(null);
 
         if (circ == null) {
@@ -140,7 +143,7 @@ public class CirculoService {
 
     public void deletar(Map<String, UUID> ids) {
         validacao(ids.get("idCirc"), ids.get("idDono"));
-        setStatusConvite(3,ids.get("idCirc"));
+        setStatusConvite(StatusConviteEnum.GRUPO_EXCLUIDO.getStatus(), ids.get("idCirc"));
         circuloRepository.deleteById(ids.get("idCirc"));
     }
 
@@ -159,15 +162,6 @@ public class CirculoService {
         );
     }
 
-    public List<Arquivo> resgatarArquivos(UUID idCirculo) {
-        Circulo circulo = circuloRepository.findById(idCirculo).orElse(null);
-
-        if (circulo == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Circulo não encontrado");
-        }
-
-        return circulo.getArquivos();
-    }
 
     public List<CirculoMembrosDto> findByNomeCirculoContaining(String nomeCirculo, UUID idUser) {
         List<CirculoMembrosDto> listCompleta = getAllById(idUser);
@@ -210,22 +204,16 @@ public class CirculoService {
         return membros.isEmpty();
     }
 
-    public Boolean adicionarArquivoNoGrupo(UUID idCirculo, UUID idArquivo) {
-        Arquivo arquivo = arquivoService.encontrarArq(idArquivo);
-        Circulo circulo = pegarCirc(idCirculo);
-
-        circulo.getArquivos().add(arquivo);
-        circuloRepository.save(circulo);
-        return true;
-    }
-
     public Boolean convidarPessoa(UUID idCirculo, UUID idAnfitriao, String emailDoConvidado) {
         validacao(idCirculo, idAnfitriao);
-
         usuarioService.encontrarUsuarioPorEmail(emailDoConvidado);
-
-        conviteRepository.save(new Convite(idCirculo, idAnfitriao, emailDoConvidado));
-        return true;
+        int statusConvite = StatusConviteEnum.NAO_LIDO.getStatus();
+        Integer qtdConvitesNesteCirculo = conviteRepository.conferirDuplicidadeConvite(emailDoConvidado, idCirculo);
+        if (qtdConvitesNesteCirculo > 0){
+            statusConvite = StatusConviteEnum.CONVITE_DUPLICADO.getStatus();
+        }
+        conviteRepository.save(new Convite(idCirculo, idAnfitriao, emailDoConvidado, statusConvite));
+        return !StatusConviteEnum.CONVITE_DUPLICADO.getStatus().equals(statusConvite);
     }
 
     public int setStatusConvite(Integer status, UUID idCirculo){
@@ -239,12 +227,12 @@ public class CirculoService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Circulo não encontrado");
         }
 
-        if(acaoBotao.equals(1)){
-            conviteRepository.mudarStatusConvite(1, idCirculo, usuario.getEmail());
+        if(StatusConviteEnum.ACEITO.getStatus().equals(acaoBotao)){
+            conviteRepository.mudarStatusConvite(StatusConviteEnum.ACEITO.getStatus(), idCirculo, usuario.getEmail());
             return addMembro(new NovoMembroDto(idCirculo, idUsuario));
         }
 
-        conviteRepository.mudarStatusConvite(2, idCirculo, usuario.getEmail());
+        conviteRepository.mudarStatusConvite(StatusConviteEnum.REJEITADO.getStatus(), idCirculo, usuario.getEmail());
         return false;
     }
 

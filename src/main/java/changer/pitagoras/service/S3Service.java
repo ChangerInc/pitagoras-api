@@ -1,6 +1,8 @@
 package changer.pitagoras.service;
 
+import changer.pitagoras.repository.ArquivoRepository;
 import com.amazonaws.services.s3.AmazonS3;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
@@ -9,17 +11,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.List;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -29,7 +25,7 @@ public class S3Service implements ContratoS3{
 
     @Value("${bucketName}")
     private String bucketName;
-
+    @Autowired
     private final AmazonS3 s3;
 
     public S3Service(AmazonS3 s3) {
@@ -44,7 +40,7 @@ public class S3Service implements ContratoS3{
         int maxTries = 3;
         while(true) {
             try {
-                File arquivo1 = converterMultiPartParaArquivo(arquivo);
+                File arquivo1 = converterMultiPartParaFile(arquivo);
                 PutObjectResult putObjectResult = s3.putObject(bucketName, pasta+originalNomeArquivo, arquivo1);
                 return putObjectResult.getContentMd5();
             } catch (IOException e) {
@@ -55,8 +51,8 @@ public class S3Service implements ContratoS3{
     }
 
     @Override
-    public byte[] downloadArquivo(String nomeArquivo, UUID idUsuario) {
-        String pasta = idUsuario+"/";
+    public byte[] downloadArquivo(String nomeArquivo, UUID idUsuarioOuIdCirculo) {
+        String pasta = idUsuarioOuIdCirculo+"/";
         S3Object object = s3.getObject(bucketName, pasta+nomeArquivo);
         S3ObjectInputStream objectContent = object.getObjectContent();
         try {
@@ -79,7 +75,7 @@ public class S3Service implements ContratoS3{
 
     }
 
-    private File converterMultiPartParaArquivo(MultipartFile arquivo) throws IOException {
+    private File converterMultiPartParaFile(MultipartFile arquivo) throws IOException {
         File convertArquivo = new File(arquivo.getOriginalFilename());
         FileOutputStream fos = new FileOutputStream(convertArquivo);
         fos.write( arquivo.getBytes() );

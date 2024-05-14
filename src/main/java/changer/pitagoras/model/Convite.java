@@ -26,16 +26,15 @@ public class Convite {
     private String emailConvidado;
 
     private Integer statusConvite;
-    /* 0 = nao lido / 1 = aceito / 2 = rejeitado / 3 = grupo excluido */
 
     private LocalDateTime dataRegistro;
 
-    public Convite(UUID idCirculo, UUID idAnfitriao, String emailConvidado) {
+    public Convite(UUID idCirculo, UUID idAnfitriao, String emailConvidado, Integer statusConvite) {
         this.idRegistro = UUID.randomUUID();
         this.idCirculo = idCirculo;
         this.idAnfitriao = idAnfitriao;
         this.emailConvidado = emailConvidado;
-        this.statusConvite = 0;
+        this.statusConvite = statusConvite;
         this.dataRegistro = LocalDateTime.now();
     }
 }

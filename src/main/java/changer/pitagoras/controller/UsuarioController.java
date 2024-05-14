@@ -9,10 +9,7 @@ import changer.pitagoras.model.Arquivo;
 import changer.pitagoras.model.Circulo;
 import changer.pitagoras.model.Convite;
 import changer.pitagoras.model.Usuario;
-import changer.pitagoras.service.ArquivoService;
-import changer.pitagoras.service.ChangerService;
-import changer.pitagoras.service.S3Service;
-import changer.pitagoras.service.UsuarioService;
+import changer.pitagoras.service.*;
 import jakarta.validation.Valid;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +20,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +38,8 @@ public class UsuarioController {
     private ArquivoService arquivoService;
     @Autowired
     private S3Service s3Service;;
+    @Autowired
+    private CirculoService circuloService;;
 
     public UsuarioController() {
     }
@@ -85,21 +85,21 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(usuarioTokenDto);
     }
 
-    @PutMapping("/{uuid}")
+    @PutMapping("/{idUsuario}")
     public ResponseEntity<?> atualizarSenha(
-            @PathVariable UUID uuid,
+            @PathVariable UUID idUsuario,
             @RequestBody Map<String, String> senhas) {
 
         if (senhas == null || !senhas.containsKey("senhaAtual") || !senhas.containsKey("senhaNova")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        int result = usuarioService.update(senhas, uuid);
+        int result = usuarioService.update(senhas, idUsuario);
 
         HttpStatus httpStatus;
 
         if (result == 200) {
-            UsuarioNomeEmailDto usuario = usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(uuid));
+            UsuarioNomeEmailDto usuario = usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(idUsuario));
             httpStatus = HttpStatus.OK;
             return ResponseEntity.status(httpStatus).body(usuario);
         } else {
@@ -109,9 +109,9 @@ public class UsuarioController {
     }
 
 
-    @DeleteMapping("/{uuid}")
-    public ResponseEntity<Usuario> excluirUsuario(@PathVariable UUID uuid) {
-        Usuario encontrado = usuarioService.encontrarUsuario(uuid);
+    @DeleteMapping("/{idUsuario}")
+    public ResponseEntity<Usuario> excluirUsuario(@PathVariable UUID idUsuario) {
+        Usuario encontrado = usuarioService.encontrarUsuario(idUsuario);
         if (encontrado == null) {
             return ResponseEntity.status(404).build();
         }
@@ -119,10 +119,10 @@ public class UsuarioController {
         return ResponseEntity.status(200).build();
     }
 
-    @GetMapping("/home/{id}")
-    public ResponseEntity<UsuarioNomeEmailDto> chamarUsuarioPorIdSemSenha(@PathVariable UUID id) {
+    @GetMapping("/home/{idUsuario}")
+    public ResponseEntity<UsuarioNomeEmailDto> chamarUsuarioPorIdSemSenha(@PathVariable UUID idUsuario) {
         UsuarioNomeEmailDto usuario =
-                usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(id));
+                usuarioService.converterParaUsuarioSemSenhaDTO(usuarioService.encontrarUsuario(idUsuario));
         if (usuario == null) {
             return ResponseEntity.status(404).build();
         }
@@ -130,7 +130,7 @@ public class UsuarioController {
     }
 
     @SneakyThrows
-    @PatchMapping(value = "/foto/{codigo}")
+    @PatchMapping(value = "/foto/{idUsuario}")
     public ResponseEntity<String> patchFoto(@PathVariable UUID idUsuario, @RequestParam("file") MultipartFile novaFoto){
         s3Service.saveArquivo(novaFoto, idUsuario);
         String urlImagem = s3Service.obterUrlPublica(novaFoto.getOriginalFilename(), idUsuario.toString());
@@ -138,36 +138,13 @@ public class UsuarioController {
         return ResponseEntity.status(200).body(urlImagem);
     }
 
-    @GetMapping(value = "/foto/{codigo}", produces = "image/**")
-    public ResponseEntity<byte[]> getFoto(@PathVariable UUID codigo){
+    @GetMapping(value = "/foto/{idUsuario}")
+    public ResponseEntity<String> getFoto(@PathVariable UUID idUsuario){
 
-        if (usuarioService.fotoExiste(codigo))
-            return ResponseEntity.status(200).body(usuarioService.getFoto(codigo));
+        if (usuarioService.fotoExiste(idUsuario))
+            return ResponseEntity.status(200).body(usuarioService.getFoto(idUsuario));
 
         return ResponseEntity.status(404).build();
-    }
-
-    @PostMapping(value = "/arquivos/{codigo}")
-    public ResponseEntity<UUID> uploadArquivo(@PathVariable UUID codigo, @RequestParam("file") MultipartFile file){
-        return ResponseEntity.status(200).body(usuarioService.salvar(codigo, file).getIdArquivo());
-    }
-
-    @DeleteMapping("/arquivos/{codigo}/{idConversao}")
-    public ResponseEntity<Boolean> removerArquivo(@PathVariable UUID codigo, @PathVariable UUID idConversao){
-        System.out.println(codigo + "\n" + idConversao);
-        return usuarioService.deletarArquivo(codigo, idConversao)
-                ? ResponseEntity.status(200).build()
-                : ResponseEntity.status(404).build();
-    }
-
-    @GetMapping("/arquivos/{id}")
-    public ResponseEntity<List<Arquivo>> getArquivosById(
-            @PathVariable UUID id) {
-        List<Arquivo> arqs = usuarioService.resgatarArquivos(id);
-
-        return arqs.isEmpty()
-                ? ResponseEntity.status(204).build()
-                : ResponseEntity.status(200).body(arqs);
     }
 
     @GetMapping("/notificacoes/{email}")

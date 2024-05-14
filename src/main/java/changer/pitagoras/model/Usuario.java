@@ -37,7 +37,7 @@ public class Usuario {
             joinColumns = @JoinColumn(name = "usuario_fk"),
             inverseJoinColumns = @JoinColumn(name = "arquivo_fk")
     )
-    private List<Arquivo> arquivos;
+    private List<Arquivo> arquivos = new ArrayList<>();
     @JsonIgnore
     @ManyToMany(mappedBy = "membros")
     private List<Circulo> circulos;

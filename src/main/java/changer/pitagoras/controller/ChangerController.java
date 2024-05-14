@@ -63,4 +63,11 @@ public class ChangerController {
 
         return ResponseEntity.status(200).body(lista);
     }
+
+    @GetMapping("/echo")
+    public ResponseEntity<String> echo(){
+        String body = "ECHO!";
+        System.out.println("ECHO!");
+        return ResponseEntity.status(200).body(body);
+    }
 }

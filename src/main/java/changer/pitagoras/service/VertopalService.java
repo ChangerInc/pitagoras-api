@@ -145,11 +145,6 @@ public class VertopalService {
         ResponseEntity<byte[]> requisicao = restTemplate
                 .exchange(output.getString("url"), HttpMethod.POST, requestEntity, byte[].class);
         System.out.println(requisicao.getBody());
-
-        if (user != null) {
-            processarArquivo(requisicao.getBody());
-        }
-
         return requisicao.getBody();
     }
 
@@ -159,24 +154,5 @@ public class VertopalService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void processarArquivo(byte[] documento) {
-        // Processar resposta
-        result = jsonObject.getJSONObject("result");
-        output = result.getJSONObject("output");
-
-        // separar o nome da extensão do arquivo
-        arquivoService.separarExtensao(nomeExtensao);
-        usuarioService.salvar(
-                user,
-                arquivoService.salvar(
-                        new Arquivo(
-                                arquivoService.getNomeAux(),
-                                new BigDecimal(output.getLong("size")),
-                                arquivoService.getExtensaoAux()
-                        )
-                )
-        );
     }
 }

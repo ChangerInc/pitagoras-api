@@ -1,11 +1,9 @@
 package changer.pitagoras.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -14,7 +12,7 @@ import java.util.UUID;
 
 @Entity(name = "Arquivo")
 @NoArgsConstructor
-@Data
+@Getter
 public class Arquivo {
     @Id
     private UUID idArquivo;
@@ -22,16 +20,14 @@ public class Arquivo {
     private LocalDateTime criacao;
     private BigDecimal tamanho;
     private String extensao;
-    @JsonIgnore
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] bytesArquivo;
+    private String urlArquivo;
 
-    public Arquivo(String nome, BigDecimal tamanho, String extensao) {
+    public Arquivo(String nome, BigDecimal tamanho, String extensao, String urlArquivo) {
         idArquivo = UUID.randomUUID();
         this.nome = nome;
         this.criacao = LocalDateTime.now();
         this.tamanho = tamanho;
         this.extensao = extensao;
+        this.urlArquivo = urlArquivo;
     }
 }
