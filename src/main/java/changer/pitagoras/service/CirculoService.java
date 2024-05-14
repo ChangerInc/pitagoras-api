@@ -213,7 +213,7 @@ public class CirculoService {
             statusConvite = StatusConviteEnum.CONVITE_DUPLICADO.getStatus();
         }
         conviteRepository.save(new Convite(idCirculo, idAnfitriao, emailDoConvidado, statusConvite));
-        return true;
+        return !StatusConviteEnum.CONVITE_DUPLICADO.getStatus().equals(statusConvite);
     }
 
     public int setStatusConvite(Integer status, UUID idCirculo){
