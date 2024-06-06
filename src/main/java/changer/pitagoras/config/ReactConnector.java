@@ -15,7 +15,7 @@ public class ReactConnector {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://changer.serveftp.com/"); // Permita o acesso a partir do seu domínio React
-        config.addAllowedOrigin("http://3.218.90.124/"); // Permita o acesso a partir do seu domínio React
+        config.addAllowedOrigin("http:/44.217.150.7/"); // Permita o acesso a partir do seu domínio React
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
