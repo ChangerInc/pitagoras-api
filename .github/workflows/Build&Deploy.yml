@@ -1,0 +1,64 @@
+name: CI pride
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build with Maven
+        run: mvn -B package -DskipTests
+
+  docker:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: emedej/pride-actions:latest
+
+      - name: Pull Docker image
+        run: docker pull emedej/pride-actions:latest
+
+      - name: Stop Docker container
+        run: docker stop pride-actions || true
+
+      - name: Remove Docker container
+        run: docker rm pride-actions || true
+
+      - name: Run Docker container with no security profile
+        run: docker run --name pride-actions -d -p 8080:8080 emedej/pride-actions:latest

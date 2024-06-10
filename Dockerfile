@@ -1,18 +1,15 @@
-# Use a lightweight Java base image
-FROM openjdk:21-slim
+FROM maven:3-openjdk-17 AS builder
 
-# Set working directory
-WORKDIR /home/ubuntu/pitagoras-api/
+WORKDIR /build
 
-# Copy your application JAR file
-COPY target/*.jar app.jar
+COPY . .
 
-# Expose port where your application listens (replace 8080 with your actual port)
-EXPOSE 8080
+RUN mvn clean package -DskipTests -Dcheckstyle.skip=true
 
-EXPOSE 443
+FROM openjdk:17-slim
 
-EXPOSE 80
+WORKDIR /app
 
-# Command to run your Spring Boot application
+COPY --from=builder /build/target/*.jar /app/app.jar
+
 CMD ["java", "-jar", "app.jar"]
