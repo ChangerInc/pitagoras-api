@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}  
+  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}  
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -39,26 +43,34 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build and push
-        uses: docker/build-push-action@v5
+      - name: Build and push image to Docker Hub
+        run: |
+          docker build -t leonardopradosptech/pitagoras:latest .
+          docker push leonardopradosptech/pitagoras:latest
+
+      - uses: appleboy/ssh-action@v1.0.3
         with:
-          context: .
-          push: true
-          tags: emedej/pride-actions:latest
+          host: "44.217.150.7"
+          username: "ubuntu"
+          key: ${{ secrets.CHANGER }}
+          script: |
+            cd /home/ubuntu/
+            ssh -i Changer.pem ubuntu@10.0.0.231
+            sudo docker pull leonardopradosptech/pitagoras
+            sudo docker run -p 80:80 -p 8080:8080 -p 443:443 -d leonardopradosptech/pitagoras
 
-      - name: Pull Docker image
-        run: docker pull emedej/pride-actions:latest
-
-      - name: Stop Docker container
-        run: docker stop pride-actions || true
-
-      - name: Remove Docker container
-        run: docker rm pride-actions || true
-
-      - name: Run Docker container with no security profile
-        run: docker run --name pride-actions -d -p 8080:8080 emedej/pride-actions:latest
+      - uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: "44.217.150.7"
+          username: "ubuntu"
+          key: ${{ secrets.CHANGER }}
+          script: |
+            cd /home/ubuntu/
+            ssh -i Changer.pem ubuntu@10.0.0.224
+            sudo docker pull leonardopradosptech/pitagoras
+            sudo docker run -p 80:80 -p 8080:8080 -p 443:443 -d leonardopradosptech/pitagoras
