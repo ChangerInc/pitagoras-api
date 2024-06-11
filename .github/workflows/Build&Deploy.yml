@@ -23,8 +23,8 @@ jobs:
 
       - name: Build and push image to Docker Hub
         run: |
-          docker build -t leonardopradosptech/changer:latest .
-          docker push leonardopradosptech/changer:latest
+          docker build -t leonardopradosptech/pitagoras:latest .
+          docker push leonardopradosptech/pitagoras:latest
 
       - uses: appleboy/ssh-action@v1.0.3
         with:
