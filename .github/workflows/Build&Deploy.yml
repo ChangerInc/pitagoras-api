@@ -1,48 +1,21 @@
-name: CI pride
+name: Build, Push to Docker Hub, and Deploy Nginx Website
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}  
   DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}  
 
 jobs:
-  build:
+  BuildAndDeploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+      - uses: actions/checkout@v3
 
-      - name: Build with Maven
-        run: mvn -B package -DskipTests
-
-  docker:
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Docker Hub
+      - name: Login to Docker Hub 
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -50,8 +23,8 @@ jobs:
 
       - name: Build and push image to Docker Hub
         run: |
-          docker build -t leonardopradosptech/pitagoras:latest .
-          docker push leonardopradosptech/pitagoras:latest
+          docker build -t leonardopradosptech/changer:latest .
+          docker push leonardopradosptech/changer:latest
 
       - uses: appleboy/ssh-action@v1.0.3
         with:
