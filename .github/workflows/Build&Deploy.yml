@@ -44,4 +44,3 @@ jobs:
            # ssh -i Changer.pem ubuntu@10.0.0.224
             # sudo docker pull leonardopradosptech/pitagoras
             # sudo docker run -p 80:80 -p 8080:8080 -p 443:443 -d leonardopradosptech/pitagoras
-
